@@ -5,6 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
+import Team from "./pages/Team";
+import Fixtures from "./pages/Fixtures";
+import NRLD from "./pages/NRLD";
+import Sponsors from "./pages/Sponsors";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +22,11 @@ const App = () => (
         <Navigation />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/fixtures" element={<Fixtures />} />
+          <Route path="/nrld" element={<NRLD />} />
+          <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
