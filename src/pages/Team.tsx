@@ -78,11 +78,19 @@ const Team = () => {
                   <CardHeader className="flex flex-col items-center">
                     <div className="flex items-center justify-center w-full mb-4 space-x-8">
                       <div className="flex flex-col items-center">
-                        <img 
-                          src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                          alt="British Flag"
-                          className="w-8 h-5 object-cover rounded"
-                        />
+                        {player.countryHeritage === "GB" ? (
+                          <img 
+                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                            alt="British Flag"
+                            className="w-8 h-5 object-cover rounded"
+                          />
+                        ) : (
+                          <img 
+                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                            alt="British Flag"
+                            className="w-8 h-5 object-cover rounded"
+                          />
+                        )}
                         <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
                       </div>
                       
@@ -94,7 +102,15 @@ const Team = () => {
                       </Avatar>
 
                       <div className="flex flex-col items-center">
-                        <Flag className={`w-8 h-8 ${player.countryHeritage === "DE" ? "text-german-gold" : "text-blue-600"}`} />
+                        {player.countryHeritage === "GB" ? (
+                          <img 
+                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                            alt="British Flag"
+                            className="w-8 h-5 object-cover rounded"
+                          />
+                        ) : (
+                          <Flag className="w-8 h-8 text-german-gold" />
+                        )}
                         {player.nationalTeamNumber && (
                           <span className="text-sm mt-2 text-gray-300">{player.nationalTeamNumber}</span>
                         )}
