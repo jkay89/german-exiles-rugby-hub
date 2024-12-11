@@ -1,28 +1,42 @@
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Flag } from "lucide-react";
 
 interface PlayerProfile {
+  teamNumber: string;
   name: string;
   position: string;
-  sponsor: string;
-  image?: string;
+  countryHeritage: "DE" | "GB";
+  nationalTeamNumber?: string;
 }
 
 const Team = () => {
-  // Placeholder data - replace with actual player data
   const players: PlayerProfile[] = [
-    {
-      name: "Player 1",
-      position: "Prop",
-      sponsor: "Sponsor A",
-    },
-    {
-      name: "Player 2",
-      position: "Hooker",
-      sponsor: "Sponsor B",
-    },
-    // Add more players as needed
+    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204" },
+    { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
+    { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
+    { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
+    { teamNumber: "#005", name: "George Wood", position: "Centre", countryHeritage: "DE" },
+    { teamNumber: "#006", name: "Will Waring", position: "Second Row", countryHeritage: "DE" },
+    { teamNumber: "#007", name: "Anthony Hackman", position: "Prop", countryHeritage: "DE" },
+    { teamNumber: "#008", name: "Connor Hampson", position: "Prop", countryHeritage: "DE" },
+    { teamNumber: "#009", name: "Alex Land", position: "Prop", countryHeritage: "GB" },
+    { teamNumber: "#010", name: "Andy Hoggins", position: "Loose Forward", countryHeritage: "DE" },
+    { teamNumber: "#011", name: "Joe Wood", position: "Dummy Half", countryHeritage: "GB" },
+    { teamNumber: "#012", name: "Jamie Billsborough", position: "Hooker", countryHeritage: "GB" },
+    { teamNumber: "#013", name: "Brad Billsborough", position: "Half Back", countryHeritage: "DE" },
+    { teamNumber: "#014", name: "Ryan Hudson", position: "Prop", countryHeritage: "GB" },
+    { teamNumber: "#015", name: "Zach Burke", position: "Centre", countryHeritage: "GB" },
+    { teamNumber: "#016", name: "Eddie Briggs", position: "Second Row", countryHeritage: "DE" },
+    { teamNumber: "#017", name: "Eoin Bowie", position: "Second Row", countryHeritage: "DE" },
+    { teamNumber: "#018", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE" },
+    { teamNumber: "#019", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
+    { teamNumber: "#020", name: "Iain Bowie", position: "Coach", countryHeritage: "GB" },
+    { teamNumber: "#021", name: "Kieron Billsborough", position: "Coach", countryHeritage: "GB" },
+    { teamNumber: "#022", name: "Callum Corey", position: "Second Row", countryHeritage: "DE" },
+    { teamNumber: "#023", name: "Shaun Smith", position: "Centre", countryHeritage: "DE" },
+    { teamNumber: "#024", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB" },
   ];
 
   return (
@@ -42,7 +56,7 @@ const Team = () => {
         </div>
         <div className="container mx-auto px-6 relative z-10">
           <h1 className="text-4xl font-bold mb-4 text-german-gold">Our Squad</h1>
-          <p className="text-gray-300 max-w-2xl mx-auto">
+          <p className="text-gray-300 max-w-2xl mx-auto mb-12">
             Meet the players representing German Exiles Rugby League. Our team consists of German-eligible players based in the UK, 
             all committed to growing the sport in Germany.
           </p>
@@ -61,17 +75,33 @@ const Team = () => {
               >
                 <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
                   <CardHeader className="flex flex-col items-center">
-                    <Avatar className="w-32 h-32 mb-4">
-                      <AvatarImage src={player.image} alt={player.name} />
-                      <AvatarFallback className="bg-german-red text-white text-2xl">
-                        {player.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="flex items-center justify-center w-full mb-4 space-x-8">
+                      <div className="flex flex-col items-center">
+                        <Flag className={`w-8 h-8 ${player.countryHeritage === "DE" ? "text-german-red" : "text-blue-600"}`} />
+                        <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
+                      </div>
+                      
+                      <Avatar className="w-24 h-24">
+                        <AvatarImage src={player.image} alt={player.name} />
+                        <AvatarFallback className="bg-german-red text-white text-2xl">
+                          {player.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex flex-col items-center">
+                        <Flag className={`w-8 h-8 ${player.countryHeritage === "DE" ? "text-german-gold" : "text-blue-600"}`} />
+                        {player.nationalTeamNumber && (
+                          <span className="text-sm mt-2 text-gray-300">{player.nationalTeamNumber}</span>
+                        )}
+                      </div>
+                    </div>
                     <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
                     <p className="text-german-red font-semibold">{player.position}</p>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <p className="text-sm text-german-gold">Sponsored by {player.sponsor}</p>
+                    <p className="text-sm text-german-gold">
+                      Heritage: {player.countryHeritage === "DE" ? "German" : "British"}
+                    </p>
                   </CardContent>
                 </Card>
               </motion.div>
