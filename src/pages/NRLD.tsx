@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Flag, Trophy, Users, ArrowUp } from "lucide-react";
+import { Flag, Trophy, Users, ArrowUp, Calendar } from "lucide-react";
 
 const NRLD = () => {
   const sections = [
@@ -25,6 +25,27 @@ const NRLD = () => {
     }
   ];
 
+  const upcomingFixtures = [
+    {
+      date: "May 15, 2024",
+      event: "Bundesliga Round 1",
+      teams: "Berlin vs Hamburg",
+      location: "Berlin Sportpark"
+    },
+    {
+      date: "June 1, 2024",
+      event: "International Friendly",
+      teams: "Germany vs Netherlands",
+      location: "Cologne Stadium"
+    },
+    {
+      date: "June 15, 2024",
+      event: "Bundesliga Round 2",
+      teams: "Munich vs Frankfurt",
+      location: "Munich Arena"
+    }
+  ];
+
   return (
     <div className="pt-16 min-h-screen bg-black">
       <div className="relative">
@@ -45,7 +66,7 @@ const NRLD = () => {
             National Rugby League Deutschland
           </motion.h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
             {sections.map((section, index) => (
               <motion.div
                 key={section.title}
@@ -62,6 +83,42 @@ const NRLD = () => {
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="max-w-6xl mx-auto"
+          >
+            <div className="bg-gray-900 border border-german-red rounded-lg p-6">
+              <div className="flex items-center mb-6">
+                <Calendar className="h-8 w-8 text-german-gold mr-4" />
+                <h2 className="text-2xl font-bold text-white">Upcoming Fixtures</h2>
+              </div>
+              <div className="space-y-4">
+                {upcomingFixtures.map((fixture, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 + (index * 0.2) }}
+                    className="border-l-4 border-german-gold p-4 bg-gray-800 rounded-r-lg hover:bg-gray-700 transition-colors duration-300"
+                  >
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+                      <div>
+                        <h3 className="text-white font-bold">{fixture.event}</h3>
+                        <p className="text-german-red">{fixture.teams}</p>
+                      </div>
+                      <div className="mt-2 md:mt-0 text-right">
+                        <p className="text-gray-300">{fixture.date}</p>
+                        <p className="text-gray-400 text-sm">{fixture.location}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

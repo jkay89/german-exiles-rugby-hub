@@ -40,10 +40,21 @@ const AboutUs = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold text-german-gold text-center mb-12"
+            className="text-4xl font-bold text-german-gold text-center mb-8"
           >
             About German Exiles RL
           </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-3xl mx-auto mb-16 text-center"
+          >
+            <p className="text-gray-300 text-lg leading-relaxed">
+              The German Exiles Rugby League serves as a vital bridge between heritage players and the German national rugby league system. Our mission is to identify, develop, and nurture talent while strengthening the foundations of rugby league in Germany. Through our comprehensive approach to player development, networking, and community building, we aim to contribute significantly to the growth and success of German Rugby League on both domestic and international stages.
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {missions.map((mission, index) => (
