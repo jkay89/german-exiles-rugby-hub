@@ -9,6 +9,7 @@ interface PlayerProfile {
   position: string;
   countryHeritage: "DE" | "GB";
   nationalTeamNumber?: string;
+  image?: string; // Added optional image property
 }
 
 const Team = () => {
