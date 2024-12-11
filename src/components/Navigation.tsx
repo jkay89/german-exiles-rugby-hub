@@ -8,6 +8,7 @@ const Navigation = () => {
 
   const links = [
     { href: "/", label: "Home" },
+    { href: "/about", label: "About Us" },
     { href: "/team", label: "Team" },
     { href: "/fixtures", label: "Fixtures" },
     { href: "/nrld", label: "NRLD" },
