@@ -9,7 +9,7 @@ interface PlayerProfile {
   position: string;
   countryHeritage: "DE" | "GB";
   nationalTeamNumber?: string;
-  image?: string; // Added optional image property
+  image?: string;
 }
 
 const Team = () => {
@@ -78,7 +78,11 @@ const Team = () => {
                   <CardHeader className="flex flex-col items-center">
                     <div className="flex items-center justify-center w-full mb-4 space-x-8">
                       <div className="flex flex-col items-center">
-                        <Flag className={`w-8 h-8 ${player.countryHeritage === "DE" ? "text-german-red" : "text-blue-600"}`} />
+                        <img 
+                          src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                          alt="British Flag"
+                          className="w-8 h-5 object-cover rounded"
+                        />
                         <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
                       </div>
                       
