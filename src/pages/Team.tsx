@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Flag } from "lucide-react";
 
 interface PlayerProfile {
   teamNumber: string;
@@ -96,7 +95,7 @@ const Team = () => {
                       <div className="flex flex-col items-center">
                         {player.countryHeritage === "DE" ? (
                           <img 
-                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                            src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
                             alt="German Flag"
                             className="w-8 h-5 object-cover rounded"
                           />
