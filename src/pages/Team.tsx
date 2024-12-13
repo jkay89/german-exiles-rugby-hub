@@ -78,19 +78,11 @@ const Team = () => {
                   <CardHeader className="flex flex-col items-center">
                     <div className="flex items-center justify-center w-full mb-4 space-x-8">
                       <div className="flex flex-col items-center">
-                        {player.countryHeritage === "GB" ? (
-                          <img 
-                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                            alt="British Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        ) : (
-                          <img 
-                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                            alt="British Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        )}
+                        <img 
+                          src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png"
+                          alt="German Exiles Logo"
+                          className="w-8 h-8 object-contain"
+                        />
                         <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
                       </div>
                       
@@ -102,18 +94,22 @@ const Team = () => {
                       </Avatar>
 
                       <div className="flex flex-col items-center">
-                        {player.countryHeritage === "GB" ? (
+                        {player.countryHeritage === "DE" ? (
+                          <img 
+                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                            alt="German Flag"
+                            className="w-8 h-5 object-cover rounded"
+                          />
+                        ) : (
                           <img 
                             src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
                             alt="British Flag"
                             className="w-8 h-5 object-cover rounded"
                           />
-                        ) : (
-                          <Flag className="w-8 h-8 text-german-gold" />
                         )}
-                        {player.nationalTeamNumber && (
-                          <span className="text-sm mt-2 text-gray-300">{player.nationalTeamNumber}</span>
-                        )}
+                        <span className="text-sm mt-2 text-gray-300">
+                          {player.nationalTeamNumber || "N/A"}
+                        </span>
                       </div>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
