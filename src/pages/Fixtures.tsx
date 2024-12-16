@@ -7,16 +7,16 @@ const Fixtures = () => {
 
   const fixtures = [
     {
-      date: "2024-03-15",
-      opponent: "Team A",
-      location: "Home",
-      time: "14:00",
+      date: "2025-04-19",
+      opponent: "Rotterdam 9s",
+      location: "Rotterdam, Netherlands",
+      time: "TBC",
     },
     {
-      date: "2024-03-22",
-      opponent: "Team B",
-      location: "Away",
-      time: "15:30",
+      date: "2025-09-04",
+      opponent: "German Domestic XIII",
+      location: "Munich, Germany",
+      time: "TBC",
     },
   ];
 

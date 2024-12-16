@@ -1,19 +1,6 @@
 import { motion } from "framer-motion";
 
 const Sponsors = () => {
-  const sponsors = [
-    {
-      name: "Sponsor 1",
-      tier: "Gold",
-      logo: "/placeholder.svg",
-    },
-    {
-      name: "Sponsor 2",
-      tier: "Silver",
-      logo: "/placeholder.svg",
-    },
-  ];
-
   return (
     <div className="pt-16 min-h-screen bg-black">
       <motion.section
@@ -37,25 +24,18 @@ const Sponsors = () => {
 
       <section className="py-16 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sponsors.map((sponsor, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300 flex flex-col items-center"
-              >
-                <img
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  className="w-48 h-48 object-contain mb-4"
-                />
-                <h3 className="text-xl font-bold mb-2 text-white">{sponsor.name}</h3>
-                <p className="text-german-gold">{sponsor.tier} Sponsor</p>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-black border border-german-red rounded-lg p-12 hover:border-german-gold transition-colors duration-300 text-center"
+          >
+            <h2 className="text-3xl font-bold text-german-gold mb-4">Coming Soon</h2>
+            <p className="text-gray-300 text-lg">
+              We are currently finalizing partnerships with our sponsors. 
+              Check back soon for updates!
+            </p>
+          </motion.div>
         </div>
       </section>
 
