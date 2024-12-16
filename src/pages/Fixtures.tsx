@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
+import { format } from "date-fns";
 
 const Fixtures = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -67,7 +68,7 @@ const Fixtures = () => {
                   >
                     <p className="font-bold text-white">{fixture.opponent}</p>
                     <p className="text-sm text-gray-300">
-                      {fixture.date} at {fixture.time}
+                      {format(new Date(fixture.date), "dd MMMM yyyy")} at {fixture.time}
                     </p>
                     <p className="text-sm text-german-gold">{fixture.location}</p>
                   </motion.div>
