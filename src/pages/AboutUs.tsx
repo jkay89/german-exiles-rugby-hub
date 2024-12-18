@@ -10,8 +10,8 @@ const AboutUs = () => {
     },
     {
       icon: <Globe className="h-12 w-12 text-german-red" />,
-      title: "Bundesliga Development",
-      description: "Supporting and strengthening the German Bundesliga setup through collaboration and resource sharing"
+      title: "Bundesleague Development",
+      description: "Supporting and strengthening the German Bundesleague setup through collaboration and resource sharing"
     },
     {
       icon: <Handshake className="h-12 w-12 text-german-gold" />,
