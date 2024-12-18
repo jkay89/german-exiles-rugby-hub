@@ -28,7 +28,7 @@ const NRLD = () => {
   const upcomingFixtures = [
     {
       date: "May 15, 2024",
-      event: "Bundesliga Round 1",
+      event: "Bundesleague Round 1",
       teams: "Berlin vs Hamburg",
       location: "Berlin Sportpark"
     },
@@ -40,7 +40,7 @@ const NRLD = () => {
     },
     {
       date: "June 15, 2024",
-      event: "Bundesliga Round 2",
+      event: "Bundesleague Round 2",
       teams: "Munich vs Frankfurt",
       location: "Munich Arena"
     }
