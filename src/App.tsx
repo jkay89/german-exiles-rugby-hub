@@ -11,6 +11,7 @@ import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
 import Contact from "./pages/Contact";
+import News from "./pages/News";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/nrld" element={<NRLD />} />
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/news" element={<News />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -11,6 +11,7 @@ const Navigation = () => {
     { href: "/about", label: "About Us" },
     { href: "/team", label: "Team" },
     { href: "/fixtures", label: "Fixtures" },
+    { href: "/news", label: "News" },
     { href: "/nrld", label: "NRLD" },
     { href: "/sponsors", label: "Sponsors" },
     { href: "/contact", label: "Contact" },
