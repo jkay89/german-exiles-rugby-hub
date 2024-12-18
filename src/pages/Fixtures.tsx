@@ -14,7 +14,7 @@ const Fixtures = () => {
       time: "TBC",
     },
     {
-      date: "2025-09-04",
+      date: "2025-09-06",
       opponent: "German Domestic XIII",
       location: "Munich, Germany",
       time: "TBC",
