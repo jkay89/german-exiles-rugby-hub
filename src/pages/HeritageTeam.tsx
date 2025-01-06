@@ -41,6 +41,7 @@ const HeritageTeam = () => {
     { teamNumber: "#026", name: "Arron Williams", position: "Second Row", countryHeritage: "DE" },
     { teamNumber: "#027", name: "Jordan Williams", position: "Prop", countryHeritage: "DE" },
     { teamNumber: "#028", name: "Louis Beattie", position: "Loose Forward", countryHeritage: "DE" },
+    { teamNumber: "#029", name: "Michael Knight", position: "Prop", countryHeritage: "GB" },
   ];
 
   return (
