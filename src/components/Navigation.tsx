@@ -35,8 +35,9 @@ const Navigation = () => {
       // Insert Teams dropdown after About Us
       if (index === 1) {
         return (
-          <div key="nav-group" className="flex items-center space-x-4">
+          <>
             <Link
+              key={link.href}
               to={link.href}
               className={`${
                 isActive(link.href)
@@ -74,7 +75,7 @@ const Navigation = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </>
         );
       }
       
