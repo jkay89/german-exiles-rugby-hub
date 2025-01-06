@@ -30,6 +30,73 @@ const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
   const isTeamActive = teamLinks.some(link => isActive(link.href));
 
+  const renderDesktopLinks = () => {
+    return links.map((link, index) => {
+      // Insert Teams dropdown after About Us
+      if (index === 1) {
+        return (
+          <div key="nav-group" className="flex items-center space-x-4">
+            <Link
+              to={link.href}
+              className={`${
+                isActive(link.href)
+                  ? "bg-german-red text-white"
+                  : "text-gray-300 hover:bg-gray-900 hover:text-white"
+              } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200`}
+            >
+              {link.label}
+            </Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`${
+                  isTeamActive
+                    ? "bg-german-red text-white"
+                    : "text-gray-300 hover:bg-gray-900 hover:text-white"
+                } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1`}
+              >
+                Teams <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-black border border-gray-700">
+                {teamLinks.map((teamLink) => (
+                  <DropdownMenuItem key={teamLink.href} className="focus:bg-gray-800">
+                    <Link
+                      to={teamLink.href}
+                      className={`${
+                        isActive(teamLink.href)
+                          ? "text-german-red"
+                          : "text-gray-300"
+                      } w-full px-2 py-1 text-sm`}
+                    >
+                      {teamLink.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      }
+      
+      // Skip rendering About Us again since it's handled above
+      if (index === 1) return null;
+
+      return (
+        <Link
+          key={link.href}
+          to={link.href}
+          className={`${
+            isActive(link.href)
+              ? "bg-german-red text-white"
+              : "text-gray-300 hover:bg-gray-900 hover:text-white"
+          } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200`}
+        >
+          {link.label}
+        </Link>
+      );
+    });
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-black text-white z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,48 +115,7 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`${
-                    isActive(link.href)
-                      ? "bg-german-red text-white"
-                      : "text-gray-300 hover:bg-gray-900 hover:text-white"
-                  } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              
-              {/* Teams Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={`${
-                    isTeamActive
-                      ? "bg-german-red text-white"
-                      : "text-gray-300 hover:bg-gray-900 hover:text-white"
-                  } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1`}
-                >
-                  Teams <ChevronDown className="h-4 w-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-black border border-gray-700">
-                  {teamLinks.map((link) => (
-                    <DropdownMenuItem key={link.href} className="focus:bg-gray-800">
-                      <Link
-                        to={link.href}
-                        className={`${
-                          isActive(link.href)
-                            ? "text-german-red"
-                            : "text-gray-300"
-                        } w-full px-2 py-1 text-sm`}
-                      >
-                        {link.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {renderDesktopLinks()}
             </div>
           </div>
 
