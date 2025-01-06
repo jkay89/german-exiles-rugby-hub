@@ -37,6 +37,9 @@ const Team = () => {
     { teamNumber: "#022", name: "Callum Corey", position: "Second Row", countryHeritage: "DE" },
     { teamNumber: "#023", name: "Shaun Smith", position: "Centre", countryHeritage: "DE" },
     { teamNumber: "#024", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB" },
+    { teamNumber: "#025", name: "Michael MacDonald", position: "Half Back", countryHeritage: "DE" },
+    { teamNumber: "#026", name: "Arron Williams", position: "Second Row", countryHeritage: "DE" },
+    { teamNumber: "#027", name: "Jordan Williams", position: "Prop", countryHeritage: "DE" },
   ];
 
   return (
