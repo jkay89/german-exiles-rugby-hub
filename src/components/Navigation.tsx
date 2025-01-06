@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +15,6 @@ const Navigation = () => {
   const links = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About Us" },
-    { href: "/heritage-team", label: "Heritage Team" },
-    { href: "/community-team", label: "Community Team" },
     { href: "/fixtures", label: "Fixtures" },
     { href: "/news", label: "News" },
     { href: "/nrld", label: "NRLD" },
@@ -18,7 +22,13 @@ const Navigation = () => {
     { href: "/contact", label: "Contact" },
   ];
 
+  const teamLinks = [
+    { href: "/heritage-team", label: "Heritage Team" },
+    { href: "/community-team", label: "Community Team" },
+  ];
+
   const isActive = (path: string) => location.pathname === path;
+  const isTeamActive = teamLinks.some(link => isActive(link.href));
 
   return (
     <nav className="fixed top-0 w-full bg-black text-white z-50">
@@ -51,6 +61,35 @@ const Navigation = () => {
                   {link.label}
                 </Link>
               ))}
+              
+              {/* Teams Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={`${
+                    isTeamActive
+                      ? "bg-german-red text-white"
+                      : "text-gray-300 hover:bg-gray-900 hover:text-white"
+                  } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1`}
+                >
+                  Teams <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-black border border-gray-700">
+                  {teamLinks.map((link) => (
+                    <DropdownMenuItem key={link.href} className="focus:bg-gray-800">
+                      <Link
+                        to={link.href}
+                        className={`${
+                          isActive(link.href)
+                            ? "text-german-red"
+                            : "text-gray-300"
+                        } w-full px-2 py-1 text-sm`}
+                      >
+                        {link.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -79,6 +118,21 @@ const Navigation = () => {
                     ? "bg-german-red text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
                 } block px-3 py-2 rounded-md text-base font-medium`}
+                onClick={() => setIsOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {/* Mobile Team Links */}
+            {teamLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`${
+                  isActive(link.href)
+                    ? "bg-german-red text-white"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } block px-3 py-2 rounded-md text-base font-medium ml-4`}
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
