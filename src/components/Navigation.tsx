@@ -9,7 +9,8 @@ const Navigation = () => {
   const links = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About Us" },
-    { href: "/team", label: "Team" },
+    { href: "/heritage-team", label: "Heritage Team" },
+    { href: "/community-team", label: "Community Team" },
     { href: "/fixtures", label: "Fixtures" },
     { href: "/news", label: "News" },
     { href: "/nrld", label: "NRLD" },

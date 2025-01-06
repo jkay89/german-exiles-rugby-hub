@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
-import Team from "./pages/Team";
+import HeritageTeam from "./pages/HeritageTeam";
+import CommunityTeam from "./pages/CommunityTeam";
 import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
@@ -25,7 +26,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/team" element={<Team />} />
+          <Route path="/heritage-team" element={<HeritageTeam />} />
+          <Route path="/community-team" element={<CommunityTeam />} />
           <Route path="/fixtures" element={<Fixtures />} />
           <Route path="/nrld" element={<NRLD />} />
           <Route path="/sponsors" element={<Sponsors />} />

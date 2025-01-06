@@ -11,36 +11,8 @@ interface PlayerProfile {
   image?: string;
 }
 
-const Team = () => {
-  const players: PlayerProfile[] = [
-    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204" },
-    { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
-    { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#005", name: "George Wood", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#006", name: "Will Waring", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#007", name: "Anthony Hackman", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#008", name: "Connor Hampson", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#009", name: "Alex Land", position: "Prop", countryHeritage: "GB" },
-    { teamNumber: "#010", name: "Andy Hoggins", position: "Loose Forward", countryHeritage: "DE" },
-    { teamNumber: "#011", name: "Joe Wood", position: "Dummy Half", countryHeritage: "GB" },
-    { teamNumber: "#012", name: "Jamie Billsborough", position: "Hooker", countryHeritage: "GB" },
-    { teamNumber: "#013", name: "Brad Billsborough", position: "Half Back", countryHeritage: "DE" },
-    { teamNumber: "#014", name: "Ryan Hudson", position: "Prop", countryHeritage: "GB" },
-    { teamNumber: "#015", name: "Zach Burke", position: "Centre", countryHeritage: "GB" },
-    { teamNumber: "#016", name: "Eddie Briggs", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#017", name: "Eoin Bowie", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#018", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE" },
-    { teamNumber: "#019", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#020", name: "Iain Bowie", position: "Coach", countryHeritage: "GB" },
-    { teamNumber: "#021", name: "Kieron Billsborough", position: "Coach", countryHeritage: "GB" },
-    { teamNumber: "#022", name: "Callum Corey", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#023", name: "Shaun Smith", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#024", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB" },
-    { teamNumber: "#025", name: "Michael MacDonald", position: "Half Back", countryHeritage: "DE" },
-    { teamNumber: "#026", name: "Arron Williams", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#027", name: "Jordan Williams", position: "Prop", countryHeritage: "DE" },
-  ];
+const CommunityTeam = () => {
+  const players: PlayerProfile[] = [];
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -58,10 +30,10 @@ const Team = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Our Squad</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold">Community Team</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
-            Meet the players representing German Exiles Rugby League. Our team consists of German-eligible players based in the UK, 
-            all committed to growing the sport in Germany.
+            Our community team represents the growing rugby league community in Germany. 
+            This page will be updated with player profiles soon.
           </p>
         </div>
       </motion.section>
@@ -132,4 +104,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default CommunityTeam;
