@@ -13,13 +13,11 @@ const Staff = () => {
   const staffMembers: StaffMember[] = [
     { 
       name: "Iain Bowie",
-      role: "Head Coach",
-      contact: "coach@germanexiles.com"
+      role: "Head Coach"
     },
     {
       name: "Kieron Billsborough",
-      role: "Assistant Coach",
-      contact: "assistant.coach@germanexiles.com"
+      role: "Assistant Coach"
     }
   ];
 
