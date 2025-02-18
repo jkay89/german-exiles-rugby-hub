@@ -13,7 +13,7 @@ interface PlayerProfile {
 
 const HeritageTeam = () => {
   const players: PlayerProfile[] = [
-    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png" },
+    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/7cdbd50d-8320-4db0-9303-53445bf0e348.png" },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE", image: "/lovable-uploads/2c677fd8-f43a-45a8-b0a1-491ba2d9eae4.png" },
     { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
     { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
