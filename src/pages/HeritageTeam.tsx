@@ -2,9 +2,6 @@
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { removeBackground, loadImage } from "@/utils/imageUtils";
-import { useToast } from "@/components/ui/use-toast";
 
 interface PlayerProfile {
   teamNumber: string;
@@ -16,9 +13,6 @@ interface PlayerProfile {
 }
 
 const HeritageTeam = () => {
-  const { toast } = useToast();
-  const [processedImages, setProcessedImages] = useState<Record<string, string>>({});
-
   const players: PlayerProfile[] = [
     { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png" },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
@@ -51,36 +45,6 @@ const HeritageTeam = () => {
     { teamNumber: "#029", name: "Michael Knight", position: "Prop", countryHeritage: "GB" },
     { teamNumber: "#030", name: "James Adams", position: "Second Row", countryHeritage: "DE" },
   ];
-
-  useEffect(() => {
-    const processImages = async () => {
-      for (const player of players) {
-        if (player.image && !processedImages[player.image]) {
-          try {
-            const response = await fetch(player.image);
-            const blob = await response.blob();
-            const img = await loadImage(blob);
-            const processedBlob = await removeBackground(img);
-            const processedUrl = URL.createObjectURL(processedBlob);
-            
-            setProcessedImages(prev => ({
-              ...prev,
-              [player.image!]: processedUrl
-            }));
-          } catch (error) {
-            console.error(`Error processing image for ${player.name}:`, error);
-            toast({
-              title: "Image Processing Error",
-              description: `Could not remove background for ${player.name}'s image`,
-              variant: "destructive",
-            });
-          }
-        }
-      }
-    };
-
-    processImages();
-  }, [players]);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -129,10 +93,7 @@ const HeritageTeam = () => {
                       </div>
                       
                       <Avatar className="w-24 h-24">
-                        <AvatarImage 
-                          src={player.image ? processedImages[player.image] || player.image : undefined} 
-                          alt={player.name} 
-                        />
+                        <AvatarImage src={player.image} alt={player.name} />
                         <AvatarFallback className="bg-german-red text-white text-2xl">
                           {player.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
