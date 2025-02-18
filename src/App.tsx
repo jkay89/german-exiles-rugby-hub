@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import HeritageTeam from "./pages/HeritageTeam";
 import CommunityTeam from "./pages/CommunityTeam";
+import Staff from "./pages/Staff";
 import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
@@ -28,6 +30,7 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/heritage-team" element={<HeritageTeam />} />
           <Route path="/community-team" element={<CommunityTeam />} />
+          <Route path="/staff" element={<Staff />} />
           <Route path="/fixtures" element={<Fixtures />} />
           <Route path="/nrld" element={<NRLD />} />
           <Route path="/sponsors" element={<Sponsors />} />

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -25,6 +26,7 @@ const Navigation = () => {
   const teamLinks = [
     { href: "/heritage-team", label: "Heritage Team" },
     { href: "/community-team", label: "Community Team" },
+    { href: "/staff", label: "Staff" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
