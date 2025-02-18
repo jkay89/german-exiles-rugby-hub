@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -12,6 +11,7 @@ interface PlayerProfile {
   countryHeritage: "DE" | "GB";
   nationalTeamNumber?: string;
   image?: string;
+  sponsors?: string[];
 }
 
 const HeritageTeam = () => {
@@ -19,7 +19,18 @@ const HeritageTeam = () => {
   const [processedImages, setProcessedImages] = useState<Record<string, string>>({});
 
   const players: PlayerProfile[] = [
-    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png" },
+    { 
+      teamNumber: "#001", 
+      name: "Jay Kay", 
+      position: "Outside Backs", 
+      countryHeritage: "DE", 
+      nationalTeamNumber: "#204", 
+      image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png",
+      sponsors: [
+        "/lovable-uploads/ec0861b7-d266-4334-aeff-fcb00e3c916e.png",
+        "/lovable-uploads/3766a9db-3b01-4c39-a8a7-1c3f2f59981b.png"
+      ]
+    },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
     { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
     { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
@@ -160,7 +171,23 @@ const HeritageTeam = () => {
                         </span>
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
+                    <div className="flex items-center justify-center space-x-4">
+                      {player.sponsors?.[0] && (
+                        <img 
+                          src={player.sponsors[0]}
+                          alt="Sponsor 1"
+                          className="h-6 object-contain"
+                        />
+                      )}
+                      <h3 className="text-xl font-bold text-white">{player.name}</h3>
+                      {player.sponsors?.[1] && (
+                        <img 
+                          src={player.sponsors[1]}
+                          alt="Sponsor 2"
+                          className="h-6 object-contain"
+                        />
+                      )}
+                    </div>
                     <p className="text-german-red font-semibold">{player.position}</p>
                   </CardHeader>
                   <CardContent className="text-center">
