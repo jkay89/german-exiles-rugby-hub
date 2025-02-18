@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
@@ -32,8 +31,6 @@ const HeritageTeam = () => {
     { teamNumber: "#017", name: "Eoin Bowie", position: "Second Row", countryHeritage: "DE" },
     { teamNumber: "#018", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE" },
     { teamNumber: "#019", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#020", name: "Iain Bowie", position: "Coach", countryHeritage: "GB" },
-    { teamNumber: "#021", name: "Kieron Billsborough", position: "Coach", countryHeritage: "GB" },
     { teamNumber: "#022", name: "Callum Corey", position: "Second Row", countryHeritage: "DE" },
     { teamNumber: "#023", name: "Shaun Smith", position: "Centre", countryHeritage: "DE" },
     { teamNumber: "#024", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB" },
