@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -127,7 +128,7 @@ const HeritageTeam = () => {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                  <CardHeader className="flex flex-col items-center">
+                  <CardHeader className="flex flex-col items-center space-y-4">
                     <div className="flex items-center justify-center w-full mb-4 space-x-8">
                       <div className="flex flex-col items-center">
                         <img 
@@ -171,24 +172,31 @@ const HeritageTeam = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-center space-x-4">
+                    
+                    <div className="grid grid-cols-3 items-center gap-4 w-full">
                       {player.sponsors?.[0] && (
-                        <img 
-                          src={player.sponsors[0]}
-                          alt="Sponsor 1"
-                          className="h-6 object-contain"
-                        />
+                        <div className="flex justify-end">
+                          <img 
+                            src={player.sponsors[0]}
+                            alt="Sponsor 1"
+                            className="h-48 object-contain"
+                          />
+                        </div>
                       )}
-                      <h3 className="text-xl font-bold text-white">{player.name}</h3>
+                      <div className="flex flex-col items-center">
+                        <h3 className="text-xl font-bold text-white text-center">{player.name}</h3>
+                        <p className="text-german-red font-semibold">{player.position}</p>
+                      </div>
                       {player.sponsors?.[1] && (
-                        <img 
-                          src={player.sponsors[1]}
-                          alt="Sponsor 2"
-                          className="h-6 object-contain"
-                        />
+                        <div className="flex justify-start">
+                          <img 
+                            src={player.sponsors[1]}
+                            alt="Sponsor 2"
+                            className="h-48 object-contain"
+                          />
+                        </div>
                       )}
                     </div>
-                    <p className="text-german-red font-semibold">{player.position}</p>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-sm text-german-gold">
