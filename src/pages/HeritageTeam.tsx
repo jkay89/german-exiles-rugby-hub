@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -13,7 +14,7 @@ interface PlayerProfile {
 
 const HeritageTeam = () => {
   const players: PlayerProfile[] = [
-    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204" },
+    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png" },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
     { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
     { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
