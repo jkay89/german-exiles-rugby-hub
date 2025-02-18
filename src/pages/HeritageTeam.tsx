@@ -1,8 +1,5 @@
-
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { removeBackground, loadImage } from "@/utils/imageUtils";
 import { useToast } from "@/components/ui/use-toast";
 
 interface PlayerProfile {
@@ -17,7 +14,6 @@ interface PlayerProfile {
 
 const HeritageTeam = () => {
   const { toast } = useToast();
-  const [processedImages, setProcessedImages] = useState<Record<string, string>>({});
 
   const players: PlayerProfile[] = [
     { 
@@ -62,36 +58,6 @@ const HeritageTeam = () => {
     { teamNumber: "#029", name: "Michael Knight", position: "Prop", countryHeritage: "GB" },
     { teamNumber: "#030", name: "James Adams", position: "Second Row", countryHeritage: "DE" },
   ];
-
-  useEffect(() => {
-    const processImages = async () => {
-      for (const player of players) {
-        if (player.image && !processedImages[player.image]) {
-          try {
-            const response = await fetch(player.image);
-            const blob = await response.blob();
-            const img = await loadImage(blob);
-            const processedBlob = await removeBackground(img);
-            const processedUrl = URL.createObjectURL(processedBlob);
-            
-            setProcessedImages(prev => ({
-              ...prev,
-              [player.image!]: processedUrl
-            }));
-          } catch (error) {
-            console.error(`Error processing image for ${player.name}:`, error);
-            toast({
-              title: "Image Processing Error",
-              description: `Could not remove background for ${player.name}'s image`,
-              variant: "destructive",
-            });
-          }
-        }
-      }
-    };
-
-    processImages();
-  }, [players]);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -142,7 +108,7 @@ const HeritageTeam = () => {
                       <div className="w-24 h-24 flex items-center justify-center">
                         {player.image ? (
                           <img 
-                            src={processedImages[player.image] || player.image}
+                            src={player.image}
                             alt={player.name}
                             className="w-full h-full object-contain"
                           />
