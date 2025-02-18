@@ -1,5 +1,9 @@
+
 import { motion } from "framer-motion";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { removeBackground, loadImage } from "@/utils/imageUtils";
 import { useToast } from "@/components/ui/use-toast";
 
 interface PlayerProfile {
@@ -9,25 +13,14 @@ interface PlayerProfile {
   countryHeritage: "DE" | "GB";
   nationalTeamNumber?: string;
   image?: string;
-  sponsors?: string[];
 }
 
 const HeritageTeam = () => {
   const { toast } = useToast();
+  const [processedImages, setProcessedImages] = useState<Record<string, string>>({});
 
   const players: PlayerProfile[] = [
-    { 
-      teamNumber: "#001", 
-      name: "Jay Kay", 
-      position: "Outside Backs", 
-      countryHeritage: "DE", 
-      nationalTeamNumber: "#204", 
-      image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png",
-      sponsors: [
-        "/lovable-uploads/ec0861b7-d266-4334-aeff-fcb00e3c916e.png",
-        "/lovable-uploads/3766a9db-3b01-4c39-a8a7-1c3f2f59981b.png"
-      ]
-    },
+    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/ed51f6ed-0dc5-4ecf-b2ba-bfc97899d0e3.png" },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE" },
     { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
     { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
@@ -58,6 +51,36 @@ const HeritageTeam = () => {
     { teamNumber: "#029", name: "Michael Knight", position: "Prop", countryHeritage: "GB" },
     { teamNumber: "#030", name: "James Adams", position: "Second Row", countryHeritage: "DE" },
   ];
+
+  useEffect(() => {
+    const processImages = async () => {
+      for (const player of players) {
+        if (player.image && !processedImages[player.image]) {
+          try {
+            const response = await fetch(player.image);
+            const blob = await response.blob();
+            const img = await loadImage(blob);
+            const processedBlob = await removeBackground(img);
+            const processedUrl = URL.createObjectURL(processedBlob);
+            
+            setProcessedImages(prev => ({
+              ...prev,
+              [player.image!]: processedUrl
+            }));
+          } catch (error) {
+            console.error(`Error processing image for ${player.name}:`, error);
+            toast({
+              title: "Image Processing Error",
+              description: `Could not remove background for ${player.name}'s image`,
+              variant: "destructive",
+            });
+          }
+        }
+      }
+    };
+
+    processImages();
+  }, [players]);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -94,7 +117,7 @@ const HeritageTeam = () => {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                  <CardHeader className="flex flex-col items-center space-y-4">
+                  <CardHeader className="flex flex-col items-center">
                     <div className="flex items-center justify-center w-full mb-4 space-x-8">
                       <div className="flex flex-col items-center">
                         <img 
@@ -105,19 +128,15 @@ const HeritageTeam = () => {
                         <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
                       </div>
                       
-                      <div className="w-24 h-24 flex items-center justify-center">
-                        {player.image ? (
-                          <img 
-                            src={player.image}
-                            alt={player.name}
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-2xl">
-                            {player.name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                        )}
-                      </div>
+                      <Avatar className="w-24 h-24">
+                        <AvatarImage 
+                          src={player.image ? processedImages[player.image] || player.image : undefined} 
+                          alt={player.name} 
+                        />
+                        <AvatarFallback className="bg-german-red text-white text-2xl">
+                          {player.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
 
                       <div className="flex flex-col items-center">
                         {player.countryHeritage === "DE" ? (
@@ -138,31 +157,8 @@ const HeritageTeam = () => {
                         </span>
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-3 items-center gap-4 w-full">
-                      {player.sponsors?.[0] && (
-                        <div className="flex justify-end">
-                          <img 
-                            src={player.sponsors[0]}
-                            alt="Sponsor 1"
-                            className="h-48 object-contain"
-                          />
-                        </div>
-                      )}
-                      <div className="flex flex-col items-center">
-                        <h3 className="text-xl font-bold text-white text-center">{player.name}</h3>
-                        <p className="text-german-red font-semibold">{player.position}</p>
-                      </div>
-                      {player.sponsors?.[1] && (
-                        <div className="flex justify-start">
-                          <img 
-                            src={player.sponsors[1]}
-                            alt="Sponsor 2"
-                            className="h-48 object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
+                    <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
+                    <p className="text-german-red font-semibold">{player.position}</p>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-sm text-german-gold">
