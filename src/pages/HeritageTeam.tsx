@@ -1,6 +1,5 @@
 
 import { motion } from "framer-motion";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { removeBackground, loadImage } from "@/utils/imageUtils";
@@ -128,15 +127,19 @@ const HeritageTeam = () => {
                         <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
                       </div>
                       
-                      <Avatar className="w-24 h-24">
-                        <AvatarImage 
-                          src={player.image ? processedImages[player.image] || player.image : undefined} 
-                          alt={player.name} 
-                        />
-                        <AvatarFallback className="bg-german-red text-white text-2xl">
-                          {player.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="w-24 h-24 flex items-center justify-center">
+                        {player.image ? (
+                          <img 
+                            src={processedImages[player.image] || player.image}
+                            alt={player.name}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-2xl">
+                            {player.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        )}
+                      </div>
 
                       <div className="flex flex-col items-center">
                         {player.countryHeritage === "DE" ? (
