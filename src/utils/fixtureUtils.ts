@@ -18,9 +18,21 @@ export const getFixtures = (): Fixture[] => {
       time: "TBC",
     },
     {
+      date: "2025-06-06",
+      opponent: "Aussie/Kiwi Exiles",
+      location: "Wasps FC, Twyford Avenue Sports Ground, Twyford Ave, London W3 9QA",
+      time: "TBC",
+    },
+    {
+      date: "2025-08-23",
+      opponent: "Royal Engineers RL",
+      location: "Walton Sports Club, Walton Recreation Ground/Shay La WF2 6LA",
+      time: "TBC",
+    },
+    {
       date: "2025-09-06",
-      opponent: "German Domestic XIII",
-      location: "Munich, Germany",
+      opponent: "Presidents XIII",
+      location: "Würzburg, Bayern, Deutschland",
       time: "TBC",
     },
   ];
