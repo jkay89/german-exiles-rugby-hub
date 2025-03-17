@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Trophy, Users, Globe, Handshake } from "lucide-react";
 
@@ -36,7 +37,7 @@ const AboutUs = () => {
           />
         </div>
         
-        <div className="relative z-10 container mx-auto px-6 py-16">
+        <div className="relative z-10 container mx-auto px-6 py-16 text-center">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -26,7 +27,7 @@ const Contact = () => {
             className="w-full h-full object-contain"
           />
         </div>
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-4xl font-bold mb-4 text-german-gold">Contact Us</h1>
           <p className="text-gray-300">Get in touch with German Exiles Rugby League</p>
         </div>

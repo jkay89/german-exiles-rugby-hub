@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -29,7 +30,7 @@ const CommunityTeam = () => {
             className="w-full h-full object-contain"
           />
         </div>
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-4xl font-bold mb-4 text-german-gold">Community Team</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
             Our community team represents the growing rugby league community in Walton, Wakefield, 

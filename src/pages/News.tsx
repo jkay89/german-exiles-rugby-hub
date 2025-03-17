@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Newspaper } from "lucide-react";
 
@@ -10,7 +11,7 @@ const News = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-6 py-12"
       >
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col items-center gap-4 mb-8 text-center">
           <Newspaper className="h-8 w-8 text-german-gold" />
           <h1 className="text-4xl font-bold text-white">Latest News</h1>
         </div>

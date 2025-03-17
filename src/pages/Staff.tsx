@@ -50,7 +50,7 @@ const Staff = () => {
             className="w-full h-full object-contain"
           />
         </div>
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-4xl font-bold mb-4 text-german-gold">Staff</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
             Meet the dedicated staff members who work behind the scenes to support and develop German Exiles Rugby League.
