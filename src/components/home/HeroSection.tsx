@@ -22,11 +22,11 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
         />
       </div>
       <div className="relative z-20 h-full flex items-center">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
             German Exiles <span className="text-german-gold">Rugby League</span>
           </h1>
-          <p className="text-xl text-gray-200 max-w-2xl">
+          <p className="text-xl text-gray-200 mx-auto">
             Bridging German talent worldwide through Rugby League excellence
           </p>
         </div>
