@@ -64,6 +64,7 @@ const translations = {
     
     // NRLD page
     "nrld_title": "National Rugby League Deutschland",
+    "nrld_description": "The NRLD is the governing body for Rugby League in Germany, dedicated to growing and developing the sport across the country. Working alongside international partners, we aim to establish Rugby League as a prominent sport in German sporting culture.",
     "upcoming_fixtures": "Upcoming Fixtures",
     "fixtures_announced_soon": "Fixtures will be announced soon. Check back later for updates.",
     "competitions": "Competitions",
@@ -72,12 +73,10 @@ const translations = {
     "development_text": "Our development programs focus on player pathways, coach education, and referee development. We work closely with clubs and regions to ensure sustainable growth of the sport.",
     "future_vision": "Future Vision",
     "future_text": "The NRLD is committed to establishing Germany as a competitive nation in international Rugby League, with aims to participate in major tournaments and develop a strong domestic competition structure.",
-    "nrld_description": "The NRLD is the governing body for Rugby League in Germany, dedicated to growing and developing the sport across the country. Working alongside international partners, we aim to establish Rugby League as a prominent sport in German sporting culture.",
     
     // Fixtures page
     "fixtures_results": "Fixtures & Results",
     "fixtures_description": "View our upcoming games, past results, and player statistics",
-    "upcoming_fixtures": "Upcoming Fixtures",
     "match_results": "Match Results",
     "no_results_yet": "No Results Yet",
     "no_matches_text": "The German Exiles haven't played any official matches yet. Stay tuned for our upcoming fixtures!",
@@ -133,6 +132,7 @@ const translations = {
     
     // NRLD page
     "nrld_title": "National Rugby League Deutschland",
+    "nrld_description": "Die NRLD ist der Dachverband für Rugby League in Deutschland und widmet sich dem Wachstum und der Entwicklung des Sports im ganzen Land. In Zusammenarbeit mit internationalen Partnern wollen wir Rugby League als prominenten Sport in der deutschen Sportkultur etablieren.",
     "upcoming_fixtures": "Kommende Spiele",
     "fixtures_announced_soon": "Spielpläne werden in Kürze bekannt gegeben. Schauen Sie später für Updates vorbei.",
     "competitions": "Wettbewerbe",
@@ -141,12 +141,10 @@ const translations = {
     "development_text": "Unsere Entwicklungsprogramme konzentrieren sich auf Spielerwege, Trainerausbildung und Schiedsrichterentwicklung. Wir arbeiten eng mit Vereinen und Regionen zusammen, um ein nachhaltiges Wachstum des Sports zu gewährleisten.",
     "future_vision": "Zukunftsvision",
     "future_text": "Die NRLD ist bestrebt, Deutschland als wettbewerbsfähige Nation im internationalen Rugby League zu etablieren, mit dem Ziel, an großen Turnieren teilzunehmen und eine starke inländische Wettbewerbsstruktur zu entwickeln.",
-    "nrld_description": "Die NRLD ist der Dachverband für Rugby League in Deutschland und widmet sich dem Wachstum und der Entwicklung des Sports im ganzen Land. In Zusammenarbeit mit internationalen Partnern wollen wir Rugby League als prominenten Sport in der deutschen Sportkultur etablieren.",
     
     // Fixtures page
     "fixtures_results": "Spielplan & Ergebnisse",
     "fixtures_description": "Sehen Sie unsere kommenden Spiele, vergangene Ergebnisse und Spielerstatistiken",
-    "upcoming_fixtures": "Kommende Spiele",
     "match_results": "Spielergebnisse",
     "no_results_yet": "Noch keine Ergebnisse",
     "no_matches_text": "Die German Exiles haben noch keine offiziellen Spiele absolviert. Bleiben Sie dran für unsere kommenden Spiele!",
