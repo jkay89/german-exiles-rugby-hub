@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Sponsors = () => {
   return (
@@ -81,7 +82,65 @@ const Sponsors = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
+      <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold text-german-gold mb-4">Gold Sponsor</h2>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-black border border-german-red rounded-lg p-8 hover:border-german-gold transition-colors duration-300"
+          >
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <a 
+                href="https://goldenguardvpn.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full md:w-1/3 hover:opacity-90 transition-opacity"
+              >
+                <img 
+                  src="/lovable-uploads/5dc48408-4d0a-448f-93fe-ee8f8babb02d.png" 
+                  alt="Golden Guard VPN Logo"
+                  className="w-full h-auto"
+                />
+              </a>
+              <div className="w-full md:w-2/3">
+                <h3 className="text-2xl font-bold text-german-gold mb-4">Golden Guard VPN</h3>
+                <p className="text-gray-300 mb-6">
+                  Golden Guard VPN is a premium virtual private network service dedicated to providing secure, 
+                  private, and unrestricted internet access to users worldwide. With military-grade encryption, 
+                  a strict no-logs policy, and servers in multiple countries, Golden Guard VPN ensures that your 
+                  online activities remain protected from surveillance and cyber threats. Their commitment to user 
+                  privacy, seamless streaming capabilities, and exceptional customer support makes them a trusted 
+                  choice for individuals and businesses seeking reliable online security solutions.
+                </p>
+                <a 
+                  href="https://goldenguardvpn.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button 
+                    variant="default" 
+                    className="bg-german-red hover:bg-red-700 text-white"
+                  >
+                    Visit Website
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-5">
           <img 
             src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png" 
