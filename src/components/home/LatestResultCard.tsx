@@ -1,5 +1,5 @@
 
-import { Trophy } from "lucide-react";
+import { Trophy, Star, CalendarCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface LatestResultCardProps {
@@ -12,11 +12,42 @@ const LatestResultCard = ({ delay = 0.4 }: LatestResultCardProps) => {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay }}
-      className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300"
+      whileHover={{ scale: 1.03 }}
+      className="bg-gradient-to-br from-gray-900 to-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-all duration-300 shadow-lg relative overflow-hidden h-full"
     >
-      <Trophy className="h-12 w-12 text-german-gold mb-4" />
-      <h3 className="text-xl font-bold mb-2 text-white">Latest Result</h3>
-      <p className="text-gray-300">Coming Soon</p>
+      <div className="absolute -right-10 -top-10 w-40 h-40 bg-german-red/10 rounded-full blur-2xl"></div>
+      <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-german-gold/10 rounded-full blur-2xl"></div>
+      
+      <div className="flex items-center gap-3 mb-4">
+        <Trophy className="h-8 w-8 text-german-gold" />
+        <h3 className="text-2xl font-bold text-white">Latest Result</h3>
+      </div>
+
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-5 transition-all">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: delay + 0.2 }}
+        >
+          <p className="text-gray-300 mb-3">Match results coming soon!</p>
+          
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4 text-german-gold" />
+              <p className="text-gray-400">Check back for our latest matches</p>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Star className="h-4 w-4 text-german-gold" />
+              <p className="text-gray-400">Player highlights and statistics</p>
+            </div>
+          </div>
+          
+          <div className="mt-4 pt-2 border-t border-gray-700">
+            <p className="text-german-gold font-medium">Season starting soon!</p>
+          </div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };
