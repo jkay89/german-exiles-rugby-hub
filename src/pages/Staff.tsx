@@ -1,23 +1,37 @@
 
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Clipboard, Users, Stethoscope } from "lucide-react";
 
 interface StaffMember {
   name: string;
   role: string;
   image?: string;
   contact?: string;
+  icon?: React.ReactNode;
 }
 
 const Staff = () => {
   const staffMembers: StaffMember[] = [
     { 
       name: "Iain Bowie",
-      role: "Head Coach"
+      role: "Head Coach",
+      icon: <Clipboard className="h-8 w-8 text-german-gold" />
     },
     {
       name: "Kieron Billsborough",
-      role: "Assistant Coach"
+      role: "Assistant Coach",
+      icon: <Users className="h-8 w-8 text-german-gold" />
+    },
+    {
+      name: "Conrad Tetley",
+      role: "Assistant Coach",
+      icon: <Users className="h-8 w-8 text-german-gold" />
+    },
+    {
+      name: "Tom Hughes",
+      role: "Head Physio",
+      icon: <Stethoscope className="h-8 w-8 text-german-gold" />
     }
   ];
 
@@ -56,7 +70,7 @@ const Staff = () => {
               >
                 <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
                   <CardHeader className="flex flex-col items-center">
-                    <div className="w-32 h-32 mb-4">
+                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden flex items-center justify-center bg-gray-800">
                       {member.image ? (
                         <img 
                           src={member.image}
@@ -64,8 +78,12 @@ const Staff = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-3xl">
-                          {member.name.split(' ').map(n => n[0]).join('')}
+                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                          {member.icon || (
+                            <div className="bg-german-red flex items-center justify-center text-white text-3xl w-full h-full">
+                              {member.name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
