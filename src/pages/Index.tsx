@@ -1,6 +1,23 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Trophy, Users } from "lucide-react";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselPrevious, 
+  CarouselNext 
+} from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
+
+interface SponsorLogo {
+  id: string;
+  name: string;
+  logo: string;
+  website: string | null;
+  tier: "platinum" | "gold" | "silver";
+}
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -8,6 +25,38 @@ const Index = () => {
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  // Sponsor data sourced from the sponsors page
+  const sponsorLogos: SponsorLogo[] = [
+    {
+      id: "safetech",
+      name: "Safetech Innovations",
+      logo: "/lovable-uploads/f79f5262-9a43-411e-85bf-4800b6fc4f3e.png",
+      website: "https://www.safetechinnovations.com",
+      tier: "platinum"
+    },
+    {
+      id: "goldenguard",
+      name: "Golden Guard VPN",
+      logo: "/lovable-uploads/5dc48408-4d0a-448f-93fe-ee8f8babb02d.png",
+      website: "https://goldenguardvpn.com",
+      tier: "gold"
+    },
+    {
+      id: "beaubijou",
+      name: "Beau Bijou Design",
+      logo: "/lovable-uploads/f46f89dd-c0de-4241-8bcb-893623c26c05.png",
+      website: "https://beaubijoudesign.com/",
+      tier: "silver"
+    },
+    {
+      id: "forjosef",
+      name: "ForJosef",
+      logo: "/lovable-uploads/86e094ab-21e7-4af4-8964-005499f0b682.png",
+      website: null,
+      tier: "silver"
+    }
+  ];
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -108,17 +157,74 @@ const Index = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h2 className="text-3xl font-bold text-center mb-12 text-german-gold">Our Sponsors</h2>
-          <div className="flex flex-wrap justify-center items-center gap-8">
-            <div className="w-32 h-32 bg-gray-900 rounded-lg flex items-center justify-center border border-german-red hover:border-german-gold transition-colors duration-300">
-              <span className="text-gray-400">Sponsor 1</span>
-            </div>
-            <div className="w-32 h-32 bg-gray-900 rounded-lg flex items-center justify-center border border-german-red hover:border-german-gold transition-colors duration-300">
-              <span className="text-gray-400">Sponsor 2</span>
-            </div>
-            <div className="w-32 h-32 bg-gray-900 rounded-lg flex items-center justify-center border border-german-red hover:border-german-gold transition-colors duration-300">
-              <span className="text-gray-400">Sponsor 3</span>
-            </div>
+          <h2 className="text-3xl font-bold text-center mb-6 text-german-gold">Our Sponsors</h2>
+          
+          {/* Sponsor Logo Carousel */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="max-w-5xl mx-auto mb-12"
+          >
+            <Carousel 
+              opts={{
+                align: "start",
+                loop: true,
+                skipSnaps: true,
+                duration: 20,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="py-4">
+                {sponsorLogos.map((sponsor) => (
+                  <CarouselItem key={sponsor.id} className={cn(
+                    "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4", 
+                    "flex items-center justify-center"
+                  )}>
+                    <div className="p-2 h-full w-full">
+                      <div className={cn(
+                        "h-32 w-full bg-gray-900 rounded-lg flex items-center justify-center p-4",
+                        "border", 
+                        sponsor.tier === "platinum" ? "border-white" : 
+                        sponsor.tier === "gold" ? "border-german-gold" : "border-german-red",
+                        "hover:border-german-gold transition-colors duration-300"
+                      )}>
+                        {sponsor.website ? (
+                          <a 
+                            href={sponsor.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="w-full h-full flex items-center justify-center"
+                          >
+                            <img 
+                              src={sponsor.logo}
+                              alt={`${sponsor.name} Logo`}
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          </a>
+                        ) : (
+                          <img 
+                            src={sponsor.logo}
+                            alt={`${sponsor.name} Logo`}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex justify-center mt-4">
+                <CarouselPrevious className="relative inset-0 translate-y-0 left-0 mr-2" />
+                <CarouselNext className="relative inset-0 translate-y-0 right-0 ml-2" />
+              </div>
+            </Carousel>
+          </motion.div>
+
+          <div className="text-center">
+            <a href="/sponsors" className="text-german-gold hover:text-german-red transition-colors">
+              View All Sponsors
+            </a>
           </div>
         </div>
       </section>
