@@ -8,14 +8,7 @@ import {
   CarouselPrevious, 
   CarouselNext 
 } from "@/components/ui/carousel";
-
-interface SponsorLogo {
-  id: string;
-  name: string;
-  logo: string;
-  website: string | null;
-  tier: "platinum" | "gold" | "silver";
-}
+import { SponsorLogo } from "./types";
 
 interface SponsorCarouselProps {
   sponsorLogos: SponsorLogo[];
@@ -53,6 +46,7 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
             <CarouselContent className="py-4">
               {sponsorLogos.map((sponsor) => (
                 <CarouselItem key={sponsor.id} className={cn(
+                  sponsor.tier === "affiliate" ? "basis-full sm:basis-1/3 md:basis-1/4 lg:basis-1/5" : 
                   "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4", 
                   "flex items-center justify-center"
                 )}>
@@ -61,7 +55,9 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
                       "h-32 w-full bg-gray-900 rounded-lg flex items-center justify-center p-4",
                       "border", 
                       sponsor.tier === "platinum" ? "border-white" : 
-                      sponsor.tier === "gold" ? "border-german-gold" : "border-german-red",
+                      sponsor.tier === "gold" ? "border-german-gold" : 
+                      sponsor.tier === "silver" ? "border-german-red" :
+                      "border-gray-600",
                       "hover:border-german-gold transition-colors duration-300"
                     )}>
                       {sponsor.website ? (
@@ -74,14 +70,20 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
                           <img 
                             src={sponsor.logo}
                             alt={`${sponsor.name} Logo`}
-                            className="max-h-full max-w-full object-contain"
+                            className={cn(
+                              "max-w-full object-contain",
+                              sponsor.tier === "affiliate" ? "max-h-16" : "max-h-full"
+                            )}
                           />
                         </a>
                       ) : (
                         <img 
                           src={sponsor.logo}
                           alt={`${sponsor.name} Logo`}
-                          className="max-h-full max-w-full object-contain"
+                          className={cn(
+                            "max-w-full object-contain",
+                            sponsor.tier === "affiliate" ? "max-h-16" : "max-h-full"
+                          )}
                         />
                       )}
                     </div>

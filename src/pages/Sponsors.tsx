@@ -4,6 +4,7 @@ import SponsorHeader from "@/components/sponsors/SponsorHeader";
 import PlatinumSponsors from "@/components/sponsors/PlatinumSponsors";
 import GoldSponsors from "@/components/sponsors/GoldSponsors";
 import SilverSponsors from "@/components/sponsors/SilverSponsors";
+import AffiliateSponsors from "@/components/sponsors/AffiliateSponsors";
 import BecomeSponsor from "@/components/sponsors/BecomeSponsor";
 
 const Sponsors = () => {
@@ -13,6 +14,7 @@ const Sponsors = () => {
       <PlatinumSponsors />
       <GoldSponsors />
       <SilverSponsors />
+      <AffiliateSponsors />
       <BecomeSponsor />
     </div>
   );

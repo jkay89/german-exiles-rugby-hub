@@ -9,6 +9,7 @@ interface SponsorCardProps {
   websiteUrl?: string;
   delay?: number;
   isMajorSponsor?: boolean;
+  isAffiliate?: boolean;
 }
 
 const SponsorCard = ({ 
@@ -17,7 +18,8 @@ const SponsorCard = ({
   logoSrc, 
   websiteUrl, 
   delay = 0.2,
-  isMajorSponsor = true
+  isMajorSponsor = true,
+  isAffiliate = false
 }: SponsorCardProps) => {
   return (
     <motion.div
@@ -37,7 +39,10 @@ const SponsorCard = ({
             <img 
               src={logoSrc} 
               alt={`${name} Logo`}
-              className={`w-full h-auto ${!isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''}`}
+              className={`w-full h-auto ${
+                isAffiliate ? 'max-h-24 object-contain mx-auto' : 
+                !isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''
+              }`}
             />
           </a>
         ) : (
@@ -45,13 +50,16 @@ const SponsorCard = ({
             <img 
               src={logoSrc} 
               alt={`${name} Logo`}
-              className={`w-full h-auto ${!isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''}`}
+              className={`w-full h-auto ${
+                isAffiliate ? 'max-h-24 object-contain mx-auto' : 
+                !isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''
+              }`}
             />
           </div>
         )}
         <div className={`${isMajorSponsor ? 'w-full md:w-2/3' : 'text-center'}`}>
           <h3 className={`text-${isMajorSponsor ? '2xl' : 'xl'} font-bold text-german-gold mb-${isMajorSponsor ? '4' : '2'}`}>{name}</h3>
-          <p className={`text-gray-300 ${!isMajorSponsor ? 'text-sm' : ''} mb-${isMajorSponsor ? '6' : '4'}`}>
+          <p className={`text-gray-300 ${isAffiliate ? 'text-xs' : !isMajorSponsor ? 'text-sm' : ''} mb-${isMajorSponsor ? '6' : '4'}`}>
             {description}
           </p>
           {websiteUrl && (
@@ -63,7 +71,7 @@ const SponsorCard = ({
               <Button 
                 variant="default" 
                 className="bg-german-red hover:bg-red-700 text-white"
-                size={isMajorSponsor ? "default" : "sm"}
+                size={isMajorSponsor ? "default" : isAffiliate ? "sm" : "sm"}
               >
                 Visit Website
               </Button>
