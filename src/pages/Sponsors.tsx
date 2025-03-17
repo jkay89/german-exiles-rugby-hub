@@ -1,4 +1,6 @@
+
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 const Sponsors = () => {
   return (
@@ -28,13 +30,53 @@ const Sponsors = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-black border border-german-red rounded-lg p-12 hover:border-german-gold transition-colors duration-300 text-center"
+            className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-german-gold mb-4">Coming Soon</h2>
-            <p className="text-gray-300 text-lg">
-              We are currently finalizing partnerships with our sponsors. 
-              Check back soon for updates!
-            </p>
+            <h2 className="text-3xl font-bold text-german-gold mb-4">Main Sponsor</h2>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-black border border-german-red rounded-lg p-8 hover:border-german-gold transition-colors duration-300"
+          >
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <a 
+                href="https://www.safetechinnovations.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full md:w-1/3 hover:opacity-90 transition-opacity"
+              >
+                <img 
+                  src="/lovable-uploads/f79f5262-9a43-411e-85bf-4800b6fc4f3e.png" 
+                  alt="Safetech Innovations Logo"
+                  className="w-full h-auto"
+                />
+              </a>
+              <div className="w-full md:w-2/3">
+                <h3 className="text-2xl font-bold text-german-gold mb-4">Safetech Innovations Global Services Ltd</h3>
+                <p className="text-gray-300 mb-6">
+                  Safetech Innovations is a global cybersecurity company dedicated to protecting organizations from 
+                  cyber threats and providing cutting-edge security solutions. Founded by a team of professionals with 
+                  extensive experience in information security, Safetech is committed to excellence, innovation, and 
+                  client satisfaction, offering comprehensive services including security monitoring, penetration testing, 
+                  and cybersecurity consulting to help businesses worldwide defend against evolving digital threats.
+                </p>
+                <a 
+                  href="https://www.safetechinnovations.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button 
+                    variant="default" 
+                    className="bg-german-red hover:bg-red-700 text-white"
+                  >
+                    Visit Website
+                  </Button>
+                </a>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
