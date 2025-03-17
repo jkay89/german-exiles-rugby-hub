@@ -1,11 +1,14 @@
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface HeroSectionProps {
   isLoaded: boolean;
 }
 
 const HeroSection = ({ isLoaded }: HeroSectionProps) => {
+  const { t } = useLanguage();
+  
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -24,10 +27,10 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
       <div className="relative z-20 h-full flex items-center">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            German Exiles <span className="text-german-gold">Rugby League</span>
+            <span className="text-german-gold">{t("hero_title")}</span>
           </h1>
           <p className="text-xl text-gray-200 mx-auto">
-            Bridging German talent worldwide through Rugby League excellence
+            {t("hero_subtitle")}
           </p>
         </div>
       </div>

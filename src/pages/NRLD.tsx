@@ -1,7 +1,11 @@
+
 import { motion } from "framer-motion";
 import { Flag, Trophy, Users, ArrowUp, Calendar } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const NRLD = () => {
+  const { t } = useLanguage();
+  
   const sections = [
     {
       icon: <Flag className="h-12 w-12 text-german-gold" />,
@@ -42,7 +46,7 @@ const NRLD = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-bold text-german-gold text-center mb-12"
           >
-            National Rugby League Deutschland
+            {t("nrld_title")}
           </motion.h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
@@ -72,10 +76,10 @@ const NRLD = () => {
             <div className="bg-gray-900 border border-german-red rounded-lg p-6">
               <div className="flex items-center justify-center mb-6">
                 <Calendar className="h-8 w-8 text-german-gold mr-4" />
-                <h2 className="text-2xl font-bold text-white">Upcoming Fixtures</h2>
+                <h2 className="text-2xl font-bold text-white">{t("upcoming_fixtures")}</h2>
               </div>
               <div className="py-8 text-center">
-                <p className="text-gray-300 italic">Fixtures will be announced soon. Check back later for updates.</p>
+                <p className="text-gray-300 italic">{t("fixtures_announced_soon")}</p>
               </div>
             </div>
           </motion.div>

@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,21 +14,22 @@ import {
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   const links = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About Us" },
-    { href: "/fixtures", label: "Fixtures" },
-    { href: "/news", label: "News" },
-    { href: "/nrld", label: "NRLD" },
-    { href: "/sponsors", label: "Sponsors" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: t("home") },
+    { href: "/about", label: t("about") },
+    { href: "/fixtures", label: t("fixtures") },
+    { href: "/news", label: t("news") },
+    { href: "/nrld", label: t("nrld") },
+    { href: "/sponsors", label: t("sponsors") },
+    { href: "/contact", label: t("contact") },
   ];
 
   const teamLinks = [
-    { href: "/heritage-team", label: "Heritage Team" },
-    { href: "/community-team", label: "Community Team" },
-    { href: "/staff", label: "Staff" },
+    { href: "/heritage-team", label: t("heritage_team") },
+    { href: "/community-team", label: t("community_team") },
+    { href: "/staff", label: t("staff") },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -58,7 +61,7 @@ const Navigation = () => {
                     : "text-gray-300 hover:bg-gray-900 hover:text-white"
                 } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1`}
               >
-                Teams <ChevronDown className="h-4 w-4" />
+                {t("teams")} <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-black border border-gray-700">
                 {teamLinks.map((teamLink) => (
@@ -116,17 +119,19 @@ const Navigation = () => {
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+          <div className="hidden md:flex md:items-center">
+            <div className="ml-10 flex items-center space-x-4">
               {renderDesktopLinks()}
+              <LanguageSwitcher />
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center">
+            <LanguageSwitcher />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+              className="ml-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

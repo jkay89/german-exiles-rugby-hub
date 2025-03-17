@@ -1,7 +1,10 @@
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const MissionSection = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="py-16 bg-gradient-to-b from-black to-gray-900">
       <div className="container mx-auto px-6">
@@ -11,12 +14,9 @@ const MissionSection = () => {
           transition={{ delay: 0.2 }}
           className="max-w-4xl mx-auto text-center"
         >
-          <h2 className="text-3xl font-bold mb-8 text-german-gold">Our Mission</h2>
+          <h2 className="text-3xl font-bold mb-8 text-german-gold">{t("our_mission")}</h2>
           <p className="text-lg text-gray-300 leading-relaxed">
-            German Exiles Rugby League serves as a pathway for German-eligible players 
-            based in the UK to represent their heritage. We're committed to growing 
-            Rugby League in Germany while providing opportunities for players to 
-            compete at an international level.
+            {t("mission_text")}
           </p>
         </motion.div>
       </div>
