@@ -1,12 +1,15 @@
 
 import SponsorTierHeader from "./SponsorTierHeader";
 import SponsorCard from "./SponsorCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AffiliateSponsors = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="py-12 bg-gradient-to-b from-gray-900 to-black">
       <div className="container mx-auto px-6">
-        <SponsorTierHeader title="Affiliate Sponsors" delay={0.7} />
+        <SponsorTierHeader title={t("affiliate_sponsors")} delay={0.7} />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {/* Elite Workforce Solutions */}

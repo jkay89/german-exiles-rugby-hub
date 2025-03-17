@@ -10,22 +10,22 @@ const NRLD = () => {
     {
       icon: <Flag className="h-12 w-12 text-german-gold" />,
       title: "National Rugby League Deutschland",
-      content: "The NRLD is the governing body for Rugby League in Germany, dedicated to growing and developing the sport across the country. Working alongside international partners, we aim to establish Rugby League as a prominent sport in German sporting culture."
+      content: t("nrld_description")
     },
     {
       icon: <Trophy className="h-12 w-12 text-german-red" />,
-      title: "Competitions",
-      content: "We organize and oversee various competitions including the German Rugby League Bundesliga, international fixtures, and youth development tournaments. These competitions provide crucial playing opportunities for athletes at all levels."
+      title: t("competitions"),
+      content: t("competitions_text")
     },
     {
       icon: <Users className="h-12 w-12 text-german-gold" />,
-      title: "Development Programs",
-      content: "Our development programs focus on player pathways, coach education, and referee development. We work closely with clubs and regions to ensure sustainable growth of the sport."
+      title: t("development_programs"),
+      content: t("development_text")
     },
     {
       icon: <ArrowUp className="h-12 w-12 text-german-red" />,
-      title: "Future Vision",
-      content: "The NRLD is committed to establishing Germany as a competitive nation in international Rugby League, with aims to participate in major tournaments and develop a strong domestic competition structure."
+      title: t("future_vision"),
+      content: t("future_text")
     }
   ];
 
@@ -52,7 +52,7 @@ const NRLD = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
             {sections.map((section, index) => (
               <motion.div
-                key={section.title}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}

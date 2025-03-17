@@ -3,15 +3,18 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Trophy } from "lucide-react";
 import { MatchResult } from "@/utils/playerStats";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MatchResultsProps {
   results: MatchResult[];
 }
 
 const MatchResults = ({ results }: MatchResultsProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300">
-      <h2 className="text-2xl font-bold mb-4 text-white">Match Results</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">{t("match_results")}</h2>
       
       {results.length > 0 ? (
         <div className="space-y-4">
@@ -45,10 +48,9 @@ const MatchResults = ({ results }: MatchResultsProps) => {
           <div className="bg-gray-800 p-4 rounded-full mb-4">
             <Trophy className="h-12 w-12 text-german-gold" />
           </div>
-          <h3 className="text-xl font-medium text-white mb-2">No Results Yet</h3>
+          <h3 className="text-xl font-medium text-white mb-2">{t("no_results_yet")}</h3>
           <p className="text-center text-gray-400">
-            The German Exiles haven't played any official matches yet. 
-            Stay tuned for our upcoming fixtures!
+            {t("no_matches_text")}
           </p>
         </div>
       )}

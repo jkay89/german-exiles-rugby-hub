@@ -1,7 +1,10 @@
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const PageHeader = () => {
+  const { t } = useLanguage();
+  
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -17,8 +20,8 @@ const PageHeader = () => {
         />
       </div>
       <div className="container mx-auto px-6 relative z-10 text-center">
-        <h1 className="text-4xl font-bold mb-4 text-german-gold">Fixtures & Results</h1>
-        <p className="text-gray-300">View our upcoming games, past results, and player statistics</p>
+        <h1 className="text-4xl font-bold mb-4 text-german-gold">{t("fixtures_results")}</h1>
+        <p className="text-gray-300">{t("fixtures_description")}</p>
       </div>
     </motion.section>
   );

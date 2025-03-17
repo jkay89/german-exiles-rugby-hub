@@ -7,9 +7,11 @@ import PageHeader from "@/components/fixtures/PageHeader";
 import FixturesList from "@/components/fixtures/FixturesList";
 import MatchResults from "@/components/fixtures/MatchResults";
 import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Fixtures = () => {
   const [activeTab, setActiveTab] = useState<string>("fixtures");
+  const { t } = useLanguage();
   
   const fixtures = getFixtures();
   const results = getMatchResults();
@@ -27,13 +29,13 @@ const Fixtures = () => {
                 value="fixtures" 
                 className="data-[state=active]:bg-german-red data-[state=active]:text-white"
               >
-                Upcoming Fixtures
+                {t("upcoming_fixtures")}
               </TabsTrigger>
               <TabsTrigger 
                 value="results" 
                 className="data-[state=active]:bg-german-red data-[state=active]:text-white"
               >
-                Results
+                {t("match_results")}
               </TabsTrigger>
             </TabsList>
             

@@ -1,12 +1,15 @@
 
 import SponsorTierHeader from "./SponsorTierHeader";
 import SponsorCard from "./SponsorCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const GoldSponsors = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
       <div className="container mx-auto px-6">
-        <SponsorTierHeader title="Gold Sponsor" delay={0.3} />
+        <SponsorTierHeader title={t("gold_sponsor")} delay={0.3} />
         
         <SponsorCard
           name="Golden Guard VPN"

@@ -66,6 +66,37 @@ const translations = {
     "nrld_title": "National Rugby League Deutschland",
     "upcoming_fixtures": "Upcoming Fixtures",
     "fixtures_announced_soon": "Fixtures will be announced soon. Check back later for updates.",
+    "competitions": "Competitions",
+    "competitions_text": "We organize and oversee various competitions including the German Rugby League Bundesliga, international fixtures, and youth development tournaments. These competitions provide crucial playing opportunities for athletes at all levels.",
+    "development_programs": "Development Programs",
+    "development_text": "Our development programs focus on player pathways, coach education, and referee development. We work closely with clubs and regions to ensure sustainable growth of the sport.",
+    "future_vision": "Future Vision",
+    "future_text": "The NRLD is committed to establishing Germany as a competitive nation in international Rugby League, with aims to participate in major tournaments and develop a strong domestic competition structure.",
+    "nrld_description": "The NRLD is the governing body for Rugby League in Germany, dedicated to growing and developing the sport across the country. Working alongside international partners, we aim to establish Rugby League as a prominent sport in German sporting culture.",
+    
+    // Fixtures page
+    "fixtures_results": "Fixtures & Results",
+    "fixtures_description": "View our upcoming games, past results, and player statistics",
+    "upcoming_fixtures": "Upcoming Fixtures",
+    "match_results": "Match Results",
+    "no_results_yet": "No Results Yet",
+    "no_matches_text": "The German Exiles haven't played any official matches yet. Stay tuned for our upcoming fixtures!",
+    "player_stats": "Player Statistics",
+    
+    // News page
+    "latest_news": "Latest News",
+    "coming_soon": "Coming Soon",
+    "news_coming_soon": "Stay tuned for the latest news and updates about German Exiles Rugby League.",
+    
+    // Sponsors page
+    "platinum_sponsor": "Platinum Sponsor",
+    "gold_sponsor": "Gold Sponsor",
+    "silver_sponsors": "Silver Sponsors",
+    "affiliate_sponsors": "Affiliate Sponsors",
+    "become_sponsor": "Become a Sponsor",
+    "sponsor_message": "Join us in supporting the development of Rugby League in Germany. Contact us to learn more about our sponsorship opportunities.",
+    "contact_sponsorship": "Contact for Sponsorship",
+    "visit_website": "Visit Website",
     
     // Common sections
     "next_fixture": "Next Fixture",
@@ -104,6 +135,37 @@ const translations = {
     "nrld_title": "National Rugby League Deutschland",
     "upcoming_fixtures": "Kommende Spiele",
     "fixtures_announced_soon": "Spielpläne werden in Kürze bekannt gegeben. Schauen Sie später für Updates vorbei.",
+    "competitions": "Wettbewerbe",
+    "competitions_text": "Wir organisieren und überwachen verschiedene Wettbewerbe, darunter die German Rugby League Bundesliga, internationale Spiele und Jugendentwicklungsturniere. Diese Wettbewerbe bieten wichtige Spielmöglichkeiten für Athleten aller Leistungsstufen.",
+    "development_programs": "Entwicklungsprogramme",
+    "development_text": "Unsere Entwicklungsprogramme konzentrieren sich auf Spielerwege, Trainerausbildung und Schiedsrichterentwicklung. Wir arbeiten eng mit Vereinen und Regionen zusammen, um ein nachhaltiges Wachstum des Sports zu gewährleisten.",
+    "future_vision": "Zukunftsvision",
+    "future_text": "Die NRLD ist bestrebt, Deutschland als wettbewerbsfähige Nation im internationalen Rugby League zu etablieren, mit dem Ziel, an großen Turnieren teilzunehmen und eine starke inländische Wettbewerbsstruktur zu entwickeln.",
+    "nrld_description": "Die NRLD ist der Dachverband für Rugby League in Deutschland und widmet sich dem Wachstum und der Entwicklung des Sports im ganzen Land. In Zusammenarbeit mit internationalen Partnern wollen wir Rugby League als prominenten Sport in der deutschen Sportkultur etablieren.",
+    
+    // Fixtures page
+    "fixtures_results": "Spielplan & Ergebnisse",
+    "fixtures_description": "Sehen Sie unsere kommenden Spiele, vergangene Ergebnisse und Spielerstatistiken",
+    "upcoming_fixtures": "Kommende Spiele",
+    "match_results": "Spielergebnisse",
+    "no_results_yet": "Noch keine Ergebnisse",
+    "no_matches_text": "Die German Exiles haben noch keine offiziellen Spiele absolviert. Bleiben Sie dran für unsere kommenden Spiele!",
+    "player_stats": "Spielerstatistiken",
+    
+    // News page
+    "latest_news": "Neueste Nachrichten",
+    "coming_soon": "Demnächst verfügbar",
+    "news_coming_soon": "Bleiben Sie auf dem Laufenden für die neuesten Nachrichten und Updates über German Exiles Rugby League.",
+    
+    // Sponsors page
+    "platinum_sponsor": "Platin-Sponsor",
+    "gold_sponsor": "Gold-Sponsor",
+    "silver_sponsors": "Silber-Sponsoren",
+    "affiliate_sponsors": "Partner-Sponsoren",
+    "become_sponsor": "Werden Sie Sponsor",
+    "sponsor_message": "Unterstützen Sie die Entwicklung von Rugby League in Deutschland. Kontaktieren Sie uns, um mehr über unsere Sponsoring-Möglichkeiten zu erfahren.",
+    "contact_sponsorship": "Kontakt für Sponsoring",
+    "visit_website": "Website besuchen",
     
     // Common sections
     "next_fixture": "Nächstes Spiel",

@@ -1,12 +1,15 @@
 
 import SponsorTierHeader from "./SponsorTierHeader";
 import SponsorCard from "./SponsorCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const PlatinumSponsors = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="py-16 bg-gradient-to-b from-black to-gray-900">
       <div className="container mx-auto px-6">
-        <SponsorTierHeader title="Platinum Sponsor" delay={0.1} />
+        <SponsorTierHeader title={t("platinum_sponsor")} delay={0.1} />
         
         <SponsorCard
           name="Safetech Innovations Global Services Ltd"

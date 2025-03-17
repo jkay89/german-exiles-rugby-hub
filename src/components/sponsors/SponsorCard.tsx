@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SponsorCardProps {
   name: string;
@@ -21,6 +22,8 @@ const SponsorCard = ({
   isMajorSponsor = true,
   isAffiliate = false
 }: SponsorCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -73,7 +76,7 @@ const SponsorCard = ({
                 className="bg-german-red hover:bg-red-700 text-white"
                 size={isMajorSponsor ? "default" : isAffiliate ? "sm" : "sm"}
               >
-                Visit Website
+                {t("visit_website")}
               </Button>
             </a>
           )}
