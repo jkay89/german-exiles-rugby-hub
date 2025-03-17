@@ -10,6 +10,9 @@ import {
   CarouselNext 
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { getNextFixture, Fixture } from "@/utils/fixtureUtils";
+import { Link } from "react-router-dom";
 
 interface SponsorLogo {
   id: string;
@@ -21,9 +24,11 @@ interface SponsorLogo {
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [nextFixture, setNextFixture] = useState<Fixture | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
+    setNextFixture(getNextFixture());
   }, []);
 
   // Sponsor data sourced from the sponsors page
@@ -119,7 +124,22 @@ const Index = () => {
             >
               <Calendar className="h-12 w-12 text-german-red mb-4" />
               <h3 className="text-xl font-bold mb-2 text-white">Next Fixture</h3>
-              <p className="text-gray-300">Coming Soon</p>
+              {nextFixture ? (
+                <div>
+                  <p className="text-german-gold font-semibold">
+                    {nextFixture.opponent}
+                  </p>
+                  <p className="text-gray-300">
+                    {format(new Date(nextFixture.date), "dd MMMM yyyy")}
+                  </p>
+                  <p className="text-gray-300">{nextFixture.location}</p>
+                  <Link to="/fixtures" className="text-sm text-german-red hover:text-german-gold mt-2 inline-block">
+                    View all fixtures
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-gray-300">No upcoming fixtures</p>
+              )}
             </motion.div>
 
             <motion.div
