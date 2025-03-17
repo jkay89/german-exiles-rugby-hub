@@ -1,4 +1,5 @@
 
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
@@ -6,7 +7,8 @@ import {
   CarouselContent, 
   CarouselItem, 
   CarouselPrevious, 
-  CarouselNext 
+  CarouselNext,
+  CarouselApi
 } from "@/components/ui/carousel";
 import { SponsorLogo } from "./types";
 
@@ -15,11 +17,33 @@ interface SponsorCarouselProps {
 }
 
 const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
+  const [api, setApi] = useState<CarouselApi>();
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
   // Sort sponsors by tier importance (platinum first, then gold, silver, affiliate)
   const sortedSponsors = [...sponsorLogos].sort((a, b) => {
     const tierOrder = { platinum: 1, gold: 2, silver: 3, affiliate: 4 };
     return tierOrder[a.tier] - tierOrder[b.tier];
   });
+
+  useEffect(() => {
+    if (!api) return;
+
+    // Function to scroll to next slide
+    const scrollToNextSlide = () => {
+      api.scrollNext();
+    };
+
+    // Set up auto-scrolling
+    autoPlayRef.current = setInterval(scrollToNextSlide, 3000);
+
+    // Clear interval when component unmounts
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [api]);
 
   return (
     <section className="py-16 bg-black relative overflow-hidden">
@@ -45,8 +69,8 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
               align: "start",
               loop: true,
               skipSnaps: true,
-              duration: 20,
             }}
+            setApi={setApi}
             className="w-full"
           >
             <CarouselContent className="py-4">
