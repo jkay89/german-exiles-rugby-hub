@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -140,7 +139,94 @@ const Sponsors = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
+      <section className="py-16 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold text-german-gold mb-4">Silver Sponsors</h2>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 gap-8">
+            {/* Beau Bijou Design Sponsor */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-black border border-german-red rounded-lg p-8 hover:border-german-gold transition-colors duration-300"
+            >
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <a 
+                  href="https://beaubijoudesign.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full md:w-1/3 hover:opacity-90 transition-opacity"
+                >
+                  <img 
+                    src="/lovable-uploads/f46f89dd-c0de-4241-8bcb-893623c26c05.png" 
+                    alt="Beau Bijou Design Logo"
+                    className="w-full h-auto"
+                  />
+                </a>
+                <div className="w-full md:w-2/3">
+                  <h3 className="text-2xl font-bold text-german-gold mb-4">Beau Bijou Design</h3>
+                  <p className="text-gray-300 mb-6">
+                    Beau Bijou Design is a creative design studio specializing in elegant, 
+                    bespoke graphic and web design solutions. With a passionate team dedicated to 
+                    crafting visually stunning and functional designs, they help businesses and 
+                    individuals bring their visions to life. Their approach combines artistic flair 
+                    with strategic thinking to create designs that not only look beautiful but also 
+                    effectively communicate their clients' unique stories and brand identities.
+                  </p>
+                  <a 
+                    href="https://beaubijoudesign.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <Button 
+                      variant="default" 
+                      className="bg-german-red hover:bg-red-700 text-white"
+                    >
+                      Visit Website
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* For Josef Sponsor */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="bg-black border border-german-red rounded-lg p-8 hover:border-german-gold transition-colors duration-300"
+            >
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-full md:w-1/3 hover:opacity-90 transition-opacity">
+                  <img 
+                    src="/lovable-uploads/86e094ab-21e7-4af4-8964-005499f0b682.png" 
+                    alt="For Josef Logo"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="w-full md:w-2/3">
+                  <h3 className="text-2xl font-bold text-german-gold mb-4">ForJosef</h3>
+                  <p className="text-gray-300 mb-6">
+                    ForJosef is in rememberance of Josef Russell whom rugby and the Russell family 
+                    lost too soon! With thanks to Matt and Francoise Russell and Jim Fountain for 
+                    the help to keep Joe's memory going in a special way with the Exiles.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-5">
           <img 
             src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png" 
