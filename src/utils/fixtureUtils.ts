@@ -14,7 +14,7 @@ export const getFixtures = (): Fixture[] => {
     {
       date: "2025-04-19",
       opponent: "Rotterdam 9s",
-      location: "Rotterdam, Netherlands",
+      location: "Rotterdam Pitbulls RLFC, Rotterdam, Netherlands",
       time: "TBC",
     },
     {
