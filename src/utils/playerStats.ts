@@ -84,32 +84,7 @@ export const getPlayerStats = (): PlayerStats[] => {
   ];
 };
 
-// Sample match results data
+// Empty match results data since the German Exiles don't have any results yet
 export const getMatchResults = (): MatchResult[] => {
-  return [
-    {
-      date: "2024-06-15",
-      opponent: "Berlin Warriors",
-      location: "Berlin, Germany",
-      homeScore: 24,
-      awayScore: 18,
-      isHome: true,
-    },
-    {
-      date: "2024-05-22",
-      opponent: "Frankfurt Lions",
-      location: "Frankfurt, Germany",
-      homeScore: 16,
-      awayScore: 22,
-      isHome: false,
-    },
-    {
-      date: "2024-04-10",
-      opponent: "Amsterdam Cobras",
-      location: "Amsterdam, Netherlands",
-      homeScore: 18,
-      awayScore: 18,
-      isHome: false,
-    },
-  ];
+  return [];
 };
