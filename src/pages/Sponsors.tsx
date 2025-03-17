@@ -32,7 +32,7 @@ const Sponsors = () => {
             transition={{ delay: 0.1 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-german-gold mb-4">Main Sponsor</h2>
+            <h2 className="text-3xl font-bold text-german-gold mb-4">Platinum Sponsor</h2>
           </motion.div>
           
           <motion.div
