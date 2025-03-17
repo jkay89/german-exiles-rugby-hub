@@ -15,6 +15,12 @@ interface SponsorCarouselProps {
 }
 
 const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
+  // Sort sponsors by tier importance (platinum first, then gold, silver, affiliate)
+  const sortedSponsors = [...sponsorLogos].sort((a, b) => {
+    const tierOrder = { platinum: 1, gold: 2, silver: 3, affiliate: 4 };
+    return tierOrder[a.tier] - tierOrder[b.tier];
+  });
+
   return (
     <section className="py-16 bg-black relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-5">
@@ -44,7 +50,7 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
             className="w-full"
           >
             <CarouselContent className="py-4">
-              {sponsorLogos.map((sponsor) => (
+              {sortedSponsors.map((sponsor) => (
                 <CarouselItem key={sponsor.id} className={cn(
                   sponsor.tier === "affiliate" ? "basis-full sm:basis-1/3 md:basis-1/4 lg:basis-1/5" : 
                   "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4", 
