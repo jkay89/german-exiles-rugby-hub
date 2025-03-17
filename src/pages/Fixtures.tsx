@@ -20,7 +20,8 @@ import {
   Zap, 
   Shield, 
   User,
-  Search
+  Search,
+  MapPin
 } from "lucide-react";
 import { getPlayerStats, getMatchResults } from "@/utils/playerStats";
 import { Fixture, getFixtures } from "@/utils/fixtureUtils";
@@ -37,6 +38,11 @@ const Fixtures = () => {
   const filteredPlayers = playerStats.filter(player => 
     player.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Function to generate Google Maps URL from a location string
+  const getGoogleMapsUrl = (location: string) => {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  };
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -93,7 +99,17 @@ const Fixtures = () => {
                       <p className="text-sm text-gray-300">
                         {format(new Date(fixture.date), "dd MMMM yyyy")} at {fixture.time}
                       </p>
-                      <p className="text-sm text-german-gold">{fixture.location}</p>
+                      <p className="text-sm text-german-gold flex items-start gap-1">
+                        <MapPin className="h-3 w-3 min-w-3 mt-1" /> 
+                        <a 
+                          href={getGoogleMapsUrl(fixture.location)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hover:underline hover:text-white transition-colors"
+                        >
+                          {fixture.location}
+                        </a>
+                      </p>
                     </motion.div>
                   ))}
                 </div>

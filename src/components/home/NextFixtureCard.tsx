@@ -11,6 +11,11 @@ interface NextFixtureCardProps {
 }
 
 const NextFixtureCard = ({ fixture, delay = 0.3 }: NextFixtureCardProps) => {
+  // Function to generate Google Maps URL from a location string
+  const getGoogleMapsUrl = (location: string) => {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  };
+
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -40,12 +45,19 @@ const NextFixtureCard = ({ fixture, delay = 0.3 }: NextFixtureCardProps) => {
           
           <div className="flex items-center gap-2 text-gray-300">
             <Clock className="h-4 w-4 text-german-red" />
-            <p>{format(new Date(fixture.date), "dd MMMM yyyy, HH:mm")}</p>
+            <p>{format(new Date(fixture.date), "dd MMMM yyyy")}{fixture.time !== "TBC" ? `, ${fixture.time}` : " (TBC)"}</p>
           </div>
           
-          <div className="flex items-center gap-2 text-gray-300">
-            <MapPin className="h-4 w-4 text-german-red" />
-            <p>{fixture.location}</p>
+          <div className="flex items-start gap-2 text-gray-300">
+            <MapPin className="h-4 w-4 text-german-red min-w-4 mt-1" />
+            <a 
+              href={getGoogleMapsUrl(fixture.location)} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-german-gold transition-colors"
+            >
+              {fixture.location}
+            </a>
           </div>
           
           <motion.div 
