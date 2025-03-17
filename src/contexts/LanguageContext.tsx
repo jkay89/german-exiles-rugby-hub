@@ -109,6 +109,42 @@ const translations = {
     "become_part": "Become part of our growing team",
     "match_results_soon": "Match results coming soon!",
     "join_us": "Join Us",
+    
+    // About page
+    "about_title": "About German Exiles RL",
+    "about_description": "The German Exiles Rugby League serves as a vital bridge between heritage players and the German national rugby league system. Our mission is to identify, develop, and nurture talent while strengthening the foundations of rugby league in Germany. Through our comprehensive approach to player development, networking, and community building, we aim to contribute significantly to the growth and success of German Rugby League on both domestic and international stages.",
+    "competitive_pathway": "Competitive Pathway",
+    "competitive_pathway_text": "Providing opportunities for eligible non-professional heritage players & upcoming youth players (16+) to enter the German RL national setup",
+    "bundesleague_development": "Bundesleague Development",
+    "bundesleague_development_text": "Supporting and strengthening the German Bundesleague setup through collaboration and resource sharing",
+    "networking_opportunities": "Networking Opportunities",
+    "networking_opportunities_text": "Creating connections for eligible non-professional heritage players into semi & professional setups",
+    "skill_development": "Skill Development",
+    "skill_development_text": "Developing basic RL skills while fostering connections across Europe to promote rugby league and our sponsors' interests",
+    
+    // Team pages
+    "heritage_team_title": "Heritage Team",
+    "heritage_team_description": "Meet the players representing German Exiles Rugby League. Our heritage team consists of German-eligible players based in the UK, all committed to growing the sport in Germany.",
+    "community_team_title": "Community Team",
+    "community_team_description": "Our community team represents the growing rugby league community in Walton, Wakefield, with players from around the local area backed up with our Heritage players flying the flag of German Rugby League here in the UK. This page will be updated with player profiles soon.",
+    "staff_title": "Staff",
+    "staff_description": "Meet the dedicated staff members who work behind the scenes to support and develop German Exiles Rugby League.",
+    "heritage": "Heritage",
+    "german": "German",
+    "british": "British",
+    
+    // Contact page
+    "contact_title": "Contact Us",
+    "contact_description": "Get in touch with German Exiles Rugby League",
+    "send_message": "Send us a message",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send_button": "Send Message",
+    "connect_with_us": "Connect with us",
+    "social_media": "Social Media",
+    "message_sent": "Message Sent",
+    "message_sent_description": "We'll get back to you as soon as possible."
   },
   de: {
     // Navigation
@@ -177,5 +213,41 @@ const translations = {
     "become_part": "Werden Sie Teil unseres wachsenden Teams",
     "match_results_soon": "Spielergebnisse kommen bald!",
     "join_us": "Mach Mit",
+    
+    // About page
+    "about_title": "Über German Exiles RL",
+    "about_description": "Die German Exiles Rugby League dient als wichtige Brücke zwischen Heritage-Spielern und dem deutschen Rugby-League-Nationalsystem. Unsere Mission ist es, Talente zu identifizieren, zu entwickeln und zu fördern und gleichzeitig die Grundlagen des Rugby League in Deutschland zu stärken. Durch unseren umfassenden Ansatz zur Spielerentwicklung, Vernetzung und Gemeinschaftsbildung wollen wir wesentlich zum Wachstum und Erfolg der deutschen Rugby League auf nationaler und internationaler Ebene beitragen.",
+    "competitive_pathway": "Wettbewerbsweg",
+    "competitive_pathway_text": "Bietet berechtigten nicht-professionellen Heritage-Spielern und aufstrebenden Jugendspielern (16+) die Möglichkeit, in die deutsche RL-Nationalmannschaft einzusteigen",
+    "bundesleague_development": "Bundesliga-Entwicklung",
+    "bundesleague_development_text": "Unterstützung und Stärkung der deutschen Bundesliga durch Zusammenarbeit und Ressourcenteilung",
+    "networking_opportunities": "Vernetzungsmöglichkeiten",
+    "networking_opportunities_text": "Schaffung von Verbindungen für berechtigte nicht-professionelle Heritage-Spieler in halb- und professionelle Aufstellungen",
+    "skill_development": "Kompetenzentwicklung",
+    "skill_development_text": "Entwicklung grundlegender RL-Fähigkeiten bei gleichzeitiger Förderung von Verbindungen in ganz Europa zur Förderung des Rugby League und der Interessen unserer Sponsoren",
+    
+    // Team pages
+    "heritage_team_title": "Heritage-Team",
+    "heritage_team_description": "Treffen Sie die Spieler, die German Exiles Rugby League vertreten. Unser Heritage-Team besteht aus deutschen Spielern mit Spielberechtigung in Großbritannien, die sich alle für die Entwicklung des Sports in Deutschland einsetzen.",
+    "community_team_title": "Community-Team",
+    "community_team_description": "Unser Community-Team repräsentiert die wachsende Rugby-League-Gemeinschaft in Walton, Wakefield, mit Spielern aus der Umgebung, unterstützt von unseren Heritage-Spielern, die die Flagge der German Rugby League hier in Großbritannien hochhalten. Diese Seite wird bald mit Spielerprofilen aktualisiert.",
+    "staff_title": "Mitarbeiter",
+    "staff_description": "Lernen Sie die engagierten Mitarbeiter kennen, die hinter den Kulissen arbeiten, um German Exiles Rugby League zu unterstützen und zu entwickeln.",
+    "heritage": "Heritage",
+    "german": "Deutsch",
+    "british": "Britisch",
+    
+    // Contact page
+    "contact_title": "Kontaktieren Sie uns",
+    "contact_description": "Nehmen Sie Kontakt mit German Exiles Rugby League auf",
+    "send_message": "Senden Sie uns eine Nachricht",
+    "name": "Name",
+    "email": "E-Mail",
+    "message": "Nachricht",
+    "send_button": "Nachricht senden",
+    "connect_with_us": "Verbinden Sie sich mit uns",
+    "social_media": "Soziale Medien",
+    "message_sent": "Nachricht gesendet",
+    "message_sent_description": "Wir werden uns so schnell wie möglich bei Ihnen melden."
   }
 };

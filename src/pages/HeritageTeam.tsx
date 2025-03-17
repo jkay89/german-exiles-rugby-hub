@@ -1,5 +1,7 @@
+
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PlayerProfile {
   teamNumber: string;
@@ -11,6 +13,8 @@ interface PlayerProfile {
 }
 
 const HeritageTeam = () => {
+  const { t } = useLanguage();
+  
   const players: PlayerProfile[] = [
     { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/7cdbd50d-8320-4db0-9303-53445bf0e348.png" },
     { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE", image: "/lovable-uploads/2c677fd8-f43a-45a8-b0a1-491ba2d9eae4.png" },
@@ -58,10 +62,9 @@ const HeritageTeam = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Heritage Team</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold">{t("heritage_team_title")}</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
-            Meet the players representing German Exiles Rugby League. Our heritage team consists of German-eligible players based in the UK, 
-            all committed to growing the sport in Germany.
+            {t("heritage_team_description")}
           </p>
         </div>
       </motion.section>
@@ -126,7 +129,7 @@ const HeritageTeam = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-sm text-german-gold">
-                      Heritage: {player.countryHeritage === "DE" ? "German" : "British"}
+                      {t("heritage")}: {player.countryHeritage === "DE" ? t("german") : t("british")}
                     </p>
                   </CardContent>
                 </Card>

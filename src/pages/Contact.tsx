@@ -2,13 +2,16 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Contact = () => {
+  const { t } = useLanguage();
+  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast({
-      title: "Message Sent",
-      description: "We'll get back to you as soon as possible.",
+      title: t("message_sent"),
+      description: t("message_sent_description"),
     });
   };
 
@@ -28,8 +31,8 @@ const Contact = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Contact Us</h1>
-          <p className="text-gray-300">Get in touch with German Exiles Rugby League</p>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold">{t("contact_title")}</h1>
+          <p className="text-gray-300">{t("contact_description")}</p>
         </div>
       </motion.section>
 
@@ -42,11 +45,11 @@ const Contact = () => {
               transition={{ delay: 0.2 }}
               className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300"
             >
-              <h2 className="text-2xl font-bold mb-6 text-german-gold">Send us a message</h2>
+              <h2 className="text-2xl font-bold mb-6 text-german-gold">{t("send_message")}</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-300">
-                    Name
+                    {t("name")}
                   </label>
                   <input
                     type="text"
@@ -57,7 +60,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                    Email
+                    {t("email")}
                   </label>
                   <input
                     type="email"
@@ -68,7 +71,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-300">
-                    Message
+                    {t("message")}
                   </label>
                   <textarea
                     id="message"
@@ -78,7 +81,7 @@ const Contact = () => {
                   ></textarea>
                 </div>
                 <Button type="submit" className="w-full bg-german-red hover:bg-red-700">
-                  Send Message
+                  {t("send_button")}
                 </Button>
               </form>
             </motion.div>
@@ -89,10 +92,10 @@ const Contact = () => {
               transition={{ delay: 0.3 }}
               className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300"
             >
-              <h2 className="text-2xl font-bold mb-6 text-german-gold">Connect with us</h2>
+              <h2 className="text-2xl font-bold mb-6 text-german-gold">{t("connect_with_us")}</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-lg mb-2 text-white">Social Media</h3>
+                  <h3 className="font-bold text-lg mb-2 text-white">{t("social_media")}</h3>
                   <div className="space-y-2">
                     <a href="#" className="text-german-red hover:text-red-700 block">
                       Facebook
@@ -106,7 +109,7 @@ const Contact = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-2 text-white">Email</h3>
+                  <h3 className="font-bold text-lg mb-2 text-white">{t("email")}</h3>
                   <a href="mailto:info@germanexilesrl.co.uk" className="text-german-red hover:text-red-700">
                     info@germanexilesrl.co.uk
                   </a>

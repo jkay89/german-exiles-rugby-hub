@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PlayerProfile {
   teamNumber: string;
@@ -13,6 +14,7 @@ interface PlayerProfile {
 }
 
 const CommunityTeam = () => {
+  const { t } = useLanguage();
   const players: PlayerProfile[] = [];
 
   return (
@@ -31,11 +33,9 @@ const CommunityTeam = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Community Team</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold">{t("community_team_title")}</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
-            Our community team represents the growing rugby league community in Walton, Wakefield, 
-            with players from around the local area backed up with our Heritage players flying the flag 
-            of German Rugby League here in the UK. This page will be updated with player profiles soon.
+            {t("community_team_description")}
           </p>
         </div>
       </motion.section>
@@ -93,7 +93,7 @@ const CommunityTeam = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-sm text-german-gold">
-                      Heritage: {player.countryHeritage === "DE" ? "German" : "British"}
+                      {t("heritage")}: {player.countryHeritage === "DE" ? t("german") : t("british")}
                     </p>
                   </CardContent>
                 </Card>

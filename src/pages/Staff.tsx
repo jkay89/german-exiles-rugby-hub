@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Clipboard, Users, Stethoscope } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StaffMember {
   name: string;
@@ -12,6 +13,8 @@ interface StaffMember {
 }
 
 const Staff = () => {
+  const { t } = useLanguage();
+  
   const staffMembers: StaffMember[] = [
     { 
       name: "Iain Bowie",
@@ -51,9 +54,9 @@ const Staff = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Staff</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold">{t("staff_title")}</h1>
           <p className="text-gray-300 max-w-2xl mx-auto mb-12">
-            Meet the dedicated staff members who work behind the scenes to support and develop German Exiles Rugby League.
+            {t("staff_description")}
           </p>
         </div>
       </motion.section>
@@ -93,7 +96,7 @@ const Staff = () => {
                   {member.contact && (
                     <CardContent className="text-center">
                       <p className="text-sm text-german-gold">
-                        Contact: {member.contact}
+                        {t("contact")}: {member.contact}
                       </p>
                     </CardContent>
                   )}

@@ -1,28 +1,31 @@
 
 import { motion } from "framer-motion";
 import { Trophy, Users, Globe, Handshake } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AboutUs = () => {
+  const { t } = useLanguage();
+  
   const missions = [
     {
       icon: <Trophy className="h-12 w-12 text-german-gold" />,
-      title: "Competitive Pathway",
-      description: "Providing opportunities for eligible non-professional heritage players & upcoming youth players (16+) to enter the German RL national setup"
+      title: t("competitive_pathway"),
+      description: t("competitive_pathway_text")
     },
     {
       icon: <Globe className="h-12 w-12 text-german-red" />,
-      title: "Bundesleague Development",
-      description: "Supporting and strengthening the German Bundesleague setup through collaboration and resource sharing"
+      title: t("bundesleague_development"),
+      description: t("bundesleague_development_text")
     },
     {
       icon: <Handshake className="h-12 w-12 text-german-gold" />,
-      title: "Networking Opportunities",
-      description: "Creating connections for eligible non-professional heritage players into semi & professional setups"
+      title: t("networking_opportunities"),
+      description: t("networking_opportunities_text")
     },
     {
       icon: <Users className="h-12 w-12 text-german-red" />,
-      title: "Skill Development",
-      description: "Developing basic RL skills while fostering connections across Europe to promote rugby league and our sponsors' interests"
+      title: t("skill_development"),
+      description: t("skill_development_text")
     }
   ];
 
@@ -43,7 +46,7 @@ const AboutUs = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-bold text-german-gold text-center mb-8"
           >
-            About German Exiles RL
+            {t("about_title")}
           </motion.h1>
 
           <motion.div
@@ -53,14 +56,14 @@ const AboutUs = () => {
             className="max-w-3xl mx-auto mb-16 text-center"
           >
             <p className="text-gray-300 text-lg leading-relaxed">
-              The German Exiles Rugby League serves as a vital bridge between heritage players and the German national rugby league system. Our mission is to identify, develop, and nurture talent while strengthening the foundations of rugby league in Germany. Through our comprehensive approach to player development, networking, and community building, we aim to contribute significantly to the growth and success of German Rugby League on both domestic and international stages.
+              {t("about_description")}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {missions.map((mission, index) => (
               <motion.div
-                key={mission.title}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
