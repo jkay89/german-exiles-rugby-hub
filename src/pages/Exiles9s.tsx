@@ -49,12 +49,12 @@ const Exiles9s = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold">Schlicht Exiles 9s</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold text-center">Schlicht Exiles 9s</h1>
           
           <div className="flex flex-col md:flex-row items-center justify-center mb-10 gap-8">
             <div className="w-40 h-40">
               <img 
-                src="/lovable-uploads/12246b2a-c79f-43ca-ba08-16ca459b6971.png" 
+                src="/lovable-uploads/51da26a8-d895-4a08-91d5-1c75e6c64b39.png" 
                 alt="Schlicht Exiles 9s Logo"
                 className="w-full h-full object-contain"
               />
