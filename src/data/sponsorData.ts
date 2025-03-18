@@ -25,6 +25,13 @@ export const sponsorData: SponsorLogo[] = [
     website: null,
     tier: "gold"
   },
+  {
+    id: "ipropertygroup",
+    name: "iProperty Group",
+    logo: "/lovable-uploads/024f0ade-065d-4049-8caf-ac7afe87606a.png",
+    website: null,
+    tier: "gold"
+  },
   // Silver Sponsors
   {
     id: "beaubijou",

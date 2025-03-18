@@ -12,6 +12,10 @@ const GoldSponsors = () => {
   const getSponsorDescription = (id: string) => {
     if (id === "goldenguard") {
       return "Golden Guard VPN is a premium virtual private network service dedicated to providing secure, private, and unrestricted internet access to users worldwide. With military-grade encryption, a strict no-logs policy, and servers in multiple countries, Golden Guard VPN ensures that your online activities remain protected from surveillance and cyber threats.";
+    } else if (id === "feet1st") {
+      return "Feet 1st Physiotherapy provides expert physiotherapy services focusing on rehabilitative treatments and sports injury management. Their experienced team is dedicated to helping clients regain mobility and improve their quality of life through personalized care programs.";
+    } else if (id === "ipropertygroup") {
+      return "iProperty Group specializes in real estate solutions with a focus on innovative property management, development, and investment opportunities. Their comprehensive approach helps clients navigate the property market with confidence.";
     }
     return "";
   };
