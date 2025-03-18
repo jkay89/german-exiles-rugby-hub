@@ -29,6 +29,7 @@ const Navigation = () => {
   const teamLinks = [
     { href: "/heritage-team", label: t("heritage_team") },
     { href: "/community-team", label: t("community_team") },
+    { href: "/exiles-9s", label: "Exiles 9s" },
     { href: "/staff", label: t("staff") },
   ];
 

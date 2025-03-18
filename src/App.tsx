@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import HeritageTeam from "./pages/HeritageTeam";
 import CommunityTeam from "./pages/CommunityTeam";
+import Exiles9s from "./pages/Exiles9s";
 import Staff from "./pages/Staff";
 import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/about" element={<AboutUs />} />
             <Route path="/heritage-team" element={<HeritageTeam />} />
             <Route path="/community-team" element={<CommunityTeam />} />
+            <Route path="/exiles-9s" element={<Exiles9s />} />
             <Route path="/staff" element={<Staff />} />
             <Route path="/fixtures" element={<Fixtures />} />
             <Route path="/nrld" element={<NRLD />} />
