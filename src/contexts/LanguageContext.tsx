@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 type Language = 'en' | 'de';
@@ -144,7 +143,17 @@ const translations = {
     "connect_with_us": "Connect with us",
     "social_media": "Social Media",
     "message_sent": "Message Sent",
-    "message_sent_description": "We'll get back to you as soon as possible."
+    "message_sent_description": "We'll get back to you as soon as possible.",
+    
+    // Exiles 9s page
+    "schlicht_exiles_9s": "Schlicht Exiles 9s",
+    "schlicht_exiles_9s_logo": "Schlicht Exiles 9s Logo",
+    "german_exiles_logo": "German Exiles Logo",
+    "german_flag": "German Flag",
+    "british_flag": "British Flag",
+    "swiss_flag": "Swiss Flag",
+    "club": "Club",
+    "exiles_9s_description": "The Schlicht Exiles 9s is a team made up of both british based and german based players who will be entering 9s tournaments around the world starting with the Rotterdam 9s, Easter weekend in April. Proudly sponsored by long standing Germany rugby league supporter Marcél Schlicht who's love for the game of rugby in Europe holds no bounds. Below is the team you will see hitting Rotterdam 9s this year"
   },
   de: {
     // Navigation
@@ -248,6 +257,16 @@ const translations = {
     "connect_with_us": "Verbinden Sie sich mit uns",
     "social_media": "Soziale Medien",
     "message_sent": "Nachricht gesendet",
-    "message_sent_description": "Wir werden uns so schnell wie möglich bei Ihnen melden."
+    "message_sent_description": "Wir werden uns so schnell wie möglich bei Ihnen melden.",
+    
+    // Exiles 9s page
+    "schlicht_exiles_9s": "Schlicht Exiles 9s",
+    "schlicht_exiles_9s_logo": "Schlicht Exiles 9s Logo",
+    "german_exiles_logo": "Deutsches Exiles Logo",
+    "german_flag": "Deutsche Flagge",
+    "british_flag": "Britische Flagge",
+    "swiss_flag": "Schweizer Flagge",
+    "club": "Verein",
+    "exiles_9s_description": "Das Schlicht Exiles 9s ist ein Team aus britischen und deutschen Spielern, das an 9er-Turnieren auf der ganzen Welt teilnehmen wird, beginnend mit dem Rotterdam 9s am Osterwochenende im April. Stolz unterstützt von Marcél Schlicht, einem langjährigen Unterstützer des deutschen Rugby Leagues, dessen Liebe zum Rugbysport in Europa keine Grenzen kennt. Unten sehen Sie das Team, das Sie dieses Jahr beim Rotterdam 9s sehen werden"
   }
 };

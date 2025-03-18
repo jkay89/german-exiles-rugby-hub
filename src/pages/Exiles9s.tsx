@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -44,26 +43,23 @@ const Exiles9s = () => {
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-48 h-48 md:w-64 md:h-64 opacity-10">
           <img 
             src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png" 
-            alt="German Exiles Logo"
+            alt={t("german_exiles_logo")}
             className="w-full h-full object-contain"
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold text-center">Schlicht Exiles 9s</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold text-center">{t("schlicht_exiles_9s")}</h1>
           
           <div className="flex flex-col md:flex-row items-center justify-center mb-10 gap-8">
             <div className="w-64 h-64">
               <img 
                 src="/lovable-uploads/51da26a8-d895-4a08-91d5-1c75e6c64b39.png" 
-                alt="Schlicht Exiles 9s Logo"
+                alt={t("schlicht_exiles_9s_logo")}
                 className="w-full h-full object-contain"
               />
             </div>
             <p className="text-gray-300 max-w-2xl">
-              The Schlicht Exiles 9s is a team made up of both british based and german based players who will be entering 
-              9s tournaments around the world starting with the Rotterdam 9s, Easter weekend in April. Proudly sponsored by 
-              long standing Germany rugby league supporter Marcél Schlicht who's love for the game of rugby in Europe holds no bounds. 
-              Below is the team you will see hitting Rotterdam 9s this year
+              {t("exiles_9s_description")}
             </p>
           </div>
         </div>
@@ -106,19 +102,19 @@ const Exiles9s = () => {
                         {player.countryHeritage === "DE" ? (
                           <img 
                             src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
-                            alt="German Flag"
+                            alt={t("german_flag")}
                             className="w-8 h-5 object-cover rounded"
                           />
                         ) : player.countryHeritage === "GB" ? (
                           <img 
                             src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                            alt="British Flag"
+                            alt={t("british_flag")}
                             className="w-8 h-5 object-cover rounded"
                           />
                         ) : (
                           <img 
                             src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg"
-                            alt="Swiss Flag"
+                            alt={t("swiss_flag")}
                             className="w-8 h-5 object-cover rounded"
                           />
                         )}
@@ -133,7 +129,7 @@ const Exiles9s = () => {
                     <div className="space-y-2">
                       {player.currentClub && player.currentClub !== "None" && (
                         <p className="text-sm text-gray-300">
-                          <span className="text-german-gold font-semibold">Club:</span> {player.currentClub}
+                          <span className="text-german-gold font-semibold">{t("club")}:</span> {player.currentClub}
                         </p>
                       )}
                       {player.role && (
