@@ -133,7 +133,7 @@ const Navigation = () => {
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1"
               >
-                {t("club_shop") || "Club Shop"} <ExternalLink className="h-3 w-3" />
+                Club Shop <ExternalLink className="h-3 w-3" />
               </a>
               
               <LanguageSwitcher />
@@ -180,7 +180,7 @@ const Navigation = () => {
               className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center gap-1"
               onClick={() => setIsOpen(false)}
             >
-              {t("club_shop") || "Club Shop"} <ExternalLink className="h-4 w-4" />
+              Club Shop <ExternalLink className="h-4 w-4" />
             </a>
             
             {/* Mobile Team Links */}
