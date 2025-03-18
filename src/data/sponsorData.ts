@@ -27,9 +27,9 @@ export const sponsorData: SponsorLogo[] = [
   },
   {
     id: "ipropertygroup",
-    name: "iProperty Group",
+    name: "LogicI",
     logo: "/lovable-uploads/024f0ade-065d-4049-8caf-ac7afe87606a.png",
-    website: null,
+    website: "https://logic-i.co.uk/",
     tier: "gold"
   },
   // Silver Sponsors
@@ -51,7 +51,7 @@ export const sponsorData: SponsorLogo[] = [
     id: "tudorjoinery",
     name: "Tudor Joinery Ltd",
     logo: "/lovable-uploads/8d54172b-b325-494c-89e9-032f9cad56a5.png",
-    website: null,
+    website: "https://tudorjoinery.co.uk",
     tier: "silver"
   },
   {

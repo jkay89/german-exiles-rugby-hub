@@ -15,7 +15,7 @@ const GoldSponsors = () => {
     } else if (id === "feet1st") {
       return "Feet 1st Physiotherapy provides expert physiotherapy services focusing on rehabilitative treatments and sports injury management. Their experienced team is dedicated to helping clients regain mobility and improve their quality of life through personalized care programs.";
     } else if (id === "ipropertygroup") {
-      return "iProperty Group specializes in real estate solutions with a focus on innovative property management, development, and investment opportunities. Their comprehensive approach helps clients navigate the property market with confidence.";
+      return "LogicI is a cutting-edge technology company specializing in innovative IT and software solutions. With expertise in providing bespoke IT support, cloud services, and cybersecurity solutions, LogicI helps businesses transform their digital infrastructure for enhanced productivity and protection.";
     }
     return "";
   };
