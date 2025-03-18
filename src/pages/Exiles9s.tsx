@@ -85,7 +85,7 @@ const Exiles9s = () => {
                         </div>
                       </div>
                       
-                      <div className="w-24 h-24 flex items-center justify-center">
+                      <div className={`${player.name === "Marcél Schlicht" ? "w-32 h-32" : "w-24 h-24"} flex items-center justify-center`}>
                         {player.image ? (
                           <img 
                             src={player.image}
