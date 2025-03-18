@@ -17,6 +17,13 @@ export const sponsorData: SponsorLogo[] = [
     website: "https://goldenguardvpn.com",
     tier: "gold"
   },
+  {
+    id: "feet1st",
+    name: "Feet 1st Physiotherapy",
+    logo: "/lovable-uploads/e7db2841-b98f-4200-b721-aa7e05d0aa97.png",
+    website: null,
+    tier: "gold"
+  },
   // Silver Sponsors
   {
     id: "beaubijou",
