@@ -27,7 +27,7 @@ const Exiles9s = () => {
     { number: "10", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE", currentClub: "Wath Brow Hornets" },
     { number: "8", name: "Korbi Mayer", countryHeritage: "DE" },
     { number: "19", name: "Harry Cartwright", countryHeritage: "DE" },
-    { number: "12", name: "Zach Burke", position: "Centre", countryHeritage: "GB", currentClub: "Featherstone Lions" },
+    { number: "12", name: "Zach Burke", position: "Centre", countryHeritage: "GB", currentClub: "Featherstone Lions", image: "/lovable-uploads/a2d09cab-2bb3-49ff-9913-9d7108a38278.png" },
     { number: "4", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
     { number: "6", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB", currentClub: "Bentley" },
     { number: "2", name: "Marcél Schlicht", position: "None", countryHeritage: "CH", currentClub: "None", role: "Sponsor", image: "/lovable-uploads/b469f12d-4b0e-4ec7-a440-89ef8e502500.png" },
