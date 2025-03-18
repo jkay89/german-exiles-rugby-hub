@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import {
@@ -35,6 +35,8 @@ const Navigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
   const isTeamActive = teamLinks.some(link => isActive(link.href));
+
+  const CLUB_SHOP_URL = "https://prontoteamwear.co.uk/product-category/club-shops/rugby-club-shops/german-exiles/";
 
   const renderDesktopLinks = () => {
     return links.map((link, index) => {
@@ -123,6 +125,17 @@ const Navigation = () => {
           <div className="hidden md:flex md:items-center">
             <div className="ml-10 flex items-center space-x-4">
               {renderDesktopLinks()}
+              
+              {/* Club Shop External Link */}
+              <a 
+                href={CLUB_SHOP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1"
+              >
+                {t("club_shop") || "Club Shop"} <ExternalLink className="h-3 w-3" />
+              </a>
+              
               <LanguageSwitcher />
             </div>
           </div>
@@ -158,6 +171,18 @@ const Navigation = () => {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Club Shop External Link for Mobile */}
+            <a 
+              href={CLUB_SHOP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center gap-1"
+              onClick={() => setIsOpen(false)}
+            >
+              {t("club_shop") || "Club Shop"} <ExternalLink className="h-4 w-4" />
+            </a>
+            
             {/* Mobile Team Links */}
             {teamLinks.map((link) => (
               <Link
