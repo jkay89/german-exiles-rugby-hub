@@ -80,7 +80,7 @@ export const sponsorData: SponsorLogo[] = [
     id: "wellnesshub",
     name: "Wellness Hub",
     logo: "/lovable-uploads/035a87e1-0bf3-41af-b5da-8f1cb7bb505d.png",
-    website: "https://wellnesshub.co",
+    website: "https://thewellnesshubonline.co.uk/",
     tier: "affiliate"
   },
   {
