@@ -9,6 +9,13 @@ const GoldSponsors = () => {
   
   const goldSponsors = sponsorData.filter(sponsor => sponsor.tier === "gold");
   
+  const getSponsorDescription = (id: string) => {
+    if (id === "goldenguard") {
+      return "Golden Guard VPN is a premium virtual private network service dedicated to providing secure, private, and unrestricted internet access to users worldwide. With military-grade encryption, a strict no-logs policy, and servers in multiple countries, Golden Guard VPN ensures that your online activities remain protected from surveillance and cyber threats.";
+    }
+    return "";
+  };
+  
   return (
     <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
       <div className="container mx-auto px-6">
@@ -19,7 +26,7 @@ const GoldSponsors = () => {
             <SponsorCard
               key={sponsor.id}
               name={sponsor.name}
-              description=""
+              description={getSponsorDescription(sponsor.id)}
               logoSrc={sponsor.logo}
               websiteUrl={sponsor.website || undefined}
               delay={0.4 + (index * 0.1)}
