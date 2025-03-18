@@ -116,9 +116,11 @@ const Exiles9s = () => {
                             className="w-8 h-5 object-cover rounded"
                           />
                         ) : (
-                          <div className="w-8 h-5 bg-red-600 flex items-center justify-center rounded">
-                            <span className="text-white text-xs">CH</span>
-                          </div>
+                          <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg"
+                            alt="Swiss Flag"
+                            className="w-8 h-5 object-cover rounded"
+                          />
                         )}
                       </div>
                     </div>
