@@ -1,3 +1,4 @@
+
 import { SponsorLogo } from "@/components/home/types";
 
 export const sponsorData: SponsorLogo[] = [
@@ -36,6 +37,27 @@ export const sponsorData: SponsorLogo[] = [
     id: "forjosef",
     name: "ForJosef",
     logo: "/lovable-uploads/86e094ab-21e7-4af4-8964-005499f0b682.png",
+    website: null,
+    tier: "silver"
+  },
+  {
+    id: "tudorjoinery",
+    name: "Tudor Joinery Ltd",
+    logo: "/lovable-uploads/8d54172b-b325-494c-89e9-032f9cad56a5.png",
+    website: null,
+    tier: "silver"
+  },
+  {
+    id: "paulreadman",
+    name: "In Memory of Paul Readman",
+    logo: "/lovable-uploads/11121476-1703-48ad-800a-7b6b2a71c787.png",
+    website: null,
+    tier: "silver"
+  },
+  {
+    id: "adamsdecor",
+    name: "Adams Decor",
+    logo: "/lovable-uploads/792d38c5-2df1-44a3-9961-07579b56c10a.png",
     website: null,
     tier: "silver"
   },
