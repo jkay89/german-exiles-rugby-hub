@@ -1,3 +1,4 @@
+
 import { SponsorLogo } from "@/components/home/types";
 
 export const sponsorData: SponsorLogo[] = [
@@ -50,7 +51,7 @@ export const sponsorData: SponsorLogo[] = [
     id: "tudorjoinery",
     name: "Tudor Joinery Ltd",
     logo: "/lovable-uploads/8d54172b-b325-494c-89e9-032f9cad56a5.png",
-    website: "https://tudorjoinery.co.uk",
+    website: "https://tudorjoinery.com/",
     tier: "silver"
   },
   {
