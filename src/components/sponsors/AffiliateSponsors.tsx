@@ -39,9 +39,9 @@ const getSponsorDescription = (name: string) => {
     "Elite Workforce Solutions": "Elite Workforce Solutions specializes in providing staffing and recruitment services across various industries.",
     "Wellness Hub": "Wellness Hub provides holistic wellness services, focusing on physical and mental health programs.",
     "Specialist Wind Services": "Specialist Wind Services delivers expert solutions for wind energy projects and technical consulting.",
-    "CMS Yorkshire Ltd": "Commercial and quantity surveying services providing professional expertise across Yorkshire.",
-    "Schlicht": "Innovative design and manufacturing solutions.",
-    "Maka Construction": "Professional construction and development services.",
+    "CMS Yorkshire Ltd": "CMS Yorkshire Ltd provides commercial and quantity surveying services across Yorkshire.",
+    "Schlicht": "With thanks to Marcel Schlicht.",
+    "Maxamaze": "Maxamaze is a specialized marketing agency focusing on strategic consultancy, brand building, and digital marketing solutions.",
     "Fellowes Farriery": "Expert farriery services by Ivan Fellowes DipWCF.",
     "White Hart Halstead": "Traditional pub and restaurant in Halstead.",
     "EMEA Channels": "Professional channel management and distribution services.",
@@ -52,4 +52,3 @@ const getSponsorDescription = (name: string) => {
 };
 
 export default AffiliateSponsors;
-

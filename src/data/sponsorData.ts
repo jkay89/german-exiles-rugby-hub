@@ -1,4 +1,3 @@
-
 import { SponsorLogo } from "@/components/home/types";
 
 export const sponsorData: SponsorLogo[] = [
@@ -106,37 +105,37 @@ export const sponsorData: SponsorLogo[] = [
   },
   {
     id: "makaconstruction",
-    name: "Maka Construction",
+    name: "Maxamaze",
     logo: "/lovable-uploads/7f7ce763-cdc0-470e-add5-e2f5a39c317b.png",
-    website: null,
+    website: "https://maxamaze.com/en",
     tier: "affiliate"
   },
   {
     id: "fellowes",
     name: "Fellowes Farriery",
     logo: "/lovable-uploads/a7745d47-664b-422c-9554-85a26b65bcc7.png",
-    website: null,
+    website: "https://fellowesfarriery.co.uk",
     tier: "affiliate"
   },
   {
     id: "whitehart",
     name: "White Hart Halstead",
     logo: "/lovable-uploads/4791d07f-a2e5-47bc-8c14-9efa1e7c3743.png",
-    website: null,
+    website: "https://whitehartathalstead.co.uk",
     tier: "affiliate"
   },
   {
     id: "emea",
     name: "EMEA Channels",
     logo: "/lovable-uploads/74ff3e9a-e806-4964-9697-5c26462f1d56.png",
-    website: null,
+    website: "https://emeachannels.com",
     tier: "affiliate"
   },
   {
     id: "pronto",
     name: "Pronto Rugby",
     logo: "/lovable-uploads/82bb56c2-068c-4f65-bd30-ad7d4ff3a8c2.png",
-    website: null,
+    website: "https://prontorugby.com",
     tier: "affiliate"
   }
 ];
