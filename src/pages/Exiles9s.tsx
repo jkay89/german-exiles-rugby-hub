@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -29,7 +30,7 @@ const Exiles9s = () => {
     { number: "12", name: "Zach Burke", position: "Centre", countryHeritage: "GB", currentClub: "Featherstone Lions" },
     { number: "4", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
     { number: "6", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB", currentClub: "Bentley" },
-    { number: "2", name: "Marcél Schlicht", position: "None", countryHeritage: "CH", currentClub: "None", role: "Sponsor" },
+    { number: "2", name: "Marcél Schlicht", position: "None", countryHeritage: "CH", currentClub: "None", role: "Sponsor", image: "/lovable-uploads/b469f12d-4b0e-4ec7-a440-89ef8e502500.png" },
   ];
 
   return (
