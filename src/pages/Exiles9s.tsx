@@ -19,7 +19,7 @@ const Exiles9s = () => {
   const players: PlayerProfile[] = [
     { number: "15", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", currentClub: "Thornhill Trojans", role: "Captain", image: "/lovable-uploads/dc8c46be-81e9-4ddf-9b23-adc3f72d2989.png" },
     { number: "5", name: "Zak Bredin", position: "Half Back", countryHeritage: "DE", currentClub: "Eastern Rhinos", role: "Vice Captain", image: "/lovable-uploads/2c677fd8-f43a-45a8-b0a1-491ba2d9eae4.png" },
-    { number: "44", name: "Henning Brockmann", countryHeritage: "DE", role: "Vice Captain" },
+    { number: "44", name: "Henning Brockmann", countryHeritage: "DE", role: "Vice Captain", image: "/lovable-uploads/035dfe88-6876-4599-9e2c-cecfdf900101.png" },
     { number: "23", name: "Malte Rohrmoser", position: "2nd Row", countryHeritage: "DE", currentClub: "Ruhrpott Ritter", image: "/lovable-uploads/dd1e1552-347d-4fc8-a19f-4f4e00b56168.png" },
     { number: "17", name: "Fabian Wendt", countryHeritage: "DE" },
     { number: "1", name: "Benedikt Esser", countryHeritage: "DE" },
