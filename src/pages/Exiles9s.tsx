@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -23,7 +22,7 @@ const Exiles9s = () => {
     { number: "23", name: "Malte Rohrmoser", position: "2nd Row", countryHeritage: "DE", currentClub: "Ruhrpott Ritter", image: "/lovable-uploads/dd1e1552-347d-4fc8-a19f-4f4e00b56168.png" },
     { number: "17", name: "Fabian Wendt", countryHeritage: "DE" },
     { number: "1", name: "Benedikt Esser", countryHeritage: "DE" },
-    { number: "3", name: "Aaron Willmott", countryHeritage: "DE" },
+    { number: "3", name: "Aaron Willmott", position: "Outside Backs", countryHeritage: "DE", currentClub: "Munich/Unterföhring", image: "/lovable-uploads/5bf2f50a-6738-4cc5-804e-fb82f4d1634b.png" },
     { number: "10", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE", currentClub: "Wath Brow Hornets" },
     { number: "8", name: "Korbi Mayer", countryHeritage: "DE" },
     { number: "19", name: "Harry Cartwright", countryHeritage: "DE" },
