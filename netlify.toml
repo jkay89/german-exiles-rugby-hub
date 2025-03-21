@@ -1,7 +1,16 @@
+
 [build]
   command = "npm run build"
   publish = "dist"
 
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.germanexilesrugbyleague.com/*"
+  to = "https://germanexilesrugbyleague.com/:splat"
+  status = 301
+  force = true
+
+# Handle all routes for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
