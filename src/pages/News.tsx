@@ -2,6 +2,8 @@
 import { motion } from "framer-motion";
 import { Newspaper } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Link } from "react-router-dom";
+import { newsArticles } from "@/data/newsData";
 
 const News = () => {
   const { t } = useLanguage();
@@ -20,21 +22,51 @@ const News = () => {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {/* Placeholder news items */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gray-900 rounded-lg overflow-hidden border border-german-red hover:border-german-gold transition-colors duration-300"
-          >
-            <div className="aspect-video bg-gray-800 flex items-center justify-center">
-              <Newspaper className="h-12 w-12 text-gray-600" />
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-white mb-2">{t("coming_soon")}</h3>
-              <p className="text-gray-400">{t("news_coming_soon")}</p>
-            </div>
-          </motion.div>
+          {newsArticles.length > 0 ? (
+            newsArticles.map((article) => (
+              <motion.div
+                key={article.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gray-900 rounded-lg overflow-hidden border border-german-red hover:border-german-gold transition-colors duration-300"
+              >
+                <Link to={`/news/${article.id}`}>
+                  <div className="aspect-video bg-gray-800 flex items-center justify-center overflow-hidden">
+                    {article.featuredImage ? (
+                      <img 
+                        src={article.featuredImage} 
+                        alt={article.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Newspaper className="h-12 w-12 text-gray-600" />
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <p className="text-sm text-gray-400 mb-2">{article.date}</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{article.title}</h3>
+                    <p className="text-gray-400">{article.summary}</p>
+                  </div>
+                </Link>
+              </motion.div>
+            ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-gray-900 rounded-lg overflow-hidden border border-german-red hover:border-german-gold transition-colors duration-300"
+            >
+              <div className="aspect-video bg-gray-800 flex items-center justify-center">
+                <Newspaper className="h-12 w-12 text-gray-600" />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2">{t("coming_soon")}</h3>
+                <p className="text-gray-400">{t("news_coming_soon")}</p>
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </div>

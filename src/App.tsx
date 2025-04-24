@@ -17,6 +17,15 @@ import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
 import Contact from "./pages/Contact";
 import News from "./pages/News";
+import NewsArticle from "./pages/NewsArticle";
+import Media from "./pages/Media";
+import MediaFolder from "./pages/MediaFolder";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminPlayers from "./pages/admin/AdminPlayers";
+import AdminNews from "./pages/admin/AdminNews";
+import AdminMedia from "./pages/admin/AdminMedia";
+import { AdminProvider } from "./contexts/AdminContext";
 
 const queryClient = new QueryClient();
 
@@ -25,24 +34,34 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <LanguageProvider>
-        <BrowserRouter>
-          <Navigation />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/heritage-team" element={<HeritageTeam />} />
-            <Route path="/community-team" element={<CommunityTeam />} />
-            <Route path="/exiles-9s" element={<Exiles9s />} />
-            <Route path="/staff" element={<Staff />} />
-            <Route path="/fixtures" element={<Fixtures />} />
-            <Route path="/nrld" element={<NRLD />} />
-            <Route path="/sponsors" element={<Sponsors />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/news" element={<News />} />
-          </Routes>
-        </BrowserRouter>
-      </LanguageProvider>
+      <AdminProvider>
+        <LanguageProvider>
+          <BrowserRouter>
+            <Navigation />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/heritage-team" element={<HeritageTeam />} />
+              <Route path="/community-team" element={<CommunityTeam />} />
+              <Route path="/exiles-9s" element={<Exiles9s />} />
+              <Route path="/staff" element={<Staff />} />
+              <Route path="/fixtures" element={<Fixtures />} />
+              <Route path="/nrld" element={<NRLD />} />
+              <Route path="/sponsors" element={<Sponsors />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsArticle />} />
+              <Route path="/media" element={<Media />} />
+              <Route path="/media/:id" element={<MediaFolder />} />
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/players" element={<AdminPlayers />} />
+              <Route path="/admin/news" element={<AdminNews />} />
+              <Route path="/admin/media" element={<AdminMedia />} />
+            </Routes>
+          </BrowserRouter>
+        </LanguageProvider>
+      </AdminProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
