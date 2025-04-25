@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
-import { folder, plus, upload, images } from "lucide-react";
+import { Folder, Plus, Upload, Images } from "lucide-react";
 
 // Sample media folders
 const mediaFolders = [
@@ -55,7 +55,7 @@ const AdminMedia = () => {
               onClick={() => setIsCreating(!isCreating)} 
               className="bg-german-red hover:bg-german-gold flex items-center gap-2"
             >
-              <plus className="h-4 w-4" /> Create New Folder
+              <Plus className="h-4 w-4" /> Create New Folder
             </Button>
           </div>
           
@@ -81,7 +81,7 @@ const AdminMedia = () => {
               <div className="mb-4">
                 <label className="block text-sm text-gray-400 mb-2">Cover Image</label>
                 <Button className="bg-gray-700 text-white flex items-center gap-2">
-                  <upload className="h-4 w-4" /> Choose Image
+                  <Upload className="h-4 w-4" /> Choose Image
                 </Button>
               </div>
               <div className="flex justify-end gap-2">
@@ -108,14 +108,14 @@ const AdminMedia = () => {
                   <div className="flex justify-between items-center mb-2">
                     <p className="text-sm text-gray-400">{folder.date}</p>
                     <p className="text-sm text-gray-400 flex items-center gap-1">
-                      <images className="h-3 w-3" /> {folder.count}
+                      <Images className="h-3 w-3" /> {folder.count}
                     </p>
                   </div>
                   <h3 className="text-lg font-medium text-white mb-3">{folder.title}</h3>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1 bg-german-red hover:bg-german-gold">Edit</Button>
                     <Button size="sm" variant="outline" className="flex items-center gap-1">
-                      <upload className="h-3 w-3" /> Add Files
+                      <Upload className="h-3 w-3" /> Add Files
                     </Button>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ const AdminMedia = () => {
           
           <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center mb-4">
             <div className="flex flex-col items-center">
-              <upload className="h-12 w-12 text-gray-500 mb-2" />
+              <Upload className="h-12 w-12 text-gray-500 mb-2" />
               <p className="text-gray-400 mb-2">Drag and drop files here, or click to select files</p>
               <p className="text-sm text-gray-500">Supported formats: JPG, PNG, GIF, MP4, WebM</p>
               <Button className="mt-4 bg-gray-800 text-white">Browse Files</Button>

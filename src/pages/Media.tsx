@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { images, folder } from "lucide-react";
+import { Images, Folder } from "lucide-react";
 
 interface MediaFolder {
   id: string;
@@ -34,7 +34,7 @@ const Media = () => {
         className="container mx-auto px-6 py-12"
       >
         <div className="flex flex-col items-center gap-4 mb-8 text-center">
-          <images className="h-8 w-8 text-german-gold" />
+          <Images className="h-8 w-8 text-german-gold" />
           <h1 className="text-4xl font-bold text-white">{t("media")}</h1>
         </div>
 
@@ -60,9 +60,9 @@ const Media = () => {
                     <p className="text-sm text-gray-400">{folder.date}</p>
                     <div className="flex items-center gap-1">
                       {folder.type === "photo" ? (
-                        <images className="h-4 w-4 text-gray-400" />
+                        <Images className="h-4 w-4 text-gray-400" />
                       ) : (
-                        <folder className="h-4 w-4 text-gray-400" />
+                        <Folder className="h-4 w-4 text-gray-400" />
                       )}
                     </div>
                   </div>

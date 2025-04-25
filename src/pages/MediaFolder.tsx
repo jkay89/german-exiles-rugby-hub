@@ -1,7 +1,7 @@
 
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { images, Calendar } from "lucide-react";
+import { Images, Calendar } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 // This is a sample collection, in a real app this would be loaded from a database
@@ -51,7 +51,7 @@ const MediaFolder = () => {
         className="container mx-auto px-6 py-12"
       >
         <div className="flex flex-col items-center gap-4 mb-8 text-center">
-          <images className="h-8 w-8 text-german-gold" />
+          <Images className="h-8 w-8 text-german-gold" />
           <h1 className="text-4xl font-bold text-white">{folder.title}</h1>
           <div className="flex items-center gap-2 text-gray-400">
             <Calendar className="h-4 w-4" />

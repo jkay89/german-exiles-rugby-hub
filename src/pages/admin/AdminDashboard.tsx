@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { folder, images, plus, news, edit } from "lucide-react";
+import { Folder, Images, Plus, Edit } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -41,7 +41,7 @@ const AdminDashboard = () => {
           <Card className="bg-gray-900 border-gray-800 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <edit className="h-5 w-5 text-german-gold" />
+                <Edit className="h-5 w-5 text-german-gold" />
                 Players Management
               </CardTitle>
             </CardHeader>
@@ -56,7 +56,7 @@ const AdminDashboard = () => {
           <Card className="bg-gray-900 border-gray-800 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <news className="h-5 w-5 text-german-gold" />
+                <Images className="h-5 w-5 text-german-gold" />
                 News Management
               </CardTitle>
             </CardHeader>
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
           <Card className="bg-gray-900 border-gray-800 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <folder className="h-5 w-5 text-german-gold" />
+                <Folder className="h-5 w-5 text-german-gold" />
                 Media Management
               </CardTitle>
             </CardHeader>
@@ -91,13 +91,13 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Button variant="outline" className="flex items-center gap-2">
-                <plus className="h-4 w-4" /> Add New Player
+                <Plus className="h-4 w-4" /> Add New Player
               </Button>
               <Button variant="outline" className="flex items-center gap-2">
-                <plus className="h-4 w-4" /> Create News Article
+                <Plus className="h-4 w-4" /> Create News Article
               </Button>
               <Button variant="outline" className="flex items-center gap-2">
-                <plus className="h-4 w-4" /> Upload Media
+                <Plus className="h-4 w-4" /> Upload Media
               </Button>
             </div>
           </CardContent>

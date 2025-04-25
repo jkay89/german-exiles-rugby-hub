@@ -1,6 +1,6 @@
 
-import { en } from './en';
-import { de } from './de';
+import en from './en';
+import de from './de';
 
 export type Language = 'en' | 'de';
 export type TranslationKey = keyof typeof en;

@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { newsArticles } from "@/data/newsData";
-import { plus, edit, upload } from "lucide-react";
+import { Plus, Edit, Upload } from "lucide-react";
 
 const AdminNews = () => {
   const { isAuthenticated } = useAdmin();
@@ -63,7 +63,7 @@ const AdminNews = () => {
               <label className="block text-sm text-gray-400 mb-2">Featured Image</label>
               <div className="flex items-center space-x-4">
                 <Button className="bg-gray-800 text-white flex items-center gap-2">
-                  <upload className="h-4 w-4" /> Upload Image
+                  <Upload className="h-4 w-4" /> Upload Image
                 </Button>
                 <p className="text-gray-400 text-sm">No image selected</p>
               </div>
@@ -72,7 +72,7 @@ const AdminNews = () => {
           
           <div className="mt-6 flex justify-end">
             <Button className="bg-german-red hover:bg-german-gold flex items-center gap-2">
-              <plus className="h-4 w-4" /> Create Article
+              <Plus className="h-4 w-4" /> Create Article
             </Button>
           </div>
         </div>
@@ -99,7 +99,7 @@ const AdminNews = () => {
                     <td className="px-4 py-3 text-sm text-gray-300">
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="flex items-center gap-1">
-                          <edit className="h-3 w-3" /> Edit
+                          <Edit className="h-3 w-3" /> Edit
                         </Button>
                         <Button size="sm" variant="destructive">Delete</Button>
                       </div>
