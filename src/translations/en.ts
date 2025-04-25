@@ -1,3 +1,4 @@
+
 export default {
   home: "Home",
   about: "About Us",
@@ -26,5 +27,62 @@ export default {
   german_exiles_logo: "German Exiles Logo",
   media: "Media",
   folder_not_found: "Folder Not Found",
-  article_not_found: "Article Not Found"
+  article_not_found: "Article Not Found",
+  
+  // About page translations
+  about_title: "About German Exiles Rugby League",
+  about_description: "The German Exiles Rugby League is dedicated to promoting and developing rugby league in Germany. We provide pathways for players with German heritage to represent their country on an international stage while building a strong foundation for the sport's future in Germany.",
+  competitive_pathway: "Competitive Pathway",
+  competitive_pathway_text: "Creating opportunities for German heritage players to compete at international tournaments and showcase their skills on a global stage.",
+  bundesleague_development: "BundesLeague Development",
+  bundesleague_development_text: "Supporting the development of domestic rugby league in Germany through collaborative initiatives with local clubs and organizations.",
+  networking_opportunities: "Networking Opportunities",
+  networking_opportunities_text: "Connecting German heritage players worldwide and building a community of rugby league enthusiasts with a shared cultural identity.",
+  skill_development: "Skill Development",
+  skill_development_text: "Offering coaching, training camps, and educational resources to enhance player skills and rugby league knowledge in Germany.",
+  
+  // Heritage Team translations
+  heritage_team_title: "Heritage Team",
+  heritage_team_description: "The German Exiles Heritage Team consists of players with German ancestry who represent their heritage on the international stage. These players bring experience from various competitive leagues to strengthen German rugby league.",
+  heritage: "Heritage",
+  german: "German",
+  british: "British",
+  
+  // Community Team translations
+  community_team_title: "Community Team",
+  community_team_description: "The German Exiles Community Team focuses on grassroots development and community engagement. This team provides opportunities for players from diverse backgrounds to participate in rugby league and contribute to the sport's growth in Germany.",
+  
+  // Staff page translations
+  staff_title: "Coaching & Support Staff",
+  staff_description: "Meet the dedicated individuals who work behind the scenes to develop our players and promote the growth of rugby league in Germany.",
+  
+  // Fixtures page translations
+  fixtures_results: "Fixtures & Results",
+  fixtures_description: "View upcoming matches, past results, and player statistics for the German Exiles teams.",
+  upcoming_fixtures: "Upcoming Fixtures",
+  match_results: "Match Results",
+  
+  // NRLD page translations
+  nrld_title: "National Rugby League Deutschland",
+  nrld_description: "The National Rugby League Deutschland (NRLD) is the governing body for rugby league in Germany, working to develop the sport at all levels throughout the country.",
+  competitions: "Competitions",
+  competitions_text: "The NRLD organizes domestic competitions including the German Rugby League Championship and regional tournaments to grow the sport's presence across the country.",
+  development_programs: "Development Programs",
+  development_text: "Various initiatives focused on player development, coaching education, and referee training to build capacity within German rugby league.",
+  future_vision: "Future Vision",
+  future_text: "The long-term goal is to establish Germany as a competitive rugby league nation with sustainable domestic competitions and international representation.",
+  fixtures_announced_soon: "Fixture announcements coming soon for the upcoming season.",
+  
+  // Contact page translations
+  contact_title: "Contact Us",
+  contact_description: "Get in touch with the German Exiles Rugby League team. We're always looking to connect with players, sponsors, and rugby league enthusiasts.",
+  send_message: "Send Us A Message",
+  name: "Name",
+  email: "Email",
+  message: "Message",
+  send_button: "Send Message",
+  connect_with_us: "Connect With Us",
+  social_media: "Social Media",
+  message_sent: "Message Sent",
+  message_sent_description: "Thank you for your message. We'll get back to you soon."
 };
