@@ -1,4 +1,3 @@
-
 export default {
   home: "Startseite",
   about: "Über Uns",
@@ -97,5 +96,22 @@ export default {
   connect_with_us: "Verbinde Dich Mit Uns",
   social_media: "Soziale Medien",
   message_sent: "Nachricht Gesendet",
-  message_sent_description: "Vielen Dank für deine Nachricht. Wir werden uns in Kürze bei dir melden."
+  message_sent_description: "Vielen Dank für deine Nachricht. Wir werden uns in Kürze bei dir melden.",
+
+  // Admin translations
+  edit_content: "Inhalt Bearbeiten",
+  edit_image: "Bild Bearbeiten",
+  save_changes: "Änderungen Speichern",
+  upload_new_image: "Neues Bild Hochladen",
+  content_saved: "Inhalt Gespeichert",
+  content_updated: "Inhalt wurde erfolgreich aktualisiert",
+  sponsor_name: "Sponsor Name",
+  sponsor_description: "Sponsor Beschreibung",
+  sponsor_website: "Sponsor Webseite",
+  sponsor_tier: "Sponsor Kategorie",
+  platinum_sponsor: "Platin Sponsor",
+  gold_sponsor: "Gold Sponsor",
+  silver_sponsors: "Silber Sponsoren",
+  affiliate_sponsors: "Partner Sponsoren",
+  visit_website: "Webseite Besuchen",
 };

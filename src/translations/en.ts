@@ -1,4 +1,3 @@
-
 export default {
   home: "Home",
   about: "About Us",
@@ -97,5 +96,22 @@ export default {
   connect_with_us: "Connect With Us",
   social_media: "Social Media",
   message_sent: "Message Sent",
-  message_sent_description: "Thank you for your message. We'll get back to you soon."
+  message_sent_description: "Thank you for your message. We'll get back to you soon.",
+
+  // Admin translations
+  edit_content: "Edit Content",
+  edit_image: "Edit Image",
+  save_changes: "Save Changes",
+  upload_new_image: "Upload New Image",
+  content_saved: "Content Saved",
+  content_updated: "Content has been updated successfully",
+  sponsor_name: "Sponsor Name",
+  sponsor_description: "Sponsor Description",
+  sponsor_website: "Sponsor Website",
+  sponsor_tier: "Sponsor Tier",
+  platinum_sponsor: "Platinum Sponsor",
+  gold_sponsor: "Gold Sponsor",
+  silver_sponsors: "Silver Sponsors",
+  affiliate_sponsors: "Affiliate Sponsors",
+  visit_website: "Visit Website",
 };

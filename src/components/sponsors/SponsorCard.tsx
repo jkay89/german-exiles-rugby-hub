@@ -1,7 +1,8 @@
-
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAdmin } from "@/contexts/AdminContext";
+import EditSponsorForm from "./EditSponsorForm";
 
 interface SponsorCardProps {
   name: string;
@@ -23,14 +24,32 @@ const SponsorCard = ({
   isAffiliate = false
 }: SponsorCardProps) => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAdmin();
   
+  const handleSave = (data: any) => {
+    // TODO: Implement save functionality when backend is connected
+    console.log("Saving sponsor data:", data);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={`bg-black border border-german-red rounded-lg ${isMajorSponsor ? 'p-8' : 'p-6'} hover:border-german-gold transition-colors duration-300 h-full`}
+      className={`bg-black border border-german-red rounded-lg ${isMajorSponsor ? 'p-8' : 'p-6'} hover:border-german-gold transition-colors duration-300 h-full relative`}
     >
+      {isAuthenticated && (
+        <EditSponsorForm
+          id={name.toLowerCase().replace(/\s+/g, '-')}
+          name={name}
+          description={description}
+          logoSrc={logoSrc}
+          websiteUrl={websiteUrl}
+          tier={isMajorSponsor ? (isAffiliate ? "affiliate" : "gold") : "silver"}
+          onSave={handleSave}
+        />
+      )}
+
       <div className={`flex flex-col ${isMajorSponsor ? 'md:flex-row' : ''} items-center gap-${isMajorSponsor ? '8' : '4'}`}>
         {websiteUrl ? (
           <a 
