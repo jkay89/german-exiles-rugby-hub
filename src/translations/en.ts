@@ -7,6 +7,7 @@ export default {
   staff: "Staff",
   fixtures: "Fixtures",
   latest_news: "Latest News",
+  news: "News",
   nrld: "NRLD",
   sponsors: "Sponsors",
   contact: "Contact",
@@ -28,6 +29,18 @@ export default {
   media: "Media",
   folder_not_found: "Folder Not Found",
   article_not_found: "Article Not Found",
+  
+  // Hero section
+  hero_title: "German Exiles Rugby League",
+  hero_subtitle: "Developing the future of German rugby league talent",
+  
+  // Mission section
+  our_mission: "Our Mission",
+  mission_text: "German Exiles Rugby League exists to provide a pathway for German heritage players to represent their country and develop rugby league at all levels throughout Germany. We're committed to building a sustainable future for the sport in Germany through our heritage and community programs.",
+  
+  // Join us section
+  join_us: "Join Us",
+  become_part: "Become a part of the German Exiles Rugby League community and help us grow the sport in Germany.",
   
   // About page translations
   about_title: "About German Exiles Rugby League",

@@ -7,6 +7,7 @@ export default {
   staff: "Mitarbeiter",
   fixtures: "Spielplan",
   latest_news: "Aktuelle Nachrichten",
+  news: "Nachrichten",
   nrld: "NRLD",
   sponsors: "Sponsoren",
   contact: "Kontakt",
@@ -28,6 +29,18 @@ export default {
   media: "Medien",
   folder_not_found: "Ordner Nicht Gefunden",
   article_not_found: "Artikel Nicht Gefunden",
+  
+  // Hero section
+  hero_title: "German Exiles Rugby League",
+  hero_subtitle: "Entwicklung der Zukunft des deutschen Rugby League Talents",
+  
+  // Mission section
+  our_mission: "Unsere Mission",
+  mission_text: "German Exiles Rugby League existiert, um deutschen Spielern mit Wurzeln in Deutschland die Möglichkeit zu geben, ihr Land zu vertreten und Rugby League auf allen Ebenen in Deutschland zu entwickeln. Wir setzen uns für eine nachhaltige Zukunft des Sports in Deutschland durch unsere Heritage- und Community-Programme ein.",
+  
+  // Join us section
+  join_us: "Mach Mit",
+  become_part: "Werde Teil der German Exiles Rugby League Gemeinschaft und hilf uns, den Sport in Deutschland zu fördern.",
   
   // About page translations
   about_title: "Über German Exiles Rugby League",
