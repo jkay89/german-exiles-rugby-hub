@@ -1,10 +1,11 @@
+
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Folder, Images, Plus, Edit } from "lucide-react";
+import { Folder, Images, Plus, Edit, Calendar } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -82,23 +83,38 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         
-        <Card className="bg-gray-900 border-gray-800 text-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-german-gold" />
-              Sponsor Management
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-400 mb-4">Add, edit, or remove sponsors from the website.</p>
-            <Link to="/admin/sponsors">
-              <Button className="w-full bg-german-red hover:bg-german-gold">Manage Sponsors</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5 text-german-gold" />
+                Sponsor Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Add, edit, or remove sponsors from the website.</p>
+              <Link to="/admin/sponsors">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Sponsors</Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-      <Card className="bg-gray-900 border-gray-800 text-white mb-8">
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-german-gold" />
+                Fixtures & Results
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Manage fixtures and update match results.</p>
+              <Link to="/admin/fixtures">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Fixtures</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-gray-900 border-gray-800 text-white mb-8">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
