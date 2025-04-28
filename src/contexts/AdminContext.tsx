@@ -1,5 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
 interface AdminContextType {
   isAuthenticated: boolean;
@@ -25,34 +27,41 @@ interface AdminProviderProps {
 export const AdminProvider = ({ children }: AdminProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentAdmin, setCurrentAdmin] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    // Check local storage for existing authentication
-    const storedAuth = localStorage.getItem("adminAuth");
-    if (storedAuth) {
-      const authData = JSON.parse(storedAuth);
-      setIsAuthenticated(true);
-      setCurrentAdmin(authData.email);
-    }
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setIsAuthenticated(!!session);
+        setCurrentAdmin(session?.user?.email ?? null);
+        setSession(session);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setCurrentAdmin(session?.user?.email ?? null);
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // For development purposes, use a simple hardcoded admin
-  // In production, this should be replaced with a proper authentication system
   const login = async (email: string, password: string) => {
-    // For simplicity, we'll accept only one admin account for now
-    if (email === "jay@germanexilesrl.co.uk" && password === "admin123") {
-      setIsAuthenticated(true);
-      setCurrentAdmin(email);
-      localStorage.setItem("adminAuth", JSON.stringify({ email }));
-      return true;
-    }
-    return false;
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return !error;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
     setCurrentAdmin(null);
-    localStorage.removeItem("adminAuth");
+    setSession(null);
   };
 
   return (
