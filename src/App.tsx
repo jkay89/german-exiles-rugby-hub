@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +25,7 @@ import AdminPlayers from "./pages/admin/AdminPlayers";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminMedia from "./pages/admin/AdminMedia";
 import { AdminProvider } from "./contexts/AdminContext";
+import AdminSponsors from "./pages/admin/AdminSponsors";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +58,7 @@ const App = () => (
               <Route path="/admin/players" element={<AdminPlayers />} />
               <Route path="/admin/news" element={<AdminNews />} />
               <Route path="/admin/media" element={<AdminMedia />} />
+              <Route path="/admin/sponsors" element={<AdminSponsors />} />
             </Routes>
           </BrowserRouter>
         </LanguageProvider>
