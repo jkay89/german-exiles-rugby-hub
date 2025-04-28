@@ -116,6 +116,7 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
+      </motion.div>
     </div>
   );
 };
