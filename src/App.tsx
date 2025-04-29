@@ -3,8 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { useEffect } from "react";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
@@ -28,8 +29,23 @@ import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminFixtures from "./pages/admin/AdminFixtures";
 import { AdminProvider } from "./contexts/AdminContext";
+import { setupSupabase } from "./lib/supabase-setup";
 
 const queryClient = new QueryClient();
+
+// Initialize Supabase setup
+setupSupabase().catch(console.error);
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,6 +55,7 @@ const App = () => (
       <AdminProvider>
         <LanguageProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <Navigation />
             <Routes>
               <Route path="/" element={<Index />} />
