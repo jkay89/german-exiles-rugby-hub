@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -54,7 +53,10 @@ const AdminMedia = () => {
     if (!isAuthenticated) {
       navigate("/admin");
     } else {
-      fetchMediaFolders();
+      // First, create tables if they don't exist
+      createMediaTablesIfNeeded().then(() => {
+        fetchMediaFolders();
+      });
     }
   }, [isAuthenticated, navigate]);
 
@@ -64,16 +66,40 @@ const AdminMedia = () => {
     }
   }, [selectedFolder]);
 
+  const createMediaTablesIfNeeded = async () => {
+    try {
+      // Check if the media_folders table exists
+      const { error } = await supabase.rpc('create_media_tables');
+      if (error && !error.message.includes('already exists')) {
+        console.error("Error creating media tables:", error);
+      }
+    } catch (err) {
+      console.error("Error checking/creating media tables:", err);
+    }
+  };
+
   const fetchMediaFolders = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('media_folders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMediaFolders(data || []);
+      // Try to fetch from media_folders
+      const { data, error } = await supabase.rpc('get_media_folders');
+      
+      if (error) {
+        if (error.message.includes('function "get_media_folders" does not exist')) {
+          console.log("Using direct table query as RPC not available");
+          const directQuery = await supabase
+            .from('media_folders')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+          if (directQuery.error) throw directQuery.error;
+          setMediaFolders(directQuery.data || []);
+        } else {
+          throw error;
+        }
+      } else {
+        setMediaFolders(data || []);
+      }
     } catch (error: any) {
       toast({
         title: "Error fetching media folders",
@@ -88,14 +114,25 @@ const AdminMedia = () => {
   const fetchMediaItems = async (folderId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('media_items')
-        .select('*')
-        .eq('folder_id', folderId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMediaItems(data || []);
+      const { data, error } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
+      
+      if (error) {
+        if (error.message.includes('function "get_media_items" does not exist')) {
+          console.log("Using direct table query as RPC not available");
+          const directQuery = await supabase
+            .from('media_items')
+            .select('*')
+            .eq('folder_id', folderId)
+            .order('created_at', { ascending: true });
+            
+          if (directQuery.error) throw directQuery.error;
+          setMediaItems(directQuery.data || []);
+        } else {
+          throw error;
+        }
+      } else {
+        setMediaItems(data || []);
+      }
     } catch (error: any) {
       toast({
         title: "Error fetching media items",
@@ -266,7 +303,10 @@ const AdminMedia = () => {
   const handleUploadMedia = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!selectedFolder && !formData.get('folderSelect')) {
+    const formData = new FormData(e.currentTarget);
+    const folderId = (formData.get('folderSelect') as string) || selectedFolder;
+    
+    if (!folderId) {
       toast({
         title: "Select a folder",
         description: "Please select a folder to upload media to",
@@ -285,8 +325,6 @@ const AdminMedia = () => {
     }
     
     setIsUploading(true);
-    const formData = new FormData(e.currentTarget);
-    const folderId = (formData.get('folderSelect') as string) || selectedFolder;
     
     try {
       // Upload each file
@@ -439,6 +477,7 @@ const AdminMedia = () => {
     return null;
   }
 
+  
   return (
     <div className="pt-16 min-h-screen bg-black">
       <motion.div
