@@ -43,25 +43,16 @@ async function createStorageBucket(id: string, name: string) {
 }
 
 async function createMediaTables() {
-  // Check if media_folders table exists
-  const { error: folderError } = await supabase
-    .from('media_folders')
-    .select('id')
-    .limit(1)
-    .single();
-
-  if (folderError && folderError.message.includes('relation "media_folders" does not exist')) {
-    console.log('Creating media_folders and media_items tables...');
+  try {
+    // Use RPC to create tables instead of directly querying them
+    const { error } = await supabase.rpc('create_media_tables');
     
-    // Create media_folders table
-    const { error: createFoldersError } = await supabase.rpc('create_media_tables');
-    
-    if (createFoldersError) {
-      console.error('Error creating media tables:', createFoldersError);
+    if (error) {
+      console.error('Error creating media tables:', error);
     } else {
-      console.log('Media tables created successfully');
+      console.log('Media tables created or already exist');
     }
-  } else {
-    console.log('Media tables already exist');
+  } catch (error) {
+    console.error('Error checking/creating media tables:', error);
   }
 }

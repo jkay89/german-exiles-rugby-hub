@@ -11,24 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Folder, Plus, Upload, Images, Edit, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
-
-interface MediaFolder {
-  id: string;
-  title: string;
-  description?: string;
-  date: string;
-  thumbnail_url?: string;
-  created_at: string;
-}
-
-interface MediaItem {
-  id: string;
-  folder_id: string;
-  url: string;
-  type: string;
-  title?: string;
-  created_at: string;
-}
+import { MediaFolder, MediaItem, fetchMediaFolders, fetchMediaItems, createMediaFolder, updateMediaFolder, deleteMediaFolder, createMediaItem, deleteMediaItem } from "@/utils/mediaUtils";
 
 const AdminMedia = () => {
   const { isAuthenticated } = useAdmin();
@@ -55,20 +38,19 @@ const AdminMedia = () => {
     } else {
       // First, create tables if they don't exist
       createMediaTablesIfNeeded().then(() => {
-        fetchMediaFolders();
+        loadMediaFolders();
       });
     }
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (selectedFolder) {
-      fetchMediaItems(selectedFolder);
+      loadMediaItems(selectedFolder);
     }
   }, [selectedFolder]);
 
   const createMediaTablesIfNeeded = async () => {
     try {
-      // Check if the media_folders table exists
       const { error } = await supabase.rpc('create_media_tables');
       if (error && !error.message.includes('already exists')) {
         console.error("Error creating media tables:", error);
@@ -78,28 +60,11 @@ const AdminMedia = () => {
     }
   };
 
-  const fetchMediaFolders = async () => {
+  const loadMediaFolders = async () => {
     setLoading(true);
     try {
-      // Try to fetch from media_folders
-      const { data, error } = await supabase.rpc('get_media_folders');
-      
-      if (error) {
-        if (error.message.includes('function "get_media_folders" does not exist')) {
-          console.log("Using direct table query as RPC not available");
-          const directQuery = await supabase
-            .from('media_folders')
-            .select('*')
-            .order('created_at', { ascending: false });
-            
-          if (directQuery.error) throw directQuery.error;
-          setMediaFolders(directQuery.data || []);
-        } else {
-          throw error;
-        }
-      } else {
-        setMediaFolders(data || []);
-      }
+      const folders = await fetchMediaFolders();
+      setMediaFolders(folders);
     } catch (error: any) {
       toast({
         title: "Error fetching media folders",
@@ -111,28 +76,11 @@ const AdminMedia = () => {
     }
   };
 
-  const fetchMediaItems = async (folderId: string) => {
+  const loadMediaItems = async (folderId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
-      
-      if (error) {
-        if (error.message.includes('function "get_media_items" does not exist')) {
-          console.log("Using direct table query as RPC not available");
-          const directQuery = await supabase
-            .from('media_items')
-            .select('*')
-            .eq('folder_id', folderId)
-            .order('created_at', { ascending: true });
-            
-          if (directQuery.error) throw directQuery.error;
-          setMediaItems(directQuery.data || []);
-        } else {
-          throw error;
-        }
-      } else {
-        setMediaItems(data || []);
-      }
+      const items = await fetchMediaItems(folderId);
+      setMediaItems(items);
     } catch (error: any) {
       toast({
         title: "Error fetching media items",
@@ -201,12 +149,7 @@ const AdminMedia = () => {
         thumbnail_url: thumbnailUrl,
       };
       
-      const { data, error } = await supabase
-        .from('media_folders')
-        .insert([folderData])
-        .select();
-        
-      if (error) throw error;
+      const newFolder = await createMediaFolder(folderData);
       
       toast({
         title: "Folder created",
@@ -219,11 +162,9 @@ const AdminMedia = () => {
       setThumbnailPreview(null);
       
       // Select the newly created folder
-      if (data && data.length > 0) {
-        setSelectedFolder(data[0].id);
-      }
+      setSelectedFolder(newFolder.id);
       
-      fetchMediaFolders();
+      loadMediaFolders();
     } catch (error: any) {
       toast({
         title: "Error creating folder",
@@ -271,12 +212,7 @@ const AdminMedia = () => {
         thumbnail_url: thumbnailUrl,
       };
       
-      const { error } = await supabase
-        .from('media_folders')
-        .update(folderData)
-        .eq('id', editingFolder.id);
-        
-      if (error) throw error;
+      await updateMediaFolder(editingFolder.id, folderData);
       
       toast({
         title: "Folder updated",
@@ -288,7 +224,7 @@ const AdminMedia = () => {
       setThumbnailFile(null);
       setThumbnailPreview(null);
       
-      fetchMediaFolders();
+      loadMediaFolders();
     } catch (error: any) {
       toast({
         title: "Error updating folder",
@@ -350,18 +286,12 @@ const AdminMedia = () => {
                          'other';
         
         // Save media item in database
-        const mediaData = {
+        await createMediaItem({
           folder_id: folderId,
           url: fileUrl,
           type: fileType,
           title: file.name,
-        };
-        
-        const { error } = await supabase
-          .from('media_items')
-          .insert([mediaData]);
-          
-        if (error) throw error;
+        });
       }
       
       toast({
@@ -374,7 +304,7 @@ const AdminMedia = () => {
       if (folderId && folderId !== selectedFolder) {
         setSelectedFolder(folderId);
       } else if (folderId) {
-        fetchMediaItems(folderId);
+        loadMediaItems(folderId);
       }
       
     } catch (error: any) {
@@ -393,21 +323,7 @@ const AdminMedia = () => {
     
     setIsDeleting(true);
     try {
-      // First delete all media items in this folder
-      const { error: itemsDeleteError } = await supabase
-        .from('media_items')
-        .delete()
-        .eq('folder_id', deleteItemId);
-        
-      if (itemsDeleteError) throw itemsDeleteError;
-      
-      // Then delete the folder
-      const { error: folderDeleteError } = await supabase
-        .from('media_folders')
-        .delete()
-        .eq('id', deleteItemId);
-        
-      if (folderDeleteError) throw folderDeleteError;
+      await deleteMediaFolder(deleteItemId);
       
       toast({
         title: "Folder deleted",
@@ -420,7 +336,7 @@ const AdminMedia = () => {
       }
       
       setDeleteItemId(null);
-      fetchMediaFolders();
+      loadMediaFolders();
     } catch (error: any) {
       toast({
         title: "Error deleting folder",
@@ -437,12 +353,7 @@ const AdminMedia = () => {
     
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from('media_items')
-        .delete()
-        .eq('id', deleteItemId);
-        
-      if (error) throw error;
+      await deleteMediaItem(deleteItemId);
       
       toast({
         title: "Media item deleted",
@@ -452,7 +363,7 @@ const AdminMedia = () => {
       setDeleteItemId(null);
       
       if (selectedFolder) {
-        fetchMediaItems(selectedFolder);
+        loadMediaItems(selectedFolder);
       }
     } catch (error: any) {
       toast({
