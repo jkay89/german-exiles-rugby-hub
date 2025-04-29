@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -79,12 +78,12 @@ const AdminFixtures = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('fixtures')
+        .from("fixtures")
         .select('*')
         .order('date', { ascending: true });
 
       if (error) throw error;
-      setFixtures(data || []);
+      setFixtures(data as Fixture[] || []);
     } catch (error: any) {
       toast({
         title: "Error fetching fixtures",
@@ -100,12 +99,12 @@ const AdminFixtures = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('results')
+        .from("results")
         .select('*')
         .order('date', { ascending: false });
 
       if (error) throw error;
-      setResults(data || []);
+      setResults(data as Result[] || []);
     } catch (error: any) {
       toast({
         title: "Error fetching results",
@@ -133,7 +132,9 @@ const AdminFixtures = () => {
     };
     
     try {
-      const { error } = await supabase.from('fixtures').insert([fixtureData]);
+      const { error } = await supabase
+        .from("fixtures")
+        .insert([fixtureData]);
       
       if (error) throw error;
       
@@ -175,7 +176,7 @@ const AdminFixtures = () => {
     
     try {
       const { error } = await supabase
-        .from('fixtures')
+        .from("fixtures")
         .update(fixtureData)
         .eq('id', editingFixture.id);
       
@@ -216,7 +217,7 @@ const AdminFixtures = () => {
     };
     
     try {
-      const { error } = await supabase.from('results').insert([resultData]);
+      const { error } = await supabase.from("results").insert([resultData]);
       
       if (error) throw error;
       
@@ -259,7 +260,7 @@ const AdminFixtures = () => {
     
     try {
       const { error } = await supabase
-        .from('results')
+        .from("results")
         .update(resultData)
         .eq('id', editingResult.id);
       
@@ -289,7 +290,7 @@ const AdminFixtures = () => {
     setIsDeleting(true);
     try {
       const { error } = await supabase
-        .from('fixtures')
+        .from("fixtures")
         .delete()
         .eq('id', deleteItemId);
         
@@ -319,7 +320,7 @@ const AdminFixtures = () => {
     setIsDeleting(true);
     try {
       const { error } = await supabase
-        .from('results')
+        .from("results")
         .delete()
         .eq('id', deleteItemId);
         

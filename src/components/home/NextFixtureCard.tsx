@@ -1,96 +1,120 @@
 
-import { Calendar, MapPin, Clock } from "lucide-react";
-import { format } from "date-fns";
-import { Link } from "react-router-dom";
-import { Fixture } from "@/utils/fixtureUtils";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { format, parseISO } from "date-fns";
+import { CalendarDays, MapPin, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
-interface NextFixtureCardProps {
-  fixture: Fixture | null;
-  delay?: number;
+interface Fixture {
+  id: string;
+  team: string;
+  opponent: string;
+  date: string;
+  time: string;
+  location: string;
+  competition: string;
+  is_home: boolean;
 }
 
-const NextFixtureCard = ({ fixture, delay = 0.3 }: NextFixtureCardProps) => {
+export const NextFixtureCard = () => {
   const { t } = useLanguage();
-  
-  // Function to generate Google Maps URL from a location string
+  const [nextFixture, setNextFixture] = useState<Fixture | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNextFixture = async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        
+        const { data, error } = await supabase
+          .from('fixtures')
+          .select('*')
+          .gte('date', today)
+          .order('date', { ascending: true })
+          .limit(1);
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setNextFixture(data[0] as Fixture);
+        } else {
+          setNextFixture(null);
+        }
+      } catch (error) {
+        console.error("Error fetching next fixture:", error);
+        setNextFixture(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNextFixture();
+  }, []);
+
   const getGoogleMapsUrl = (location: string) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
   };
 
   return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay }}
-      whileHover={{ scale: 1.03 }}
-      className="bg-gradient-to-br from-gray-900 to-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-all duration-300 shadow-lg relative overflow-hidden h-full"
-    >
-      <div className="absolute -right-10 -top-10 w-40 h-40 bg-german-red/10 rounded-full blur-2xl"></div>
-      <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-german-gold/10 rounded-full blur-2xl"></div>
-      
-      <div className="flex items-center gap-3 mb-4">
-        <Calendar className="h-8 w-8 text-german-red" />
-        <h3 className="text-2xl font-bold text-white">{t("next_fixture")}</h3>
-      </div>
-      
-      {fixture ? (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: delay + 0.2 }}
-          className="space-y-3"
-        >
-          <p className="text-german-gold font-semibold text-xl">
-            German Exiles vs {fixture.opponent}
-          </p>
-          
-          <div className="flex items-center gap-2 text-gray-300">
-            <Clock className="h-4 w-4 text-german-red" />
-            <p>{format(new Date(fixture.date), "dd MMMM yyyy")}{fixture.time !== "TBC" ? `, ${fixture.time}` : " (TBC)"}</p>
+    <Card className="bg-gray-900 border-german-red border-2 h-full">
+      <CardHeader className="bg-german-red">
+        <CardTitle className="flex items-center text-white">
+          <CalendarDays className="mr-2 h-5 w-5 text-white" />
+          {t("next_fixture")}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-6 flex-grow">
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 text-german-gold animate-spin" />
           </div>
-          
-          <div className="flex items-start gap-2 text-gray-300">
-            <MapPin className="h-4 w-4 text-german-red min-w-4 mt-1" />
-            <a 
-              href={getGoogleMapsUrl(fixture.location)} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:text-german-gold transition-colors"
-            >
-              {fixture.location}
-            </a>
+        ) : nextFixture ? (
+          <div className="space-y-3 text-white">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-medium bg-gray-800 text-german-gold px-2 py-0.5 rounded">
+                  {nextFixture.team}
+                </span>
+                <span className="text-xs font-medium bg-gray-800 text-white px-2 py-0.5 rounded">
+                  {nextFixture.competition}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold">
+                {nextFixture.is_home ? "German Exiles" : nextFixture.opponent} vs {nextFixture.is_home ? nextFixture.opponent : "German Exiles"}
+              </h3>
+            </div>
+            <p className="text-german-gold flex items-center">
+              <CalendarDays className="mr-2 h-4 w-4" />
+              {format(parseISO(nextFixture.date), "EEEE, MMMM d, yyyy")} at {nextFixture.time}
+            </p>
+            <p>
+              <a 
+                href={getGoogleMapsUrl(nextFixture.location)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-300 flex items-center hover:text-german-gold transition-colors"
+              >
+                <MapPin className="mr-2 h-4 w-4 text-german-gold" />
+                {nextFixture.location}
+              </a>
+            </p>
           </div>
-          
-          <motion.div 
-            whileHover={{ x: 5 }}
-            className="pt-3"
-          >
-            <Link 
-              to="/fixtures" 
-              className="text-german-red hover:text-german-gold transition-colors inline-flex items-center font-medium"
-            >
-              {t("view_all_fixtures")}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </motion.div>
-        </motion.div>
-      ) : (
-        <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-          <p className="text-gray-300">{t("no_upcoming_fixtures")}</p>
-          <Link 
-            to="/fixtures" 
-            className="text-german-red hover:text-german-gold transition-colors mt-2 inline-block font-medium"
-          >
-            {t("view_fixture_schedule")}
-          </Link>
-        </div>
-      )}
-    </motion.div>
+        ) : (
+          <div className="py-4 text-center">
+            <p className="text-gray-300">{t("no_upcoming_fixtures")}</p>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter>
+        <Link to="/fixtures" className="w-full">
+          <Button className="w-full bg-german-gold hover:bg-german-red text-white transition-colors">
+            {t("view_all_fixtures")}
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 };
-
-export default NextFixtureCard;

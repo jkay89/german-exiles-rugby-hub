@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      fixtures: {
+        Row: {
+          competition: string
+          created_at: string
+          date: string
+          id: string
+          is_home: boolean
+          location: string
+          opponent: string
+          team: string
+          time: string
+          updated_at: string
+        }
+        Insert: {
+          competition: string
+          created_at?: string
+          date: string
+          id?: string
+          is_home?: boolean
+          location: string
+          opponent: string
+          team: string
+          time: string
+          updated_at?: string
+        }
+        Update: {
+          competition?: string
+          created_at?: string
+          date?: string
+          id?: string
+          is_home?: boolean
+          location?: string
+          opponent?: string
+          team?: string
+          time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      results: {
+        Row: {
+          competition: string
+          created_at: string
+          date: string
+          fixture_id: string | null
+          id: string
+          is_home: boolean
+          motm: string | null
+          opponent: string
+          opponent_score: number
+          team: string
+          team_score: number
+          updated_at: string
+        }
+        Insert: {
+          competition: string
+          created_at?: string
+          date: string
+          fixture_id?: string | null
+          id?: string
+          is_home?: boolean
+          motm?: string | null
+          opponent: string
+          opponent_score: number
+          team: string
+          team_score: number
+          updated_at?: string
+        }
+        Update: {
+          competition?: string
+          created_at?: string
+          date?: string
+          fixture_id?: string | null
+          id?: string
+          is_home?: boolean
+          motm?: string | null
+          opponent?: string
+          opponent_score?: number
+          team?: string
+          team_score?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sponsors: {
         Row: {
           created_at: string

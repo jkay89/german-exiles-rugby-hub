@@ -1,58 +1,144 @@
 
-import { Trophy, Star, CalendarCheck } from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { format, parseISO } from "date-fns";
+import { Trophy, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
-interface LatestResultCardProps {
-  delay?: number;
+interface Result {
+  id: string;
+  team: string;
+  opponent: string;
+  date: string;
+  team_score: number;
+  opponent_score: number;
+  competition: string;
+  is_home: boolean;
+  motm?: string;
 }
 
-const LatestResultCard = ({ delay = 0.4 }: LatestResultCardProps) => {
+export const LatestResultCard = () => {
   const { t } = useLanguage();
-  
-  return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay }}
-      whileHover={{ scale: 1.03 }}
-      className="bg-gradient-to-br from-gray-900 to-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-all duration-300 shadow-lg relative overflow-hidden h-full"
-    >
-      <div className="absolute -right-10 -top-10 w-40 h-40 bg-german-red/10 rounded-full blur-2xl"></div>
-      <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-german-gold/10 rounded-full blur-2xl"></div>
-      
-      <div className="flex items-center gap-3 mb-4">
-        <Trophy className="h-8 w-8 text-german-gold" />
-        <h3 className="text-2xl font-bold text-white">{t("latest_result")}</h3>
-      </div>
+  const [latestResult, setLatestResult] = useState<Result | null>(null);
+  const [loading, setLoading] = useState(true);
 
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-5 transition-all">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: delay + 0.2 }}
-        >
-          <p className="text-gray-300 mb-3">{t("match_results_soon")}</p>
-          
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <CalendarCheck className="h-4 w-4 text-german-gold" />
-              <p className="text-gray-400">{t("check_back")}</p>
+  useEffect(() => {
+    const fetchLatestResult = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('results')
+          .select('*')
+          .order('date', { ascending: false })
+          .limit(1);
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setLatestResult(data[0] as Result);
+        } else {
+          setLatestResult(null);
+        }
+      } catch (error) {
+        console.error("Error fetching latest result:", error);
+        setLatestResult(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestResult();
+  }, []);
+
+  const getResultText = (result: Result) => {
+    if (result.is_home) {
+      if (result.team_score > result.opponent_score) return "WIN";
+      if (result.team_score < result.opponent_score) return "LOSS";
+      return "DRAW";
+    } else {
+      if (result.team_score > result.opponent_score) return "WIN";
+      if (result.team_score < result.opponent_score) return "LOSS";
+      return "DRAW";
+    }
+  };
+
+  const getResultClass = (result: Result) => {
+    if (result.is_home) {
+      if (result.team_score > result.opponent_score) return "bg-green-800";
+      if (result.team_score < result.opponent_score) return "bg-red-800";
+      return "bg-gray-700";
+    } else {
+      if (result.team_score > result.opponent_score) return "bg-green-800";
+      if (result.team_score < result.opponent_score) return "bg-red-800";
+      return "bg-gray-700";
+    }
+  };
+
+  return (
+    <Card className="bg-gray-900 border-german-gold border-2 h-full">
+      <CardHeader className="bg-german-gold">
+        <CardTitle className="flex items-center text-black">
+          <Trophy className="mr-2 h-5 w-5 text-black" />
+          {t("latest_result")}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-6 flex-grow">
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 text-german-gold animate-spin" />
+          </div>
+        ) : latestResult ? (
+          <div className="space-y-4 text-white">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-medium bg-gray-800 text-german-gold px-2 py-0.5 rounded">
+                  {latestResult.team}
+                </span>
+                <span className="text-xs font-medium bg-gray-800 text-white px-2 py-0.5 rounded">
+                  {latestResult.competition}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold">
+                {latestResult.is_home ? "German Exiles" : latestResult.opponent} vs {latestResult.is_home ? latestResult.opponent : "German Exiles"}
+              </h3>
+              <p className="text-sm text-gray-300">
+                {format(parseISO(latestResult.date), "MMMM d, yyyy")}
+              </p>
             </div>
             
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-german-gold" />
-              <p className="text-gray-400">{t("player_highlights")}</p>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">
+                {latestResult.is_home ? latestResult.team_score : latestResult.opponent_score} - {latestResult.is_home ? latestResult.opponent_score : latestResult.team_score}
+              </div>
+              <div className={`px-3 py-1 rounded-full text-sm font-bold ${getResultClass(latestResult)}`}>
+                {getResultText(latestResult)}
+              </div>
             </div>
+            
+            {latestResult.motm && (
+              <div className="mt-2">
+                <p className="text-sm">
+                  <span className="text-german-gold font-semibold">{t("man_of_the_match")}: </span>
+                  {latestResult.motm}
+                </p>
+              </div>
+            )}
           </div>
-          
-          <div className="mt-4 pt-2 border-t border-gray-700">
-            <p className="text-german-gold font-medium">{t("season_starting_soon")}</p>
+        ) : (
+          <div className="py-4 text-center">
+            <p className="text-gray-300">{t("no_results_yet")}</p>
           </div>
-        </motion.div>
-      </div>
-    </motion.div>
+        )}
+      </CardContent>
+      <CardFooter>
+        <Link to="/fixtures" className="w-full">
+          <Button className="w-full bg-german-red hover:bg-german-gold text-white transition-colors">
+            {t("view_all_results")}
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 };
-
-export default LatestResultCard;

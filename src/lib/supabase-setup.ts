@@ -8,6 +8,8 @@ export async function setupSupabase() {
     await createStorageBucket('news', 'News images');
     await createStorageBucket('media', 'Media gallery');
     await createStorageBucket('sponsors', 'Sponsor logos');
+    await createStorageBucket('fixtures', 'Fixture images');
+    await createStorageBucket('results', 'Result images');
 
     console.log('Supabase setup completed successfully');
   } catch (error) {
