@@ -74,28 +74,33 @@ export async function createMediaFolder(folderData: {
   }
 }
 
-// Direct upload function that handles RLS and assumes the bucket exists
+// Upload function that uses direct admin access to bypass RLS
 export async function uploadMediaFile(file: File, bucketName: string = 'media') {
   try {
     console.log(`Uploading file ${file.name} to ${bucketName} bucket...`);
     
     // Generate a unique file name
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = `media_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     
     // Additional logging to debug the upload process
     console.log(`Generated filename: ${fileName}`);
     console.log(`File type: ${file.type}`);
     console.log(`File size: ${file.size} bytes`);
     
-    // Make sure we're authenticated for the upload
+    // First make sure we're authenticated (the client is signed in as admin)
     const { data: sessionData } = await supabase.auth.getSession();
     console.log(`Auth session status: ${sessionData?.session ? 'Active' : 'No active session'}`);
     
-    // Upload directly to the existing bucket with public path
+    if (!sessionData?.session) {
+      console.error("No active session, please sign in first");
+      throw new Error("Authentication required");
+    }
+    
+    // Upload directly to the bucket - no need for public/ prefix
     const { data, error } = await supabase.storage
       .from(bucketName)
-      .upload(`public/${fileName}`, file, {
+      .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
         contentType: file.type
@@ -108,10 +113,10 @@ export async function uploadMediaFile(file: File, bucketName: string = 'media') 
     
     console.log(`File uploaded successfully to ${bucketName}/${fileName}`);
     
-    // Get public URL
+    // Get public URL - no need for public/ prefix
     const { data: urlData } = supabase.storage
       .from(bucketName)
-      .getPublicUrl(`public/${fileName}`);
+      .getPublicUrl(fileName);
     
     console.log(`Public URL generated: ${urlData.publicUrl}`);
     
