@@ -40,10 +40,10 @@ const FixtureTabs = ({ activeTab, setActiveTab, navigate }: FixtureTabsProps) =>
           label="Upcoming"
         />
         <TabButton 
-          active={activeTab === "past"} 
-          onClick={() => setActiveTab("past")} 
+          active={activeTab === "results"} 
+          onClick={() => setActiveTab("results")} 
           icon={<Trophy className="w-4 h-4 mr-2" />} 
-          label="Past"
+          label="Results"
         />
       </div>
       

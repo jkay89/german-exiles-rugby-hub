@@ -33,7 +33,7 @@ export const EmptyState = ({ activeTab }: EmptyStateProps) => (
     <p className="text-gray-400">
       {activeTab === "upcoming" 
         ? "No upcoming fixtures available." 
-        : "No past fixtures available."}
+        : "No results available."}
     </p>
   </div>
 );
