@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { getLatestResult } from "@/utils/fixtureUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Result {
   id: string;
@@ -24,6 +25,7 @@ export const LatestResultCard = () => {
   const { t } = useLanguage();
   const [latestResult, setLatestResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchLatestResult = async () => {
@@ -34,6 +36,11 @@ export const LatestResultCard = () => {
         setLatestResult(result);
       } catch (error) {
         console.error("Error fetching latest result:", error);
+        toast({
+          title: "Error",
+          description: "Could not load latest result",
+          variant: "destructive",
+        });
         setLatestResult(null);
       } finally {
         setLoading(false);
@@ -41,7 +48,7 @@ export const LatestResultCard = () => {
     };
 
     fetchLatestResult();
-  }, []);
+  }, [toast]);
 
   const getResultText = (result: Result) => {
     if (result.team_score > result.opponent_score) return "WIN";

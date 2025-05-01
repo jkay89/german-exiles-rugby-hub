@@ -8,19 +8,28 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { getNextFixture } from "@/utils/fixtureUtils";
 import { Fixture } from "@/utils/fixtureUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 export const NextFixtureCard = () => {
   const { t } = useLanguage();
   const [nextFixture, setNextFixture] = useState<Fixture | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchNextFixture = async () => {
+      setLoading(true);
       try {
         const fixture = await getNextFixture();
+        console.log("Next fixture from database:", fixture);
         setNextFixture(fixture);
       } catch (error) {
         console.error("Error fetching next fixture:", error);
+        toast({
+          title: "Error",
+          description: "Could not load upcoming fixture",
+          variant: "destructive",
+        });
         setNextFixture(null);
       } finally {
         setLoading(false);
@@ -28,7 +37,7 @@ export const NextFixtureCard = () => {
     };
 
     fetchNextFixture();
-  }, []);
+  }, [toast]);
 
   const getGoogleMapsUrl = (location: string) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;

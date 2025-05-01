@@ -22,7 +22,10 @@ export const getFixtures = async (): Promise<Fixture[]> => {
       .select('*')
       .order('date', { ascending: true });
     
-    if (error) throw error;
+    if (error) {
+      console.error("Database error fetching fixtures:", error);
+      throw error;
+    }
     
     // If we have data, return it
     if (data && data.length > 0) {
@@ -104,7 +107,10 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
       .order('date', { ascending: true })
       .limit(1);
     
-    if (error) throw error;
+    if (error) {
+      console.error("Database error fetching next fixture:", error);
+      throw error;
+    }
     
     if (data && data.length > 0) {
       console.log("Next fixture found in database:", data[0]);
@@ -141,7 +147,10 @@ export const getResults = async (): Promise<any[]> => {
       .select('*')
       .order('date', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error("Database error fetching results:", error);
+      throw error;
+    }
     
     // If we have data from the database, return it
     if (data && data.length > 0) {
@@ -190,7 +199,10 @@ export const getLatestResult = async (): Promise<any | null> => {
       .order('date', { ascending: false })
       .limit(1);
     
-    if (error) throw error;
+    if (error) {
+      console.error("Database error fetching latest result:", error);
+      throw error;
+    }
     
     if (data && data.length > 0) {
       console.log("Latest result found in database:", data[0]);
