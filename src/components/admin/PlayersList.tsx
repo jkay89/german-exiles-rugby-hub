@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PlayersListProps {
   players: Player[];
@@ -48,6 +49,15 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersL
       setIsDeleting(false);
     }
   };
+  
+  const getFlagIcon = (heritage: string | null) => {
+    if (heritage === "DE" || heritage?.toLowerCase() === "german") {
+      return "/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png";
+    } else if (heritage === "GB" || heritage?.toLowerCase() === "british") {
+      return "/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png";
+    }
+    return null;
+  };
 
   return (
     <>
@@ -58,6 +68,7 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersL
           <Table className="w-full bg-gray-800 rounded-lg overflow-hidden">
             <TableHeader className="bg-gray-700">
               <TableRow>
+                <TableHead className="text-white">Photo</TableHead>
                 <TableHead className="text-white">Number</TableHead>
                 <TableHead className="text-white">Name</TableHead>
                 <TableHead className="text-white">Position</TableHead>
@@ -69,10 +80,37 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersL
             <TableBody className="divide-y divide-gray-700">
               {players.map((player) => (
                 <TableRow key={player.id}>
-                  <TableCell className="text-gray-300">{player.number || "-"}</TableCell>
+                  <TableCell className="text-gray-300">
+                    <Avatar className="h-10 w-10">
+                      {player.photo_url ? (
+                        <AvatarImage src={player.photo_url} alt={player.name} />
+                      ) : (
+                        <AvatarFallback className="bg-german-red text-white">
+                          {player.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </TableCell>
+                  <TableCell className="text-gray-300">
+                    {player.number ? `#${String(player.number).padStart(3, '0')}` : "-"} 
+                    {player.national_number && (
+                      <div className="text-xs text-gray-500 mt-1">{player.national_number}</div>
+                    )}
+                  </TableCell>
                   <TableCell className="text-gray-300">{player.name}</TableCell>
                   <TableCell className="text-gray-300">{player.position || "-"}</TableCell>
-                  <TableCell className="text-gray-300">{player.heritage || "-"}</TableCell>
+                  <TableCell className="text-gray-300">
+                    <div className="flex items-center gap-2">
+                      {player.heritage && getFlagIcon(player.heritage) && (
+                        <img 
+                          src={getFlagIcon(player.heritage)} 
+                          alt={`${player.heritage} Flag`} 
+                          className="w-6 h-4 object-cover rounded"
+                        />
+                      )}
+                      {player.heritage || "-"}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-gray-300">{player.club || "-"}</TableCell>
                   <TableCell className="text-gray-300">
                     <div className="flex gap-2">

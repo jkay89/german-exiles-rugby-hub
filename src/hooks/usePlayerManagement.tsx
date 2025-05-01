@@ -71,6 +71,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
         photo_url: photoUrl,
+        national_number: formData.get('national_number') as string || null,
       };
       
       const { data, error } = await supabase.rest
@@ -134,6 +135,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
         photo_url: photoUrl,
+        national_number: formData.get('national_number') as string || null,
       };
       
       const { error } = await supabase.rest
@@ -159,11 +161,81 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     }
   };
 
+  const importHeritageTeam = async () => {
+    setLoading(true);
+    
+    try {
+      const heritageTeamData = [
+        { number: 1, name: "Jay Kay", heritage: "DE", position: "Outside Backs", national_number: "#204", club: "Thornhill Trojans", team: "heritage" },
+        { number: 2, name: "Zak Bredin", heritage: "DE", position: "Centre", national_number: "", club: "Eastern Rhinos", team: "heritage" },
+        { number: 3, name: "Oliver Bowie", heritage: "DE", position: "Second Row", national_number: "#205", club: "Unaffiliated", team: "heritage" },
+        { number: 4, name: "Charlie Tetley", heritage: "DE", position: "Prop", national_number: "", club: "Oulton Raiders", team: "heritage" },
+        { number: 5, name: "George Wood", heritage: "DE", position: "Centre", national_number: "", club: "Eastern Rhinos", team: "heritage" },
+        { number: 6, name: "Will Waring", heritage: "DE", position: "Second Row", national_number: "", club: "Unaffiliated", team: "heritage" },
+        { number: 8, name: "Connor Hampson", heritage: "DE", position: "Prop", national_number: "", club: "Featherstone Lions", team: "heritage" },
+        { number: 9, name: "Alex Land", heritage: "GB", position: "Prop", national_number: "", club: "Featherstone Lions", team: "heritage" },
+        { number: 10, name: "Andy Hoggins", heritage: "DE", position: "Loose Forward", national_number: "", club: "Oxford Cavaliers", team: "heritage" },
+        { number: 11, name: "Joe Wood", heritage: "GB", position: "Dummy Half", national_number: "", club: "Shaw Cross Sharks", team: "heritage" },
+        { number: 12, name: "Jamie Billsborough", heritage: "GB", position: "Hooker", national_number: "", club: "Unaffiliated", team: "heritage" },
+        { number: 13, name: "Brad Billsborough", heritage: "DE", position: "Half Back", national_number: "", club: "Midlands Hurricanes", team: "heritage" },
+        { number: 15, name: "Zach Burke", heritage: "GB", position: "Centre", national_number: "", club: "Featherstone Lions", team: "heritage" },
+        { number: 16, name: "Eddie Briggs", heritage: "DE", position: "Second Row", national_number: "", club: "Unaffiliated", team: "heritage" },
+        { number: 17, name: "Eoin Bowie", heritage: "DE", position: "Second Row", national_number: "", club: "Nambour Crushers", team: "heritage" },
+        { number: 18, name: "Joshua McConnell", heritage: "DE", position: "Loose Forward", national_number: "", club: "Wath Brow Hornets", team: "heritage" },
+        { number: 19, name: "Ad Morley", heritage: "DE", position: "Centre", national_number: "", club: "Sharlston Rovers", team: "heritage" },
+        { number: 20, name: "Callum Corey", heritage: "DE", position: "Second Row", national_number: "", club: "Corrimal Cougars", team: "heritage" },
+        { number: 21, name: "Shaun Smith", heritage: "DE", position: "Centre", national_number: "", club: "Crigglestone All Blacks", team: "heritage" },
+        { number: 22, name: "Lewis Wilson", heritage: "GB", position: "Centre", national_number: "", club: "Bentley", team: "heritage" },
+        { number: 23, name: "Michael MacDonald", heritage: "DE", position: "Half Back", national_number: "", club: "Army", team: "heritage" },
+        { number: 24, name: "Arron Williams", heritage: "DE", position: "Second Row", national_number: "", club: "Westgate Common", team: "heritage" },
+        { number: 25, name: "Jordan Williams", heritage: "DE", position: "Prop", national_number: "", club: "Westgate Common", team: "heritage" },
+        { number: 26, name: "Louis Beattie", heritage: "DE", position: "Loose Forward", national_number: "", club: "Midlands Hurricanes", team: "heritage" },
+        { number: 27, name: "Michael Knight", heritage: "GB", position: "Prop", national_number: "", club: "Unaffiliated", team: "heritage" },
+        { number: 28, name: "James Adams", heritage: "DE", position: "Second Row", national_number: "", club: "REME RL", team: "heritage" },
+        { number: 29, name: "Dylan Burdof", heritage: "DE", position: "Wing", national_number: "", club: "Eastern Rhinos", team: "heritage" },
+        { number: 30, name: "Jordan Walker", heritage: "GB", position: "Loose Forward", national_number: "", club: "Featherstone Lions", team: "heritage" },
+        { number: 31, name: "Ellis Armstrong", heritage: "DE", position: "Centre", national_number: "", club: "Kings Cross Park", team: "heritage" },
+        { number: 32, name: "Louis Beattie", heritage: "DE", position: "Hooker", national_number: "", club: "Midlands Hurricanes", team: "heritage" }
+      ];
+
+      // First, delete existing heritage team players
+      const { error: deleteError } = await supabase.rest
+        .from('players')
+        .delete()
+        .eq('team', 'heritage');
+      
+      if (deleteError) throw deleteError;
+      
+      // Insert the new heritage team players
+      const { error: insertError } = await supabase.rest
+        .from('players')
+        .insert(heritageTeamData);
+      
+      if (insertError) throw insertError;
+      
+      toast({
+        title: "Heritage team imported",
+        description: "The heritage team has been updated successfully",
+      });
+      
+      loadPlayers();
+    } catch (error: any) {
+      toast({
+        title: "Error importing heritage team",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     players,
     loadPlayers,
     handleAddPlayer,
-    handleUpdatePlayer
+    handleUpdatePlayer,
+    importHeritageTeam
   };
 };

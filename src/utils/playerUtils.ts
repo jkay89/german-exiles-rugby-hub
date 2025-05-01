@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Player {
@@ -11,6 +10,7 @@ export interface Player {
   club?: string | null;
   bio?: string | null;
   photo_url?: string | null;
+  national_number?: string | null;
 }
 
 // Fetch all players
@@ -114,7 +114,7 @@ export const deletePlayer = async (id: string): Promise<void> => {
   }
 };
 
-// Sample data for initial players
+// Sample data for initial players - we'll keep this for compatibility but it's no longer used
 const samplePlayers = [
   // Heritage team
   {

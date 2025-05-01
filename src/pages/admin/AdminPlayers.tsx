@@ -11,6 +11,8 @@ import PlayerTeamSelector from "@/components/admin/PlayerTeamSelector";
 import { usePlayerManagement } from "@/hooks/usePlayerManagement";
 import { Player } from "@/utils/playerUtils";
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { UploadCloud } from "lucide-react";
 
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
@@ -18,6 +20,7 @@ const AdminPlayers = () => {
   const [activeTeam, setActiveTeam] = useState("heritage");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   // Use our custom hook for player management
   const { 
@@ -25,7 +28,8 @@ const AdminPlayers = () => {
     players, 
     loadPlayers, 
     handleAddPlayer, 
-    handleUpdatePlayer 
+    handleUpdatePlayer,
+    importHeritageTeam
   } = usePlayerManagement(activeTeam, () => {
     setShowAddForm(false);
     setEditingPlayer(null);
@@ -65,6 +69,11 @@ const AdminPlayers = () => {
     setShowAddForm(true);
   };
 
+  const handleImport = async () => {
+    await importHeritageTeam();
+    setShowImportDialog(false);
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -86,6 +95,44 @@ const AdminPlayers = () => {
 
         {/* Team selector for adding new players */}
         <PlayerTeamSelector onSelectTeam={handleTeamSelect} />
+
+        {/* Import heritage team button (only visible when heritage team is selected) */}
+        {activeTeam === "heritage" && (
+          <div className="mt-4 mb-6">
+            <AlertDialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 border-german-gold text-german-gold hover:bg-german-gold/10"
+                >
+                  <UploadCloud size={16} />
+                  Import Official Heritage Team
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-gray-900 text-white border-gray-700">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Import Heritage Team Data</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-400">
+                    This will replace all existing heritage team players with the official lineup. 
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleImport} 
+                    className="bg-german-red hover:bg-german-gold"
+                  >
+                    Import Team
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <p className="text-gray-400 text-xs mt-2">
+              Import the official heritage team data, including all player information.
+            </p>
+          </div>
+        )}
 
         {/* Add player form */}
         {showAddForm && (

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PlayerFormProps {
   isEditing: boolean;
@@ -26,6 +27,7 @@ interface PlayerFormProps {
     club?: string;
     bio?: string;
     photo_url?: string;
+    national_number?: string;
   };
 }
 
@@ -83,25 +85,12 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 
         <div>
           <Label className="text-gray-400">Position</Label>
-          <Select name="position" defaultValue={initialValues?.position || ""}>
-            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-              <SelectValue placeholder="Select position" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 text-white">
-              <SelectItem value="prop">Prop</SelectItem>
-              <SelectItem value="hooker">Hooker</SelectItem>
-              <SelectItem value="secondRow">Second Row</SelectItem>
-              <SelectItem value="looseForward">Loose Forward</SelectItem>
-              <SelectItem value="halfBack">Half Back</SelectItem>
-              <SelectItem value="standOff">Stand Off</SelectItem>
-              <SelectItem value="center">Center</SelectItem>
-              <SelectItem value="wing">Wing</SelectItem>
-              <SelectItem value="fullBack">Full Back</SelectItem>
-              <SelectItem value="forward">Forward</SelectItem>
-              <SelectItem value="utility">Utility</SelectItem>
-              <SelectItem value="halfback">Halfback</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input
+            name="position"
+            placeholder="Player position"
+            className="bg-gray-800 border-gray-700 text-white"
+            defaultValue={initialValues?.position || ""}
+          />
         </div>
 
         <div>
@@ -120,12 +109,15 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 
         <div>
           <Label className="text-gray-400">Heritage</Label>
-          <Input
-            name="heritage"
-            placeholder="Player heritage"
-            className="bg-gray-800 border-gray-700 text-white"
-            defaultValue={initialValues?.heritage || ""}
-          />
+          <Select name="heritage" defaultValue={initialValues?.heritage || ""}>
+            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+              <SelectValue placeholder="Select heritage" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 text-white">
+              <SelectItem value="DE">German (DE)</SelectItem>
+              <SelectItem value="GB">British (GB)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
@@ -135,6 +127,16 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
             placeholder="Current club"
             className="bg-gray-800 border-gray-700 text-white"
             defaultValue={initialValues?.club || ""}
+          />
+        </div>
+
+        <div>
+          <Label className="text-gray-400">National Team Heritage Number</Label>
+          <Input
+            name="national_number"
+            placeholder="e.g. #204"
+            className="bg-gray-800 border-gray-700 text-white"
+            defaultValue={initialValues?.national_number || ""}
           />
         </div>
 
@@ -151,6 +153,15 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
         <div className="md:col-span-2">
           <Label className="text-gray-400">Photo</Label>
           <div className="flex items-center gap-4 mt-2">
+            {previewUrl && (
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={previewUrl} alt="Player" />
+                <AvatarFallback className="bg-gray-700">
+                  {initialValues?.name?.split(' ').map(n => n[0]).join('') || 'PL'}
+                </AvatarFallback>
+              </Avatar>
+            )}
+            
             <label className="cursor-pointer">
               <div className="flex items-center gap-2 px-4 py-2 border border-gray-600 rounded bg-gray-800 hover:bg-gray-700 transition">
                 <Upload className="h-4 w-4" /> Upload Photo
@@ -167,15 +178,6 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
               {selectedFile ? selectedFile.name : previewUrl ? "Current photo" : "No file selected"}
             </p>
           </div>
-          {previewUrl && (
-            <div className="mt-4">
-              <img 
-                src={previewUrl} 
-                alt="Preview" 
-                className="max-h-40 rounded border border-gray-700"
-              />
-            </div>
-          )}
         </div>
       </div>
 
