@@ -1,6 +1,6 @@
 
 import { compareAsc } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 export interface Fixture {
   id?: string;
@@ -22,7 +22,7 @@ export const getFixtures = async (): Promise<Fixture[]> => {
     const now = new Date();
     const today = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
     
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from("fixtures")
       .select('*')
       .gte('date', today)
@@ -43,28 +43,44 @@ export const getFixtures = async (): Promise<Fixture[]> => {
     // Fallback to hardcoded fixtures
     return [
       {
+        id: "hardcoded-1",
         date: "2025-04-19",
         opponent: "Rotterdam 9s",
         location: "Rotterdam Pitbulls RLFC, Rotterdam, Netherlands",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
       {
+        id: "hardcoded-2",
         date: "2025-06-06",
         opponent: "Aussie/Kiwi Exiles",
         location: "Wasps FC, Twyford Avenue Sports Ground, Twyford Ave, London W3 9QA",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
       {
+        id: "hardcoded-3",
         date: "2025-08-23",
         opponent: "Royal Engineers RL",
         location: "Walton Sports Club, Walton Recreation Ground/Shay La WF2 6LA",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: false
       },
       {
+        id: "hardcoded-4",
         date: "2025-09-06",
         opponent: "Presidents XIII",
         location: "Würzburg, Bayern, Deutschland",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
     ];
   } catch (error) {
@@ -72,28 +88,44 @@ export const getFixtures = async (): Promise<Fixture[]> => {
     // Fallback to hardcoded fixtures on error
     return [
       {
+        id: "error-1",
         date: "2025-04-19",
         opponent: "Rotterdam 9s",
         location: "Rotterdam Pitbulls RLFC, Rotterdam, Netherlands",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
       {
+        id: "error-2",
         date: "2025-06-06",
         opponent: "Aussie/Kiwi Exiles",
         location: "Wasps FC, Twyford Avenue Sports Ground, Twyford Ave, London W3 9QA",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
       {
+        id: "error-3",
         date: "2025-08-23",
         opponent: "Royal Engineers RL",
         location: "Walton Sports Club, Walton Recreation Ground/Shay La WF2 6LA",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: false
       },
       {
+        id: "error-4",
         date: "2025-09-06",
         opponent: "Presidents XIII",
         location: "Würzburg, Bayern, Deutschland",
         time: "TBC",
+        team: "Heritage Team",
+        competition: "Friendly",
+        is_home: true
       },
     ];
   }
@@ -108,7 +140,7 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     console.log("Fetching next fixture after date:", today);
     
     // Try to get from Supabase first - force fetch all records to make sure we have the latest data
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from("fixtures")
       .select('*')
       .gte('date', today)
@@ -149,7 +181,17 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     return null;
   } catch (error) {
     console.error("Error fetching next fixture:", error);
-    return null;
+    // Return a default fixture in case of error
+    return {
+      id: "default-1",
+      date: "2025-06-06",
+      opponent: "Aussie/Kiwi Exiles",
+      location: "Wasps FC, Twyford Avenue Sports Ground, Twyford Ave, London W3 9QA",
+      time: "TBC",
+      team: "Heritage Team",
+      competition: "Friendly",
+      is_home: true
+    };
   }
 };
 
@@ -159,7 +201,7 @@ export const getResults = async (): Promise<any[]> => {
     console.log("Fetching results from database with explicit limit removed...");
     
     // Force fetch all records without any limit to ensure we get all results
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from("results")
       .select('*')
       .order('date', { ascending: false });
@@ -212,7 +254,7 @@ export const getLatestResult = async (): Promise<any | null> => {
   try {
     console.log("Fetching latest result from database with explicit cache control...");
     
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from("results")
       .select('*')
       .order('date', { ascending: false })

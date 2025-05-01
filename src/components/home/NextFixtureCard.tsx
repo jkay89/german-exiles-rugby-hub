@@ -39,7 +39,17 @@ export const NextFixtureCard = () => {
           // Fallback to hardcoded fixture from utils if no data in DB
           const fallbackFixture = await getNextFixture();
           console.log("Using fallback fixture data:", fallbackFixture);
-          setNextFixture(fallbackFixture);
+          
+          // Add missing properties to ensure the fallback fixture has the same structure
+          const completeFixture = {
+            ...fallbackFixture,
+            id: fallbackFixture.id || `fallback-${Date.now()}`,
+            team: fallbackFixture.team || "Heritage Team",
+            competition: fallbackFixture.competition || "Friendly",
+            is_home: fallbackFixture.is_home !== undefined ? fallbackFixture.is_home : true
+          };
+          
+          setNextFixture(completeFixture);
         }
       } catch (error) {
         console.error("Error fetching next fixture:", error);

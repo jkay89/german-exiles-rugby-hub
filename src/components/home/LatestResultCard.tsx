@@ -49,7 +49,17 @@ export const LatestResultCard = () => {
           // Fallback to hardcoded result from utils if no data in DB
           const fallbackResult = await getLatestResult();
           console.log("Using fallback result data:", fallbackResult);
-          setLatestResult(fallbackResult);
+          
+          // Make sure the fallback has the correct structure
+          const completeResult = {
+            ...fallbackResult,
+            id: fallbackResult.id || `fallback-${Date.now()}`,
+            team: fallbackResult.team || "Heritage Team",
+            competition: fallbackResult.competition || "Friendly",
+            is_home: fallbackResult.is_home !== undefined ? fallbackResult.is_home : true,
+          };
+          
+          setLatestResult(completeResult);
         }
       } catch (error) {
         console.error("Error fetching latest result:", error);

@@ -8,7 +8,7 @@ import MatchResults from "@/components/fixtures/MatchResults";
 import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 // Fixture type
 interface Fixture {
@@ -71,7 +71,7 @@ const Fixtures = () => {
     try {
       // Direct database query to ensure fresh data
       const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from("fixtures")
         .select('*')
         .gte('date', today)
@@ -128,7 +128,7 @@ const Fixtures = () => {
     setLoading(true);
     try {
       // Direct database query to ensure fresh data
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from("results")
         .select('*')
         .order('date', { ascending: false });
