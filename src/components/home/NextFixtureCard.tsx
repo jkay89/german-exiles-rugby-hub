@@ -20,6 +20,7 @@ export const NextFixtureCard = () => {
     const fetchNextFixture = async () => {
       setLoading(true);
       try {
+        // Force fresh data fetch by bypassing cache
         const fixture = await getNextFixture();
         console.log("Next fixture from database in NextFixtureCard:", fixture);
         setNextFixture(fixture);

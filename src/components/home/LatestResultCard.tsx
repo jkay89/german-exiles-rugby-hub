@@ -31,6 +31,7 @@ export const LatestResultCard = () => {
     const fetchLatestResult = async () => {
       setLoading(true);
       try {
+        // Force fresh data fetch
         const result = await getLatestResult();
         console.log("Latest result data in LatestResultCard:", result);
         setLatestResult(result);

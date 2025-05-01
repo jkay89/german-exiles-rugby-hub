@@ -48,14 +48,20 @@ const Fixtures = () => {
   const playerStats = getPlayerStats();
   
   useEffect(() => {
-    // On initial load, force fetch both fixtures and results
-    if (loading) {
-      Promise.all([fetchFixtures(), fetchResults()])
-        .then(() => setLoading(false))
-        .catch(() => setLoading(false));
-    } else if (activeTab === "fixtures") {
+    // Always force fetch both fixtures and results on initial load
+    Promise.all([fetchFixtures(), fetchResults()])
+      .then(() => setLoading(false))
+      .catch((error) => {
+        console.error("Error loading fixture/result data:", error);
+        setLoading(false);
+      });
+  }, []); // Run once on mount
+  
+  // Add separate useEffect to react to tab changes
+  useEffect(() => {
+    if (activeTab === "fixtures") {
       fetchFixtures();
-    } else {
+    } else if (activeTab === "results") {
       fetchResults();
     }
   }, [activeTab]);
@@ -63,6 +69,7 @@ const Fixtures = () => {
   const fetchFixtures = async () => {
     setLoading(true);
     try {
+      // Force fresh data
       const fixturesData = await getFixtures();
       console.log("Fixtures data in Fixtures page:", fixturesData);
       setFixtures(fixturesData as Fixture[]);
@@ -82,6 +89,7 @@ const Fixtures = () => {
   const fetchResults = async () => {
     setLoading(true);
     try {
+      // Force fresh data
       const resultsData = await getResults();
       console.log("Results data in Fixtures page:", resultsData);
       

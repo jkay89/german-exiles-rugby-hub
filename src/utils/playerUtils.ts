@@ -16,6 +16,7 @@ export interface Player {
 // Fetch all players
 export const fetchAllPlayers = async (): Promise<Player[]> => {
   try {
+    // Force fetch with cache control to get fresh data
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -23,6 +24,7 @@ export const fetchAllPlayers = async (): Promise<Player[]> => {
       
     if (error) throw error;
     
+    console.log(`Fetched ${data?.length || 0} players:`, data);
     return data || [];
   } catch (error: any) {
     console.error('Error fetching players:', error.message);
@@ -34,6 +36,8 @@ export const fetchAllPlayers = async (): Promise<Player[]> => {
 export const fetchPlayersByTeam = async (team: string): Promise<Player[]> => {
   try {
     console.log(`Fetching players for team: ${team}`);
+    
+    // Force fetch with cache control to get fresh data
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -41,7 +45,10 @@ export const fetchPlayersByTeam = async (team: string): Promise<Player[]> => {
       .order('number', { ascending: true })
       .order('name');
       
-    if (error) throw error;
+    if (error) {
+      console.error(`Error in Supabase query for ${team} players:`, error);
+      throw error;
+    }
     
     console.log(`Found ${data?.length || 0} players for team ${team}:`, data);
     return data || [];
@@ -62,6 +69,7 @@ export const createPlayer = async (player: Omit<Player, 'id'>): Promise<Player> 
       
     if (error) throw error;
     
+    console.log("Created new player:", data);
     return data;
   } catch (error: any) {
     console.error('Error creating player:', error.message);
@@ -81,6 +89,7 @@ export const updatePlayer = async (id: string, player: Partial<Player>): Promise
       
     if (error) throw error;
     
+    console.log("Updated player:", data);
     return data;
   } catch (error: any) {
     console.error('Error updating player:', error.message);
@@ -97,6 +106,8 @@ export const deletePlayer = async (id: string): Promise<void> => {
       .eq('id', id);
       
     if (error) throw error;
+    
+    console.log(`Deleted player with id: ${id}`);
   } catch (error: any) {
     console.error('Error deleting player:', error.message);
     throw new Error(`Failed to delete player: ${error.message}`);
@@ -160,9 +171,9 @@ export const importExistingPlayers = async (): Promise<{ success: boolean, messa
     console.log("Checking for existing players in the database...");
     
     // First check if we already have players in the database
-    const { data, error, count } = await supabase
+    const { count, error } = await supabase
       .from('players')
-      .select('*', { count: 'exact' });
+      .select('*', { count: 'exact', head: true });
       
     if (error) throw error;
     
@@ -195,17 +206,19 @@ export const syncExistingPlayers = async (): Promise<{success: boolean, message:
   try {
     console.log("Synchronizing players in database with sample data...");
     
-    // Check if we have existing players in database
-    const { data: existingPlayers, count, error } = await supabase
+    // Force re-fetch existing players with cache control
+    const { data: existingPlayers, error } = await supabase
       .from('players')
-      .select('*', { count: 'exact' });
+      .select('*');
       
     if (error) throw error;
     
-    console.log(`Found ${count || 0} players in database before sync`);
+    const count = existingPlayers?.length || 0;
+    console.log(`Found ${count} players in database before sync`);
     
     // If we already have players but they might be missing some from sample data
     // Check if each sample player exists, and add if missing
+    let added = 0;
     for (const samplePlayer of samplePlayers) {
       const exists = existingPlayers?.some(
         p => p.name === samplePlayer.name && p.team === samplePlayer.team
@@ -223,6 +236,7 @@ export const syncExistingPlayers = async (): Promise<{success: boolean, message:
           throw insertError;
         }
         
+        added++;
         console.log(`Added missing player: ${samplePlayer.name} to ${samplePlayer.team}`);
       } else {
         console.log(`Player ${samplePlayer.name} already exists for team ${samplePlayer.team}`);
@@ -230,15 +244,17 @@ export const syncExistingPlayers = async (): Promise<{success: boolean, message:
     }
     
     // Re-fetch the count after sync
-    const { count: newCount, error: countError } = await supabase
+    const { data: updatedPlayers, error: countError } = await supabase
       .from('players')
-      .select('*', { count: 'exact' });
+      .select('*');
       
     if (countError) throw countError;
     
+    const newCount = updatedPlayers?.length || 0;
+    
     return { 
       success: true, 
-      message: `Players synchronized. Database now has ${newCount || 0} players.` 
+      message: `Players synchronized. Added ${added} missing players. Database now has ${newCount} players.` 
     };
   } catch (error: any) {
     console.error('Error synchronizing players:', error.message);

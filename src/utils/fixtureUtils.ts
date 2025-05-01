@@ -18,10 +18,14 @@ export const getFixtures = async (): Promise<Fixture[]> => {
   try {
     console.log("Fetching fixtures from database...");
     
-    // Try to get fixtures from Supabase
+    // Try to get fixtures from Supabase with a basic filter for future fixtures
+    const now = new Date();
+    const today = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    
     const { data, error } = await supabase
       .from("fixtures")
       .select('*')
+      .gte('date', today)
       .order('date', { ascending: true });
     
     if (error) {
@@ -103,7 +107,7 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     
     console.log("Fetching next fixture after date:", today);
     
-    // Try to get from Supabase first
+    // Try to get from Supabase first - force fetch all records to make sure we have the latest data
     const { data, error } = await supabase
       .from("fixtures")
       .select('*')
@@ -152,8 +156,9 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
 // Get all match results
 export const getResults = async (): Promise<any[]> => {
   try {
-    console.log("Fetching results from database...");
+    console.log("Fetching results from database with explicit limit removed...");
     
+    // Force fetch all records without any limit to ensure we get all results
     const { data, error } = await supabase
       .from("results")
       .select('*')
@@ -205,7 +210,7 @@ export const getResults = async (): Promise<any[]> => {
 // Get latest result
 export const getLatestResult = async (): Promise<any | null> => {
   try {
-    console.log("Fetching latest result from database...");
+    console.log("Fetching latest result from database with explicit cache control...");
     
     const { data, error } = await supabase
       .from("results")

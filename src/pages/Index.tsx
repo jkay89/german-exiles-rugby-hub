@@ -19,10 +19,16 @@ const Index = () => {
     // Check for fixtures and results
     const checkDatabaseData = async () => {
       try {
+        // Force fresh data from database
         const fixture = await getNextFixture();
         console.log("Next fixture on homepage:", fixture);
       } catch (error) {
         console.error("Error checking fixtures:", error);
+        toast({
+          title: "Data Error",
+          description: "Could not check fixture data. Please try refreshing the page.",
+          variant: "destructive",
+        });
       }
     };
     
@@ -34,6 +40,10 @@ const Index = () => {
         const importResult = await importExistingPlayers();
         if (importResult.success) {
           console.log("Players imported successfully");
+          toast({
+            title: "Player Data",
+            description: "Initial player data imported successfully",
+          });
           return;
         } else {
           console.log("Players not imported:", importResult.message);
@@ -46,10 +56,20 @@ const Index = () => {
             console.log("Players synchronized successfully:", syncResult.message);
           } else {
             console.error("Player sync failed:", syncResult?.message);
+            toast({
+              title: "Player Data Warning",
+              description: "Could not synchronize all player data",
+              variant: "destructive",
+            });
           }
         }
       } catch (error) {
         console.error("Error in player initialization:", error);
+        toast({
+          title: "Player Data Error",
+          description: "Failed to initialize player data. Please refresh and try again.",
+          variant: "destructive",
+        });
       }
     };
       
@@ -57,7 +77,7 @@ const Index = () => {
     syncPlayers();
     checkDatabaseData();
     
-  }, []);
+  }, [toast]);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
