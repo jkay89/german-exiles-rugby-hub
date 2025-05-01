@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -74,10 +73,8 @@ const AdminPlayers = () => {
     setActiveTeam(value);
     setShowAddForm(false);
     setEditingPlayer(null);
-    // Force reload players when team tab changes
-    setTimeout(() => {
-      loadPlayers();
-    }, 100);
+    // Clear state when switching tabs to avoid showing wrong data
+    loadPlayers();
   };
 
   const handleImport = async () => {

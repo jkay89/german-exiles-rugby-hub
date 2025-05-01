@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
@@ -36,7 +37,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     }
   }, [activeTeam, toast]);
 
-  // Initial load of players
+  // Initial load of players when the component mounts or activeTeam changes
   useEffect(() => {
     loadPlayers();
   }, [loadPlayers]);
@@ -224,7 +225,10 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         description: "The heritage team has been updated successfully",
       });
       
-      loadPlayers();
+      // Only reload if we're currently viewing the heritage team
+      if (activeTeam === 'heritage') {
+        loadPlayers();
+      }
     } catch (error: any) {
       toast({
         title: "Error importing heritage team",
@@ -277,7 +281,10 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         description: "The Exiles 9s team has been updated successfully",
       });
       
-      loadPlayers();
+      // Only reload if we're currently viewing the exiles9s team
+      if (activeTeam === 'exiles9s') {
+        loadPlayers();
+      }
     } catch (error: any) {
       toast({
         title: "Error importing Exiles 9s team",
