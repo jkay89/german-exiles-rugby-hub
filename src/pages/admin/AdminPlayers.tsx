@@ -74,6 +74,10 @@ const AdminPlayers = () => {
     setActiveTeam(value);
     setShowAddForm(false);
     setEditingPlayer(null);
+    // Force reload players when team tab changes
+    setTimeout(() => {
+      loadPlayers();
+    }, 100);
   };
 
   const handleImport = async () => {
