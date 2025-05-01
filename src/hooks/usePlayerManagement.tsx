@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { Player } from "@/utils/playerUtils";
@@ -8,9 +9,11 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
 
-  const loadPlayers = async () => {
+  // Use useCallback to prevent recreation of this function on every render
+  const loadPlayers = useCallback(async () => {
     setLoading(true);
     try {
+      console.log(`Loading players for team: ${activeTeam}`);
       const { data, error } = await supabase.rest
         .from('players')
         .select('*')
@@ -32,7 +35,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTeam, toast]);
+
+  // Initial load of players
+  useEffect(() => {
+    loadPlayers();
+  }, [loadPlayers]);
 
   const handleAddPlayer = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -60,13 +60,20 @@ const AdminPlayers = () => {
       };
       
       ensureStorageBucket();
-      loadPlayers();
+      // We don't need to call loadPlayers() here as it's already handled in the hook
     }
-  }, [isAuthenticated, navigate, activeTeam, loadPlayers]);
+  }, [isAuthenticated, navigate]);
 
   const handleTeamSelect = (team: string) => {
     setActiveTeam(team);
     setShowAddForm(true);
+  };
+
+  const handleTeamChange = (value: string) => {
+    setActiveTeam(value);
+    setShowAddForm(false);
+    setEditingPlayer(null);
+    // We don't need to manually call loadPlayers() here as it will be triggered by the useEffect in the hook
   };
 
   const handleImport = async () => {
@@ -170,11 +177,7 @@ const AdminPlayers = () => {
           <Tabs 
             defaultValue="heritage" 
             value={activeTeam}
-            onValueChange={(value) => {
-              setActiveTeam(value);
-              setShowAddForm(false);
-              setEditingPlayer(null);
-            }}
+            onValueChange={handleTeamChange}
           >
             <TabsList className="mb-4 bg-gray-800">
               <TabsTrigger value="heritage" className="data-[state=active]:bg-german-red">Heritage Team</TabsTrigger>
