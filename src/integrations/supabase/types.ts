@@ -148,6 +148,7 @@ export type Database = {
           heritage: string | null
           id: string
           name: string
+          national_number: string | null
           number: number | null
           photo_url: string | null
           position: string | null
@@ -161,6 +162,7 @@ export type Database = {
           heritage?: string | null
           id?: string
           name: string
+          national_number?: string | null
           number?: number | null
           photo_url?: string | null
           position?: string | null
@@ -174,6 +176,7 @@ export type Database = {
           heritage?: string | null
           id?: string
           name?: string
+          national_number?: string | null
           number?: number | null
           photo_url?: string | null
           position?: string | null

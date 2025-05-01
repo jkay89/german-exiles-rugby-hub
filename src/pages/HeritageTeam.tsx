@@ -17,6 +17,7 @@ const HeritageTeam = () => {
       setLoading(true);
       try {
         const data = await fetchPlayersByTeam("heritage");
+        console.log("Loaded heritage team players:", data);
         setPlayers(data);
       } catch (error) {
         console.error("Error loading heritage team players:", error);
@@ -70,7 +71,7 @@ const HeritageTeam = () => {
                     <CardHeader className="flex flex-col items-center">
                       <div className="w-full flex justify-between items-center mb-4">
                         <div className="text-center">
-                          <span className="text-sm text-gray-300">#{String(player.number).padStart(3, '0')}</span>
+                          <span className="text-sm text-gray-300">#{String(player.number || '').padStart(3, '0')}</span>
                         </div>
                         
                         <div className="w-24 h-24 flex items-center justify-center">
