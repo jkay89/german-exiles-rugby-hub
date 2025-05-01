@@ -26,28 +26,37 @@ const Index = () => {
       }
     };
     
-    // Import existing players to the database if they don't exist yet
-    importExistingPlayers()
-      .then((result) => {
-        if (result.success) {
+    // First try to import all players
+    const syncPlayers = async () => {
+      try {
+        console.log("Starting player data initialization...");
+        // First try to import
+        const importResult = await importExistingPlayers();
+        if (importResult.success) {
           console.log("Players imported successfully");
+          return;
         } else {
-          console.log("Players not imported:", result.message);
+          console.log("Players not imported:", importResult.message);
+          
           // If players exist but might be incomplete, sync missing ones
-          return syncExistingPlayers();
+          console.log("Syncing any missing players...");
+          const syncResult = await syncExistingPlayers();
+          
+          if (syncResult?.success) {
+            console.log("Players synchronized successfully:", syncResult.message);
+          } else {
+            console.error("Player sync failed:", syncResult?.message);
+          }
         }
-      })
-      .then((result) => {
-        if (result?.success) {
-          console.log("Players synchronized successfully:", result.message);
-        }
-      })
-      .catch((error) => {
-        console.error("Error importing/syncing players:", error);
-      });
+      } catch (error) {
+        console.error("Error in player initialization:", error);
+      }
+    };
       
-    // Check for fixtures and results
+    // Run initialization in parallel
+    syncPlayers();
     checkDatabaseData();
+    
   }, []);
 
   return (

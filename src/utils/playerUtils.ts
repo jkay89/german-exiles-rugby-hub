@@ -43,7 +43,7 @@ export const fetchPlayersByTeam = async (team: string): Promise<Player[]> => {
       
     if (error) throw error;
     
-    console.log(`Found ${data?.length || 0} players for team ${team}`);
+    console.log(`Found ${data?.length || 0} players for team ${team}:`, data);
     return data || [];
   } catch (error: any) {
     console.error(`Error fetching ${team} players:`, error.message);
@@ -157,6 +157,8 @@ const samplePlayers = [
 // Import existing players to the database if they don't exist yet
 export const importExistingPlayers = async (): Promise<{ success: boolean, message: string }> => {
   try {
+    console.log("Checking for existing players in the database...");
+    
     // First check if we already have players in the database
     const { data, error, count } = await supabase
       .from('players')
@@ -180,6 +182,7 @@ export const importExistingPlayers = async (): Promise<{ success: boolean, messa
       
     if (insertError) throw insertError;
     
+    console.log("Successfully imported sample players into database");
     return { success: true, message: "Players imported successfully" };
   } catch (error: any) {
     console.error('Error importing players:', error.message);
@@ -187,15 +190,19 @@ export const importExistingPlayers = async (): Promise<{ success: boolean, messa
   }
 };
 
-// Sync existing players from public pages to database
+// Sync existing players from sample data to database
 export const syncExistingPlayers = async (): Promise<{success: boolean, message: string}> => {
   try {
+    console.log("Synchronizing players in database with sample data...");
+    
     // Check if we have existing players in database
     const { data: existingPlayers, count, error } = await supabase
       .from('players')
       .select('*', { count: 'exact' });
       
     if (error) throw error;
+    
+    console.log(`Found ${count || 0} players in database before sync`);
     
     // If we already have players but they might be missing some from sample data
     // Check if each sample player exists, and add if missing
@@ -205,19 +212,33 @@ export const syncExistingPlayers = async (): Promise<{success: boolean, message:
       );
       
       if (!exists) {
+        console.log(`Adding missing player: ${samplePlayer.name} to ${samplePlayer.team}`);
+        
         const { error: insertError } = await supabase
           .from('players')
           .insert([samplePlayer]);
           
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error(`Error adding player ${samplePlayer.name}:`, insertError);
+          throw insertError;
+        }
         
         console.log(`Added missing player: ${samplePlayer.name} to ${samplePlayer.team}`);
+      } else {
+        console.log(`Player ${samplePlayer.name} already exists for team ${samplePlayer.team}`);
       }
     }
     
+    // Re-fetch the count after sync
+    const { count: newCount, error: countError } = await supabase
+      .from('players')
+      .select('*', { count: 'exact' });
+      
+    if (countError) throw countError;
+    
     return { 
       success: true, 
-      message: `Players synchronized. Database now has ${count || 0} players.` 
+      message: `Players synchronized. Database now has ${newCount || 0} players.` 
     };
   } catch (error: any) {
     console.error('Error synchronizing players:', error.message);

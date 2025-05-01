@@ -21,7 +21,7 @@ export const NextFixtureCard = () => {
       setLoading(true);
       try {
         const fixture = await getNextFixture();
-        console.log("Next fixture from database:", fixture);
+        console.log("Next fixture from database in NextFixtureCard:", fixture);
         setNextFixture(fixture);
       } catch (error) {
         console.error("Error fetching next fixture:", error);

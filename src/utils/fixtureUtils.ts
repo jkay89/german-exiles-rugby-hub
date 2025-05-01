@@ -16,6 +16,8 @@ export interface Fixture {
 // Get all fixtures from Supabase, fallback to hardcoded data
 export const getFixtures = async (): Promise<Fixture[]> => {
   try {
+    console.log("Fetching fixtures from database...");
+    
     // Try to get fixtures from Supabase
     const { data, error } = await supabase
       .from("fixtures")
@@ -29,7 +31,7 @@ export const getFixtures = async (): Promise<Fixture[]> => {
     
     // If we have data, return it
     if (data && data.length > 0) {
-      console.log("Fixtures found in database:", data);
+      console.log(`Found ${data.length} fixtures in database:`, data);
       return data as Fixture[];
     }
     
@@ -99,6 +101,8 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     const now = new Date();
     const today = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
     
+    console.log("Fetching next fixture after date:", today);
+    
     // Try to get from Supabase first
     const { data, error } = await supabase
       .from("fixtures")
@@ -117,7 +121,7 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
       return data[0] as Fixture;
     }
     
-    console.log("No fixtures found in database, using hardcoded fixtures for next fixture");
+    console.log("No upcoming fixtures found in database, checking hardcoded fixtures");
     // If nothing from DB, get from hardcoded data
     const fixtures = await getFixtures();
     
@@ -132,7 +136,13 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     );
     
     // Return the next fixture or null if none found
-    return upcomingFixtures.length > 0 ? upcomingFixtures[0] : null;
+    if (upcomingFixtures.length > 0) {
+      console.log("Using hardcoded next fixture:", upcomingFixtures[0]);
+      return upcomingFixtures[0];
+    }
+    
+    console.log("No upcoming fixtures found in hardcoded data");
+    return null;
   } catch (error) {
     console.error("Error fetching next fixture:", error);
     return null;
@@ -142,6 +152,8 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
 // Get all match results
 export const getResults = async (): Promise<any[]> => {
   try {
+    console.log("Fetching results from database...");
+    
     const { data, error } = await supabase
       .from("results")
       .select('*')
@@ -154,11 +166,11 @@ export const getResults = async (): Promise<any[]> => {
     
     // If we have data from the database, return it
     if (data && data.length > 0) {
-      console.log("Results found in database:", data);
+      console.log(`Found ${data.length} results in database:`, data);
       return data;
     }
     
-    console.log("No results found, returning sample result");
+    console.log("No results found in database, returning sample result");
     // Create a sample result if none are available
     return [{
       id: "sample-1",
@@ -193,6 +205,8 @@ export const getResults = async (): Promise<any[]> => {
 // Get latest result
 export const getLatestResult = async (): Promise<any | null> => {
   try {
+    console.log("Fetching latest result from database...");
+    
     const { data, error } = await supabase
       .from("results")
       .select('*')

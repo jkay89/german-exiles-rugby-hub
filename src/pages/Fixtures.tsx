@@ -48,7 +48,12 @@ const Fixtures = () => {
   const playerStats = getPlayerStats();
   
   useEffect(() => {
-    if (activeTab === "fixtures") {
+    // On initial load, force fetch both fixtures and results
+    if (loading) {
+      Promise.all([fetchFixtures(), fetchResults()])
+        .then(() => setLoading(false))
+        .catch(() => setLoading(false));
+    } else if (activeTab === "fixtures") {
       fetchFixtures();
     } else {
       fetchResults();
@@ -59,7 +64,7 @@ const Fixtures = () => {
     setLoading(true);
     try {
       const fixturesData = await getFixtures();
-      console.log("Fixtures data in page:", fixturesData);
+      console.log("Fixtures data in Fixtures page:", fixturesData);
       setFixtures(fixturesData as Fixture[]);
     } catch (error) {
       console.error("Error fetching fixtures:", error);
@@ -78,7 +83,7 @@ const Fixtures = () => {
     setLoading(true);
     try {
       const resultsData = await getResults();
-      console.log("Results data in page:", resultsData);
+      console.log("Results data in Fixtures page:", resultsData);
       
       // Transform results to include location if not present
       const resultsWithLocation: Result[] = resultsData.map((result: any) => ({

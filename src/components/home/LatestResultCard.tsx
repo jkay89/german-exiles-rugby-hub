@@ -32,7 +32,7 @@ export const LatestResultCard = () => {
       setLoading(true);
       try {
         const result = await getLatestResult();
-        console.log("Latest result data:", result);
+        console.log("Latest result data in LatestResultCard:", result);
         setLatestResult(result);
       } catch (error) {
         console.error("Error fetching latest result:", error);
