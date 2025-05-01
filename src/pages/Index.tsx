@@ -13,14 +13,26 @@ const Index = () => {
 
   useEffect(() => {
     setIsLoaded(true);
-    setNextFixture(getNextFixture());
+    
+    // Properly handle the Promise returned by getNextFixture
+    const fetchNextFixture = async () => {
+      try {
+        const fixture = await getNextFixture();
+        setNextFixture(fixture);
+      } catch (error) {
+        console.error("Error fetching next fixture:", error);
+        setNextFixture(null);
+      }
+    };
+    
+    fetchNextFixture();
   }, []);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
       <HeroSection isLoaded={isLoaded} />
       <MissionSection />
-      <FeatureGrid nextFixture={nextFixture} />
+      <FeatureGrid />
       <SponsorCarousel sponsorLogos={sponsorData} />
     </div>
   );
