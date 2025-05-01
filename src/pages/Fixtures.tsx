@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -59,7 +60,7 @@ const Fixtures = () => {
       setError(null);
 
       try {
-        const { data: fixtureData, error: fixtureError } = await supabase
+        const { data: fixtureData, error: fixtureError } = await supabase.rest
           .from('fixtures')
           .select('*')
           .order('date', { ascending: true });

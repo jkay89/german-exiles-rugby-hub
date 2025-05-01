@@ -55,7 +55,7 @@ const AdminPlayers = () => {
   // Load all players for stats management
   const loadAllPlayers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('players')
         .select('*')
         .order('name');
