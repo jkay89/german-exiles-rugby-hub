@@ -2,49 +2,30 @@
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-interface PlayerProfile {
-  teamNumber: string;
-  name: string;
-  position: string;
-  countryHeritage: "DE" | "GB";
-  nationalTeamNumber?: string;
-  image?: string;
-}
+import { useEffect, useState } from "react";
+import { fetchPlayersByTeam, Player } from "@/utils/playerUtils";
+import { Loader2 } from "lucide-react";
 
 const HeritageTeam = () => {
   const { t } = useLanguage();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const players: PlayerProfile[] = [
-    { teamNumber: "#001", name: "Jay Kay", position: "Outside Backs", countryHeritage: "DE", nationalTeamNumber: "#204", image: "/lovable-uploads/7cdbd50d-8320-4db0-9303-53445bf0e348.png" },
-    { teamNumber: "#002", name: "Zak Bredin", position: "Centre", countryHeritage: "DE", image: "/lovable-uploads/2c677fd8-f43a-45a8-b0a1-491ba2d9eae4.png" },
-    { teamNumber: "#003", name: "Oliver Bowie", position: "Second Row", countryHeritage: "DE", nationalTeamNumber: "#205" },
-    { teamNumber: "#004", name: "Charlie Tetley", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#005", name: "George Wood", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#006", name: "Will Waring", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#007", name: "Anthony Hackman", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#008", name: "Connor Hampson", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#009", name: "Alex Land", position: "Prop", countryHeritage: "GB" },
-    { teamNumber: "#010", name: "Andy Hoggins", position: "Loose Forward", countryHeritage: "DE" },
-    { teamNumber: "#011", name: "Joe Wood", position: "Dummy Half", countryHeritage: "GB" },
-    { teamNumber: "#012", name: "Jamie Billsborough", position: "Hooker", countryHeritage: "GB" },
-    { teamNumber: "#013", name: "Brad Billsborough", position: "Half Back", countryHeritage: "DE" },
-    { teamNumber: "#014", name: "Ryan Hudson", position: "Prop", countryHeritage: "GB" },
-    { teamNumber: "#015", name: "Zach Burke", position: "Centre", countryHeritage: "GB" },
-    { teamNumber: "#016", name: "Eddie Briggs", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#017", name: "Eoin Bowie", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#018", name: "Joshua McConnell", position: "Loose Forward", countryHeritage: "DE" },
-    { teamNumber: "#019", name: "Ad Morley", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#022", name: "Callum Corey", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#023", name: "Shaun Smith", position: "Centre", countryHeritage: "DE" },
-    { teamNumber: "#024", name: "Lewis Wilson", position: "Centre", countryHeritage: "GB" },
-    { teamNumber: "#025", name: "Michael MacDonald", position: "Half Back", countryHeritage: "DE" },
-    { teamNumber: "#026", name: "Arron Williams", position: "Second Row", countryHeritage: "DE" },
-    { teamNumber: "#027", name: "Jordan Williams", position: "Prop", countryHeritage: "DE" },
-    { teamNumber: "#028", name: "Louis Beattie", position: "Loose Forward", countryHeritage: "DE" },
-    { teamNumber: "#029", name: "Michael Knight", position: "Prop", countryHeritage: "GB" },
-    { teamNumber: "#030", name: "James Adams", position: "Second Row", countryHeritage: "DE" },
-  ];
+  useEffect(() => {
+    const loadPlayers = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchPlayersByTeam("heritage");
+        setPlayers(data);
+      } catch (error) {
+        console.error("Error loading heritage team players:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPlayers();
+  }, []);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -71,71 +52,77 @@ const HeritageTeam = () => {
 
       <section className="py-16 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {players.map((player, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                  <CardHeader className="flex flex-col items-center">
-                    <div className="flex items-center justify-center w-full mb-4 space-x-8">
-                      <div className="flex flex-col items-center">
-                        <img 
-                          src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png"
-                          alt="German Exiles Logo"
-                          className="w-8 h-8 object-contain"
-                        />
-                        <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
-                      </div>
-                      
-                      <div className="w-24 h-24 flex items-center justify-center">
-                        {player.image ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-12 w-12 text-german-gold animate-spin" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {players.map((player, index) => (
+                <motion.div
+                  key={player.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
+                    <CardHeader className="flex flex-col items-center">
+                      <div className="flex items-center justify-center w-full mb-4 space-x-8">
+                        <div className="flex flex-col items-center">
                           <img 
-                            src={player.image}
-                            alt={player.name}
-                            className="w-full h-full object-contain"
+                            src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png"
+                            alt="German Exiles Logo"
+                            className="w-8 h-8 object-contain"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-2xl">
-                            {player.name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                        )}
-                      </div>
+                          <span className="text-sm mt-2 text-gray-300">#{player.number?.toString().padStart(3, '0') || "000"}</span>
+                        </div>
+                        
+                        <div className="w-24 h-24 flex items-center justify-center">
+                          {player.photo_url ? (
+                            <img 
+                              src={player.photo_url}
+                              alt={player.name}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-2xl">
+                              {player.name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="flex flex-col items-center">
-                        {player.countryHeritage === "DE" ? (
-                          <img 
-                            src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
-                            alt="German Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        ) : (
-                          <img 
-                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                            alt="British Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        )}
-                        <span className="text-sm mt-2 text-gray-300">
-                          {player.nationalTeamNumber || "N/A"}
-                        </span>
+                        <div className="flex flex-col items-center">
+                          {player.heritage === "German" ? (
+                            <img 
+                              src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
+                              alt="German Flag"
+                              className="w-8 h-5 object-cover rounded"
+                            />
+                          ) : (
+                            <img 
+                              src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
+                              alt="British Flag"
+                              className="w-8 h-5 object-cover rounded"
+                            />
+                          )}
+                          <span className="text-sm mt-2 text-gray-300">
+                            N/A
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
-                    <p className="text-german-red font-semibold">{player.position}</p>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm text-german-gold">
-                      {t("heritage")}: {player.countryHeritage === "DE" ? t("german") : t("british")}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                      <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
+                      <p className="text-german-red font-semibold">{player.position}</p>
+                    </CardHeader>
+                    <CardContent className="text-center">
+                      <p className="text-sm text-german-gold">
+                        {t("heritage")}: {player.heritage === "German" ? t("german") : t("british")}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
