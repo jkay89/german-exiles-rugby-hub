@@ -28,46 +28,43 @@ async function createStorageBucket(id: string, name: string) {
   try {
     console.log(`Checking if bucket '${id}' exists...`);
     
-    // First try to list all buckets to check if the bucket exists
+    // Check if the bucket exists using the more reliable listBuckets method
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
     if (listError) {
       console.error(`Error listing buckets:`, listError);
-      // Continue anyway, we'll try to create the bucket
+      throw listError; // Throw to jump to catch block and attempt creation anyway
     }
     
-    let bucketExists = false;
+    const bucketExists = buckets && buckets.some(bucket => bucket.name === id);
     
-    if (buckets) {
-      bucketExists = buckets.some(bucket => bucket.name === id);
-    }
-    
-    // If bucket doesn't exist, create it
+    // If bucket doesn't exist or we couldn't determine, try to create it
     if (!bucketExists) {
-      console.log(`Bucket '${id}' not found, attempting to create it...`);
+      console.log(`Bucket '${id}' not found or couldn't be verified, attempting to create it...`);
       
-      const { data, error: createError } = await supabase.storage.createBucket(id, {
-        public: true,
-        fileSizeLimit: 50000000, // 50MB
-      });
-      
-      if (createError) {
-        console.error(`Failed to create bucket '${id}':`, createError);
+      try {
+        const { data, error: createError } = await supabase.storage.createBucket(id, {
+          public: true,
+          fileSizeLimit: 50000000, // 50MB
+        });
         
-        // If creation failed due to RLS, try with admin role if available
-        if (createError.message.includes('row-level security')) {
-          console.warn(`RLS policy preventing bucket creation for '${id}'. Please check your Supabase permissions.`);
+        if (createError) {
+          console.error(`Failed to create bucket '${id}':`, createError);
+          // Continue execution despite error - bucket might actually exist
+        } else {
+          console.log(`Successfully created bucket '${id}'`);
         }
-      } else {
-        console.log(`Successfully created bucket '${id}'`);
+      } catch (createError) {
+        console.error(`Exception creating bucket '${id}':`, createError);
+        // Continue execution despite error - bucket might actually exist
       }
     } else {
       console.log(`Bucket '${id}' already exists`);
     }
     
-    // After creating (or failing to create), verify the bucket exists and is properly configured
+    // After creating (or failing to create), force update the bucket to be public
+    // This is a safety measure that ensures the bucket is public even if it already existed
     try {
-      // Use updateBucket to make sure the bucket is public
       const { error: updateError } = await supabase.storage.updateBucket(id, {
         public: true,
         fileSizeLimit: 50000000, // 50MB
@@ -76,13 +73,14 @@ async function createStorageBucket(id: string, name: string) {
       if (updateError) {
         console.error(`Error updating bucket '${id}' to be public:`, updateError);
       } else {
-        console.log(`Verified bucket '${id}' is correctly configured`);
+        console.log(`Verified bucket '${id}' is correctly configured as public`);
       }
-    } catch (error) {
-      console.error(`Error verifying bucket '${id}':`, error);
+    } catch (updateError) {
+      console.error(`Exception updating bucket '${id}':`, updateError);
     }
   } catch (error) {
     console.error(`Unexpected error with bucket '${id}':`, error);
+    // Continue execution despite error - setup should not completely fail because of one bucket
   }
 }
 

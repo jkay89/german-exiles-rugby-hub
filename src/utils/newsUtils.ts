@@ -45,56 +45,50 @@ export async function fetchNewsArticle(id: string) {
   }
 }
 
-// Improved function to check if a bucket exists
-async function checkBucketExists(bucketName: string): Promise<boolean> {
-  try {
-    // Using listBuckets instead of getBucket which might have stricter permissions
-    const { data: buckets, error } = await supabase.storage.listBuckets();
-    
-    if (error) {
-      console.error("Error checking buckets:", error);
-      return false;
-    }
-    
-    return buckets?.some(bucket => bucket.name === bucketName) || false;
-  } catch (error) {
-    console.error("Error in checkBucketExists:", error);
-    return false;
-  }
-}
-
-// Function to upload image for news
+// Improved function to upload image for news with better bucket handling
 export async function uploadNewsImage(file: File) {
   const bucketName = 'news';
   
   try {
-    console.log("Checking if news bucket exists...");
+    console.log(`Starting upload to ${bucketName} bucket with file: ${file.name}`);
     
-    // First check if the bucket exists
-    const bucketExists = await checkBucketExists(bucketName);
-    
-    if (!bucketExists) {
-      console.log("News bucket not found, attempting to create it...");
-      try {
-        const { error: createError } = await supabase.storage.createBucket(bucketName, {
-          public: true,
-          fileSizeLimit: 50000000, // 50MB
-        });
-        
-        if (createError) {
-          console.error("Error creating news bucket:", createError);
-          throw new Error(`Failed to create news bucket: ${createError.message}`);
-        }
-        
-        console.log("Successfully created news bucket");
-      } catch (error: any) {
-        console.error("Failed to create bucket, will still try to upload:", error);
-        // Continue with upload attempt even if bucket creation fails
-        // as the bucket might exist but we don't have permission to list it
+    // Force bucket creation regardless of check - this is a more aggressive approach
+    console.log(`Ensuring ${bucketName} bucket exists...`);
+    try {
+      const { error: createError } = await supabase.storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (createError) {
+        // Log error but continue - the bucket might already exist
+        console.log(`Note: Couldn't create bucket '${bucketName}'. It might already exist: ${createError.message}`);
+      } else {
+        console.log(`Successfully created or confirmed bucket '${bucketName}'`);
       }
+    } catch (err) {
+      console.log(`Exception when creating bucket ${bucketName}:`, err);
+      // Continue anyway - the bucket might exist
     }
     
-    // Proceed with upload regardless of bucket creation success
+    // Force bucket to be public
+    try {
+      const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (updateError) {
+        console.log(`Note: Couldn't update bucket '${bucketName}' settings: ${updateError.message}`);
+      } else {
+        console.log(`Successfully updated bucket '${bucketName}' to be public`);
+      }
+    } catch (err) {
+      console.log(`Exception when updating bucket ${bucketName}:`, err);
+      // Continue anyway
+    }
+    
+    // Proceed with upload regardless of bucket creation/update success
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     
@@ -105,14 +99,18 @@ export async function uploadNewsImage(file: File) {
       .upload(fileName, file);
     
     if (error) {
-      console.error("Error uploading file:", error);
+      console.error(`Error uploading file to ${bucketName}:`, error);
       throw error;
     }
+    
+    console.log(`File uploaded successfully to ${bucketName}/${fileName}`);
     
     // Get public URL
     const { data: urlData } = supabase.storage
       .from(bucketName)
       .getPublicUrl(fileName);
+    
+    console.log(`Public URL generated: ${urlData.publicUrl}`);
     
     return urlData.publicUrl;
   } catch (error) {
