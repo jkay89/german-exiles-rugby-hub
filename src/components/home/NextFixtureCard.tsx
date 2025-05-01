@@ -6,18 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Fixture {
-  id: string;
-  team: string;
-  opponent: string;
-  date: string;
-  time: string;
-  location: string;
-  competition: string;
-  is_home: boolean;
-}
+import { getNextFixture } from "@/utils/fixtureUtils";
+import { Fixture } from "@/utils/fixtureUtils";
 
 export const NextFixtureCard = () => {
   const { t } = useLanguage();
@@ -27,22 +17,8 @@ export const NextFixtureCard = () => {
   useEffect(() => {
     const fetchNextFixture = async () => {
       try {
-        const today = new Date().toISOString().split('T')[0];
-        
-        const { data, error } = await supabase
-          .from('fixtures')
-          .select('*')
-          .gte('date', today)
-          .order('date', { ascending: true })
-          .limit(1);
-
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          setNextFixture(data[0] as Fixture);
-        } else {
-          setNextFixture(null);
-        }
+        const fixture = await getNextFixture();
+        setNextFixture(fixture);
       } catch (error) {
         console.error("Error fetching next fixture:", error);
         setNextFixture(null);
@@ -76,10 +52,10 @@ export const NextFixtureCard = () => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-medium bg-gray-800 text-german-gold px-2 py-0.5 rounded">
-                  {nextFixture.team}
+                  {nextFixture.team || "Heritage Team"}
                 </span>
                 <span className="text-xs font-medium bg-gray-800 text-white px-2 py-0.5 rounded">
-                  {nextFixture.competition}
+                  {nextFixture.competition || "Friendly"}
                 </span>
               </div>
               <h3 className="text-lg font-bold">

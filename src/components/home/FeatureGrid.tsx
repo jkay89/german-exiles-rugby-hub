@@ -2,13 +2,8 @@
 import { motion } from "framer-motion";
 import { NextFixtureCard } from "./NextFixtureCard";
 import { LatestResultCard } from "./LatestResultCard";
-import { Fixture } from "@/utils/fixtureUtils";
 
-interface FeatureGridProps {
-  nextFixture: Fixture | null;
-}
-
-const FeatureGrid = ({ nextFixture }: FeatureGridProps) => {
+const FeatureGrid = () => {
   return (
     <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
       <div className="container mx-auto px-6">

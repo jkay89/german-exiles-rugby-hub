@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { getLatestResult } from "@/utils/fixtureUtils";
 
 interface Result {
   id: string;
@@ -28,19 +28,8 @@ export const LatestResultCard = () => {
   useEffect(() => {
     const fetchLatestResult = async () => {
       try {
-        const { data, error } = await supabase
-          .from('results')
-          .select('*')
-          .order('date', { ascending: false })
-          .limit(1);
-
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          setLatestResult(data[0] as Result);
-        } else {
-          setLatestResult(null);
-        }
+        const result = await getLatestResult();
+        setLatestResult(result);
       } catch (error) {
         console.error("Error fetching latest result:", error);
         setLatestResult(null);

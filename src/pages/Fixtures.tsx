@@ -7,7 +7,7 @@ import FixturesList from "@/components/fixtures/FixturesList";
 import MatchResults from "@/components/fixtures/MatchResults";
 import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { supabase } from "@/integrations/supabase/client";
+import { getFixtures, getResults } from "@/utils/fixtureUtils";
 
 // Fixture type
 interface Fixture {
@@ -56,16 +56,10 @@ const Fixtures = () => {
   const fetchFixtures = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("fixtures")
-        .select('*')
-        .order('date', { ascending: true });
-
-      if (error) throw error;
-      setFixtures(data as Fixture[] || []);
+      const fixturesData = await getFixtures();
+      setFixtures(fixturesData as Fixture[]);
     } catch (error) {
       console.error("Error fetching fixtures:", error);
-      // Fallback to hardcoded fixtures
       setFixtures([]);
     } finally {
       setLoading(false);
@@ -75,15 +69,10 @@ const Fixtures = () => {
   const fetchResults = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("results")
-        .select('*')
-        .order('date', { ascending: false });
-
-      if (error) throw error;
+      const resultsData = await getResults();
       
-      // Transform results to include location
-      const resultsWithLocation: Result[] = data.map((result: any) => ({
+      // Transform results to include location if not present
+      const resultsWithLocation: Result[] = resultsData.map((result: any) => ({
         ...result,
         location: result.location || "Match Venue" // Fallback if location is not stored
       }));
