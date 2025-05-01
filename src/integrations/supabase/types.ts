@@ -48,6 +48,140 @@ export type Database = {
         }
         Relationships: []
       }
+      media_folders: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      media_items: {
+        Row: {
+          created_at: string
+          folder_id: string
+          id: string
+          title: string | null
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          folder_id: string
+          id?: string
+          title?: string | null
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string
+          id?: string
+          title?: string | null
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_items_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "media_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      players: {
+        Row: {
+          bio: string | null
+          club: string | null
+          created_at: string
+          heritage: string | null
+          id: string
+          name: string
+          number: number | null
+          photo_url: string | null
+          position: string | null
+          team: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          club?: string | null
+          created_at?: string
+          heritage?: string | null
+          id?: string
+          name: string
+          number?: number | null
+          photo_url?: string | null
+          position?: string | null
+          team: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          club?: string | null
+          created_at?: string
+          heritage?: string | null
+          id?: string
+          name?: string
+          number?: number | null
+          photo_url?: string | null
+          position?: string | null
+          team?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       results: {
         Row: {
           competition: string

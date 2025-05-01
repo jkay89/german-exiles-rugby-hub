@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { seedInitialContent } from "@/utils/seedInitialContent";
 
 export async function setupSupabase() {
   try {
@@ -11,8 +12,8 @@ export async function setupSupabase() {
     await createStorageBucket('fixtures', 'Fixture images');
     await createStorageBucket('results', 'Result images');
 
-    // Create tables if they don't exist
-    await createMediaTables();
+    // Seed initial content after buckets are created
+    await seedInitialContent();
 
     console.log('Supabase setup completed successfully');
   } catch (error) {
@@ -43,22 +44,5 @@ async function createStorageBucket(id: string, name: string) {
     }
   } catch (error) {
     console.error(`Error with bucket ${id}:`, error);
-  }
-}
-
-async function createMediaTables() {
-  try {
-    // Check if media_folders table exists using the generic client
-    const { error } = await supabase.rest.from('media_folders').select('count');
-    
-    if (error) {
-      console.log('Media tables likely need to be created:', error.message);
-      // Tables don't exist, but we can't create them directly here
-      // They should be created via SQL migrations
-    } else {
-      console.log('Media tables already exist');
-    }
-  } catch (error) {
-    console.error('Error checking/creating media tables:', error);
   }
 }

@@ -102,6 +102,12 @@ const mediaFolders = [
     description: "Team members visiting local schools",
     date: "2024-04-22",
     thumbnail_url: null
+  },
+  {
+    title: "Schlicht Exiles 9s - Rotterdam 2025",
+    description: "Tournament photos from our recent competition in Rotterdam",
+    date: "2025-04-22",
+    thumbnail_url: null
   }
 ];
 
@@ -138,6 +144,50 @@ export async function seedInitialContent() {
       console.log("Creating media folders...");
       for (const folder of mediaFolders) {
         await supabase.rest.from('media_folders').insert([folder]);
+      }
+    }
+    
+    // Seed sample media items for the Rotterdam folder if it exists
+    const { data: rotterdamFolder } = await supabase.rest
+      .from('media_folders')
+      .select('id')
+      .eq('title', 'Schlicht Exiles 9s - Rotterdam 2025')
+      .maybeSingle();
+    
+    if (rotterdamFolder) {
+      // First check if there are any existing items for this folder
+      const { data: existingItems } = await supabase.rest
+        .from('media_items')
+        .select('id')
+        .eq('folder_id', rotterdamFolder.id);
+        
+      if (!existingItems || existingItems.length === 0) {
+        // Sample image URLs from the lovable uploads
+        const sampleImages = [
+          "/lovable-uploads/dc8c46be-81e9-4ddf-9b23-adc3f72d2989.png",
+          "/lovable-uploads/2c677fd8-f43a-45a8-b0a1-491ba2d9eae4.png",
+          "/lovable-uploads/9c438e26-41cf-42af-90d6-4797bbc5f8b0.png",
+          "/lovable-uploads/dd1e1552-347d-4fc8-a19f-4f4e00b56168.png",
+          "/lovable-uploads/5bf2f50a-6738-4cc5-804e-fb82f4d1634b.png",
+          "/lovable-uploads/a2d09cab-2bb3-49ff-9913-9d7108a38278.png",
+          "/lovable-uploads/b469f12d-4b0e-4ec7-a440-89ef8e502500.png"
+        ];
+        
+        // Insert sample media items
+        for (let i = 0; i < sampleImages.length; i++) {
+          await supabase.rest.from('media_items').insert([{
+            folder_id: rotterdamFolder.id,
+            url: sampleImages[i],
+            type: 'image',
+            title: `Rotterdam Event - Image ${i + 1}`
+          }]);
+        }
+        
+        // Update thumbnail for the folder
+        await supabase.rest
+          .from('media_folders')
+          .update({ thumbnail_url: sampleImages[0] })
+          .eq('id', rotterdamFolder.id);
       }
     }
     
