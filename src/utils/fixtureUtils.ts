@@ -26,6 +26,7 @@ export const getFixtures = async (): Promise<Fixture[]> => {
     
     // If we have data, return it
     if (data && data.length > 0) {
+      console.log("Fixtures found in database:", data);
       return data as Fixture[];
     }
     
@@ -106,6 +107,7 @@ export const getNextFixture = async (): Promise<Fixture | null> => {
     if (error) throw error;
     
     if (data && data.length > 0) {
+      console.log("Next fixture found in database:", data[0]);
       return data[0] as Fixture;
     }
     
@@ -141,24 +143,26 @@ export const getResults = async (): Promise<any[]> => {
     
     if (error) throw error;
     
-    // Create a sample result if none are available
-    if (!data || data.length === 0) {
-      console.log("No results found, returning sample result");
-      return [{
-        id: "sample-1",
-        team: "Heritage Team",
-        opponent: "Rotterdam 9s",
-        date: "2024-03-15",
-        team_score: 24,
-        opponent_score: 12,
-        competition: "Friendly",
-        is_home: true,
-        motm: "Brad Billsborough",
-        location: "Rotterdam, Netherlands"
-      }];
+    // If we have data from the database, return it
+    if (data && data.length > 0) {
+      console.log("Results found in database:", data);
+      return data;
     }
     
-    return data;
+    console.log("No results found, returning sample result");
+    // Create a sample result if none are available
+    return [{
+      id: "sample-1",
+      team: "Heritage Team",
+      opponent: "Rotterdam 9s",
+      date: "2024-03-15",
+      team_score: 24,
+      opponent_score: 12,
+      competition: "Friendly",
+      is_home: true,
+      motm: "Brad Billsborough",
+      location: "Rotterdam, Netherlands"
+    }];
   } catch (error) {
     console.error("Error fetching results:", error);
     // Return sample result on error
@@ -189,6 +193,7 @@ export const getLatestResult = async (): Promise<any | null> => {
     if (error) throw error;
     
     if (data && data.length > 0) {
+      console.log("Latest result found in database:", data[0]);
       return data[0];
     }
     

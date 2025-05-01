@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { getNextFixture, Fixture } from "@/utils/fixtureUtils";
+import { getNextFixture } from "@/utils/fixtureUtils";
 import HeroSection from "@/components/home/HeroSection";
 import MissionSection from "@/components/home/MissionSection";
 import FeatureGrid from "@/components/home/FeatureGrid";
@@ -15,6 +15,16 @@ const Index = () => {
 
   useEffect(() => {
     setIsLoaded(true);
+
+    // Check for fixtures and results
+    const checkDatabaseData = async () => {
+      try {
+        const fixture = await getNextFixture();
+        console.log("Next fixture on homepage:", fixture);
+      } catch (error) {
+        console.error("Error checking fixtures:", error);
+      }
+    };
     
     // Import existing players to the database if they don't exist yet
     importExistingPlayers()
@@ -28,6 +38,9 @@ const Index = () => {
       .catch((error) => {
         console.error("Error importing players:", error);
       });
+      
+    // Check for fixtures and results
+    checkDatabaseData();
   }, []);
 
   return (

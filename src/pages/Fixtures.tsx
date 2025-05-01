@@ -8,6 +8,7 @@ import MatchResults from "@/components/fixtures/MatchResults";
 import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getFixtures, getResults } from "@/utils/fixtureUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 // Fixture type
 interface Fixture {
@@ -42,6 +43,7 @@ const Fixtures = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
   const playerStats = getPlayerStats();
   
@@ -57,9 +59,15 @@ const Fixtures = () => {
     setLoading(true);
     try {
       const fixturesData = await getFixtures();
+      console.log("Fixtures data in page:", fixturesData);
       setFixtures(fixturesData as Fixture[]);
     } catch (error) {
       console.error("Error fetching fixtures:", error);
+      toast({
+        title: "Error",
+        description: "Could not load fixtures. Please try again later.",
+        variant: "destructive"
+      });
       setFixtures([]);
     } finally {
       setLoading(false);
@@ -70,6 +78,7 @@ const Fixtures = () => {
     setLoading(true);
     try {
       const resultsData = await getResults();
+      console.log("Results data in page:", resultsData);
       
       // Transform results to include location if not present
       const resultsWithLocation: Result[] = resultsData.map((result: any) => ({
@@ -80,6 +89,11 @@ const Fixtures = () => {
       setResults(resultsWithLocation || []);
     } catch (error) {
       console.error("Error fetching results:", error);
+      toast({
+        title: "Error",
+        description: "Could not load match results. Please try again later.",
+        variant: "destructive"
+      });
       setResults([]);
     } finally {
       setLoading(false);
