@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 export async function setupSupabase() {
   try {

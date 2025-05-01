@@ -9,11 +9,17 @@ const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI
 // Create a direct client without type definitions for generic tables
 const genericClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Export the original typed client with our generic one
+// Export the client with added rest property for non-typed tables
 export const supabase = {
   ...originalSupabase,
-  // Expose a separate rest property for accessing tables not in the types
+  // Pass through storage capabilities
+  storage: genericClient.storage,
+  // Add rest property for accessing tables not in the types
   rest: {
     from: (table: string) => genericClient.from(table)
-  }
+  },
+  // Pass through auth capabilities
+  auth: genericClient.auth,
+  // Pass through realtime capabilities
+  realtime: genericClient.realtime
 };
