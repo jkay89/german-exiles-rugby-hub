@@ -60,7 +60,6 @@ const AdminPlayers = () => {
       };
       
       ensureStorageBucket();
-      // We don't need to call loadPlayers() here as it's already handled in the hook
     }
   }, [isAuthenticated, navigate]);
 
@@ -73,7 +72,6 @@ const AdminPlayers = () => {
     setActiveTeam(value);
     setShowAddForm(false);
     setEditingPlayer(null);
-    // We don't need to manually call loadPlayers() here as it will be triggered by the useEffect in the hook
   };
 
   const handleImport = async () => {
@@ -146,7 +144,7 @@ const AdminPlayers = () => {
           <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-8">
             <h2 className="text-xl font-bold text-white mb-4">
               Add Player to {activeTeam === "heritage" ? "Heritage Team" : 
-                            activeTeam === "community" ? "Community Team" : "Exiles 9s"}
+                          activeTeam === "community" ? "Community Team" : "Exiles 9s"}
             </h2>
             <PlayerForm 
               isEditing={false} 
@@ -186,16 +184,13 @@ const AdminPlayers = () => {
             </TabsList>
             
             <TabsContent value={activeTeam}>
-              {loading ? (
-                <p className="text-gray-400 text-center py-4">Loading players...</p>
-              ) : (
-                <PlayersList 
-                  players={players}
-                  activeTeam={activeTeam}
-                  onEdit={setEditingPlayer}
-                  onPlayersChanged={loadPlayers}
-                />
-              )}
+              <PlayersList 
+                players={players}
+                activeTeam={activeTeam}
+                onEdit={setEditingPlayer}
+                onPlayersChanged={loadPlayers}
+                loading={loading}
+              />
             </TabsContent>
           </Tabs>
         </div>

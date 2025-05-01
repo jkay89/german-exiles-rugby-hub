@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Player } from "@/utils/playerUtils";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,12 +14,23 @@ interface PlayersListProps {
   activeTeam: string;
   onEdit: (player: Player) => void;
   onPlayersChanged: () => void;
+  loading: boolean;
 }
 
-const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersListProps) => {
+const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }: PlayersListProps) => {
   const { toast } = useToast();
   const [deletePlayerId, setDeletePlayerId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Use useMemo to prevent unnecessary re-renders of the flag icons
+  const getFlagIcon = useMemo(() => (heritage: string | null) => {
+    if (heritage === "DE" || heritage?.toLowerCase() === "german") {
+      return "/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png";
+    } else if (heritage === "GB" || heritage?.toLowerCase() === "british") {
+      return "/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png";
+    }
+    return null;
+  }, []);
 
   const handleDeletePlayer = async () => {
     if (!deletePlayerId) return;
@@ -50,15 +61,15 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersL
       setIsDeleting(false);
     }
   };
-  
-  const getFlagIcon = (heritage: string | null) => {
-    if (heritage === "DE" || heritage?.toLowerCase() === "german") {
-      return "/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png";
-    } else if (heritage === "GB" || heritage?.toLowerCase() === "british") {
-      return "/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png";
-    }
-    return null;
-  };
+
+  if (loading) {
+    return (
+      <div className="w-full py-10 flex flex-col items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-german-red mb-2" />
+        <p className="text-gray-400 text-center">Loading players...</p>
+      </div>
+    );
+  }
 
   if (players.length === 0) {
     return <p className="text-gray-400 text-center py-4">No players found. Add a player to get started.</p>;
@@ -153,7 +164,12 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged }: PlayersL
               className="bg-red-600 hover:bg-red-700"
               disabled={isDeleting}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
