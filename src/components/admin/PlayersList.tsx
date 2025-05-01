@@ -7,7 +7,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2 } from "lucide-react";
+import { Loader2, ZoomIn, ZoomOut } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 interface PlayersListProps {
   players: Player[];
@@ -21,6 +23,7 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }:
   const { toast } = useToast();
   const [deletePlayerId, setDeletePlayerId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageSize, setImageSize] = useState<number>(10); // Default size for avatars
 
   // Use useMemo to prevent unnecessary re-renders of the flag icons
   const getFlagIcon = useMemo(() => (heritage: string | null) => {
@@ -77,6 +80,24 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }:
 
   return (
     <>
+      <div className="mb-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Image Size:</span>
+            <ZoomOut className="h-4 w-4 text-gray-400" />
+          </div>
+          <Slider 
+            value={[imageSize]} 
+            onValueChange={(value) => setImageSize(value[0])} 
+            min={6} 
+            max={20} 
+            step={1}
+            className="w-40 mx-4"
+          />
+          <ZoomIn className="h-4 w-4 text-gray-400" />
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <Table className="w-full bg-gray-800 rounded-lg overflow-hidden">
           <TableHeader className="bg-gray-700">
@@ -94,7 +115,7 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }:
             {players.map((player) => (
               <TableRow key={player.id}>
                 <TableCell className="text-gray-300">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className={`h-${imageSize} w-${imageSize} transition-all duration-200`}>
                     {player.photo_url ? (
                       <AvatarImage src={player.photo_url} alt={player.name} />
                     ) : (
