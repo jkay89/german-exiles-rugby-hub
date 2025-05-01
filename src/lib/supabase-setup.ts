@@ -26,22 +26,25 @@ export async function setupSupabase() {
 
 async function createStorageBucket(id: string, name: string) {
   try {
+    // First check if bucket exists
     const { data, error } = await supabase.storage.getBucket(id);
     
-    if (error && error.message.includes('The resource was not found')) {
-      // Bucket doesn't exist, create it
-      const { error: createError } = await supabase.storage.createBucket(id, {
-        public: true,
-        fileSizeLimit: 50000000, // 50MB
-      });
-      
-      if (createError) {
-        console.error(`Error creating bucket ${id}:`, createError);
+    if (error) {
+      if (error.message.includes('Bucket not found')) {
+        // Create the bucket if it doesn't exist
+        const { error: createError } = await supabase.storage.createBucket(id, {
+          public: true,
+          fileSizeLimit: 50000000, // 50MB
+        });
+        
+        if (createError) {
+          console.error(`Error creating bucket ${id}:`, createError);
+        } else {
+          console.log(`Created bucket: ${id}`);
+        }
       } else {
-        console.log(`Created bucket: ${id}`);
+        console.error(`Error checking bucket ${id}:`, error);
       }
-    } else if (error) {
-      console.error(`Error checking bucket ${id}:`, error);
     } else {
       console.log(`Bucket exists: ${id}`);
     }
