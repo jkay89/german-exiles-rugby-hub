@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
@@ -237,12 +236,66 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     }
   };
 
+  const importExiles9sTeam = async () => {
+    setLoading(true);
+    
+    try {
+      const exiles9sTeamData = [
+        { number: 15, name: "Jay Kay", heritage: "DE", position: "Outside Backs", club: "Thornhill Trojans", bio: "Role: Captain", team: "exiles9s" },
+        { number: 5, name: "Zak Bredin", heritage: "DE", position: "Half Back", club: "Eastern Rhinos", bio: "Role: Vice Captain", team: "exiles9s" },
+        { number: 44, name: "Henning Brockmann", heritage: "DE", bio: "Role: Vice Captain", team: "exiles9s" },
+        { number: 23, name: "Malte Rohrmoser", heritage: "DE", team: "exiles9s" },
+        { number: 17, name: "Fabian Wendt", heritage: "DE", team: "exiles9s" },
+        { number: 1, name: "Benedikt Esser", heritage: "DE", team: "exiles9s" },
+        { number: 3, name: "Aaron Willmott", heritage: "DE", team: "exiles9s" },
+        { number: 10, name: "Joshua McConnell", heritage: "DE", position: "Loose Forward", club: "Wath Brow Hornets", team: "exiles9s" },
+        { number: 8, name: "Korbi Mayer", heritage: "DE", team: "exiles9s" },
+        { number: 19, name: "Harry Cartwright", heritage: "DE", team: "exiles9s" },
+        { number: 12, name: "Zach Burke", heritage: "GB", position: "Centre", club: "Featherstone Lions", team: "exiles9s" },
+        { number: 4, name: "Ad Morley", heritage: "DE", position: "Centre", team: "exiles9s" },
+        { number: 6, name: "Lewis Wilson", heritage: "GB", position: "Centre", club: "Bentley", team: "exiles9s" },
+        { number: 2, name: "Marcél Schlicht", heritage: "CH", position: "None", club: "None", bio: "Role: Sponsor", team: "exiles9s" }
+      ];
+
+      // First, delete existing exiles9s team players
+      const { error: deleteError } = await supabase.rest
+        .from('players')
+        .delete()
+        .eq('team', 'exiles9s');
+      
+      if (deleteError) throw deleteError;
+      
+      // Insert the new exiles9s team players
+      const { error: insertError } = await supabase.rest
+        .from('players')
+        .insert(exiles9sTeamData);
+      
+      if (insertError) throw insertError;
+      
+      toast({
+        title: "Exiles 9s team imported",
+        description: "The Exiles 9s team has been updated successfully",
+      });
+      
+      loadPlayers();
+    } catch (error: any) {
+      toast({
+        title: "Error importing Exiles 9s team",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     players,
     loadPlayers,
     handleAddPlayer,
     handleUpdatePlayer,
-    importHeritageTeam
+    importHeritageTeam,
+    importExiles9sTeam
   };
 };

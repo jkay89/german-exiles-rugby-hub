@@ -27,6 +27,13 @@ const Exiles9s = () => {
     loadPlayers();
   }, []);
 
+  // Extract the role from the bio field
+  const getPlayerRole = (bio: string | null): string | null => {
+    if (!bio) return null;
+    const roleMatch = bio.match(/Role: (.*)/);
+    return roleMatch ? roleMatch[1] : null;
+  };
+
   return (
     <div className="pt-16 min-h-screen bg-black">
       <motion.section
@@ -99,42 +106,44 @@ const Exiles9s = () => {
                         </div>
 
                         <div className="flex flex-col items-center">
-                          {player.heritage === "German" ? (
+                          {player.heritage === "DE" || player.heritage === "German" ? (
                             <img 
                               src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
                               alt={t("german_flag")}
                               className="w-8 h-5 object-cover rounded"
                             />
-                          ) : player.heritage === "British" ? (
+                          ) : player.heritage === "GB" || player.heritage === "British" ? (
                             <img 
                               src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
                               alt={t("british_flag")}
                               className="w-8 h-5 object-cover rounded"
                             />
-                          ) : (
+                          ) : player.heritage === "CH" ? (
                             <img 
                               src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg"
-                              alt={t("swiss_flag")}
+                              alt="Swiss Flag"
                               className="w-8 h-5 object-cover rounded"
                             />
+                          ) : (
+                            <div className="w-8 h-5 bg-gray-700 rounded"></div>
                           )}
                         </div>
                       </div>
                       <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
-                      {player.position && (
+                      {player.position && player.position !== "None" && (
                         <p className="text-german-red font-semibold">{player.position}</p>
                       )}
                     </CardHeader>
                     <CardContent className="text-center">
                       <div className="space-y-2">
-                        {player.club && (
+                        {player.club && player.club !== "None" && (
                           <p className="text-sm text-gray-300">
                             <span className="text-german-gold font-semibold">{t("club")}:</span> {player.club}
                           </p>
                         )}
                         {player.bio && (
                           <p className="text-sm text-german-gold font-semibold">
-                            {player.bio.replace("Role: ", "")}
+                            {getPlayerRole(player.bio)}
                           </p>
                         )}
                       </div>

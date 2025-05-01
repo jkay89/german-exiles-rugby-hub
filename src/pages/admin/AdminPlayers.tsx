@@ -21,6 +21,7 @@ const AdminPlayers = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showExilesImportDialog, setShowExilesImportDialog] = useState(false);
 
   // Use our custom hook for player management
   const { 
@@ -29,7 +30,8 @@ const AdminPlayers = () => {
     loadPlayers, 
     handleAddPlayer, 
     handleUpdatePlayer,
-    importHeritageTeam
+    importHeritageTeam,
+    importExiles9sTeam
   } = usePlayerManagement(activeTeam, () => {
     setShowAddForm(false);
     setEditingPlayer(null);
@@ -77,6 +79,11 @@ const AdminPlayers = () => {
   const handleImport = async () => {
     await importHeritageTeam();
     setShowImportDialog(false);
+  };
+
+  const handleImportExiles = async () => {
+    await importExiles9sTeam();
+    setShowExilesImportDialog(false);
   };
 
   if (!isAuthenticated) {
@@ -135,6 +142,44 @@ const AdminPlayers = () => {
             </AlertDialog>
             <p className="text-gray-400 text-xs mt-2">
               Import the official heritage team data, including all player information.
+            </p>
+          </div>
+        )}
+
+        {/* Import exiles9s team button (only visible when exiles9s team is selected) */}
+        {activeTeam === "exiles9s" && (
+          <div className="mt-4 mb-6">
+            <AlertDialog open={showExilesImportDialog} onOpenChange={setShowExilesImportDialog}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 border-german-gold text-german-gold hover:bg-german-gold/10"
+                >
+                  <UploadCloud size={16} />
+                  Import Official Exiles 9s Team
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-gray-900 text-white border-gray-700">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Import Exiles 9s Team Data</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-400">
+                    This will replace all existing Exiles 9s team players with the official lineup. 
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleImportExiles} 
+                    className="bg-german-red hover:bg-german-gold"
+                  >
+                    Import Team
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <p className="text-gray-400 text-xs mt-2">
+              Import the official Exiles 9s team data, including all player information.
             </p>
           </div>
         )}
