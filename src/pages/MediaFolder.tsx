@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -131,11 +132,6 @@ const MediaFolderPage = () => {
                       controls
                       className="max-w-full max-h-full"
                     />
-                  </div>
-                )}
-                {item.title && (
-                  <div className="p-3 bg-gray-800">
-                    <p className="text-white text-sm">{item.title}</p>
                   </div>
                 )}
               </motion.div>
