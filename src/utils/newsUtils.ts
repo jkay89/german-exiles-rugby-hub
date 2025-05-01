@@ -45,7 +45,7 @@ export async function fetchNewsArticle(id: string) {
   }
 }
 
-// Direct upload function that doesn't try to create buckets
+// Direct upload function that assumes the bucket already exists
 export async function uploadNewsImage(file: File) {
   try {
     console.log(`Uploading file ${file.name} to news bucket...`);
@@ -54,7 +54,7 @@ export async function uploadNewsImage(file: File) {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     
-    // Upload directly without checking if bucket exists first
+    // Upload directly to the existing bucket
     const { data, error } = await supabase.storage
       .from('news')
       .upload(fileName, file, {
