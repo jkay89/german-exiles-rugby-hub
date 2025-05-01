@@ -1,6 +1,6 @@
 
 import { compareAsc } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 export interface PlayerStats {
   id: string;
@@ -28,7 +28,7 @@ export interface MatchResult {
 // Get player stats from database
 export const getPlayerStats = async (): Promise<PlayerStats[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from('player_stats')
       .select('*');
       
@@ -61,7 +61,7 @@ export const getPlayerStats = async (): Promise<PlayerStats[]> => {
 // Get player stats by ID
 export const getPlayerStatsById = async (id: string): Promise<PlayerStats | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from('player_stats')
       .select('*')
       .eq('player_id', id)
@@ -102,7 +102,7 @@ export const getPlayerStatsById = async (id: string): Promise<PlayerStats | null
 export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<PlayerStats> => {
   // Format the data for the database
   const dbStats = {
-    player_id: stats.id,
+    player_id: stats.playerId,
     name: stats.name,
     position: stats.position,
     games_played: stats.gamesPlayed || 0,
@@ -116,10 +116,10 @@ export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<Play
 
   try {
     // Check if stats already exist for this player
-    const { data: existingStats, error: fetchError } = await supabase
+    const { data: existingStats, error: fetchError } = await supabase.rest
       .from('player_stats')
       .select('id')
-      .eq('player_id', stats.id)
+      .eq('player_id', stats.playerId)
       .maybeSingle();
     
     if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
@@ -128,7 +128,7 @@ export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<Play
     
     if (existingStats) {
       // Update existing stats
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('player_stats')
         .update(dbStats)
         .eq('id', existingStats.id)
@@ -139,7 +139,7 @@ export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<Play
       result = data;
     } else {
       // Insert new stats
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('player_stats')
         .insert(dbStats)
         .select()

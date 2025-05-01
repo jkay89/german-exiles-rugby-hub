@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +26,7 @@ const PlayerStatsForm = ({ onSubmit, onCancel, initialStats, players }: PlayerSt
     redCards: 0,
     manOfTheMatch: 0,
   });
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string>(initialStats?.id?.toString() || "");
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string>(initialStats?.playerId || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get selected player details
@@ -47,7 +47,7 @@ const PlayerStatsForm = ({ onSubmit, onCancel, initialStats, players }: PlayerSt
     if (playerWithStats) {
       setStats(prev => ({
         ...prev,
-        id: parseInt(playerId),
+        playerId: playerId,
         name: playerWithStats.name,
         position: playerWithStats.position || "",
       }));
@@ -73,7 +73,7 @@ const PlayerStatsForm = ({ onSubmit, onCancel, initialStats, players }: PlayerSt
       const playerData = players.find(p => p.id === selectedPlayerId);
       const statsToSubmit = {
         ...stats,
-        id: selectedPlayerId,
+        playerId: selectedPlayerId,
         name: playerData?.name || "",
         position: playerData?.position || ""
       };

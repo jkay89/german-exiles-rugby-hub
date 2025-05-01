@@ -1,216 +1,219 @@
-
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getPlayerStats } from "@/utils/playerStats";
-import PageHeader from "@/components/fixtures/PageHeader";
-import FixturesList from "@/components/fixtures/FixturesList";
-import MatchResults from "@/components/fixtures/MatchResults";
-import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client-extensions";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { format, parseISO } from 'date-fns';
+import { enGB, de } from 'date-fns/locale';
 
-// Fixture type
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge";
+import { CalendarIcon, MapPinIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client-extensions";
+import { getPlayerStats, PlayerStats } from "@/utils/playerStats";
+
 interface Fixture {
   id: string;
-  team: string;
-  opponent: string;
   date: string;
   time: string;
-  location: string;
-  competition: string;
-  is_home: boolean;
-}
-
-// Result type
-interface Result {
-  id: string;
-  fixture_id?: string;
-  team: string;
   opponent: string;
-  date: string;
-  team_score: number;
-  opponent_score: number;
-  competition: string;
+  location: string;
   is_home: boolean;
-  motm?: string;
-  location?: string;
+  competition: string;
 }
 
 const Fixtures = () => {
-  const [activeTab, setActiveTab] = useState<string>("fixtures");
-  const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
-  const [results, setResults] = useState<Result[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  
-  const playerStats = getPlayerStats();
-  
+  const [error, setError] = useState<string | null>(null);
+
+  const formatDate = (dateString: string) => {
+    const parsedDate = parseISO(dateString);
+    const locale = i18n.language === 'de' ? de : enGB;
+    return format(parsedDate, 'EEE, d MMM yyyy', { locale });
+  };
+
+  const formatTime = (timeString: string) => {
+    const parsedTime = parseISO(`2000-01-01T${timeString}`);
+    return format(parsedTime, 'HH:mm');
+  };
+
   useEffect(() => {
-    // Always force fetch both fixtures and results on initial load
-    Promise.all([fetchFixtures(), fetchResults()])
-      .then(() => setLoading(false))
-      .catch((error) => {
-        console.error("Error loading fixture/result data:", error);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const { data: fixtureData, error: fixtureError } = await supabase
+          .from('fixtures')
+          .select('*')
+          .order('date', { ascending: true });
+
+        if (fixtureError) {
+          throw new Error(`Error fetching fixtures: ${fixtureError.message}`);
+        }
+
+        if (!fixtureData) {
+          throw new Error('No fixtures data received');
+        }
+
+        // Filter fixtures based on date
+        const today = new Date();
+        const upcoming = fixtureData.filter(fixture => new Date(fixture.date) >= today);
+        const past = fixtureData.filter(fixture => new Date(fixture.date) < today);
+
+        // Sort upcoming fixtures by date and time
+        upcoming.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA < dateB) return -1;
+          if (dateA > dateB) return 1;
+          return a.time.localeCompare(b.time); // Sort by time if dates are equal
+        });
+
+        // Sort past fixtures by date in descending order
+        past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        // Combine and set fixtures based on the active tab
+        const combinedFixtures = activeTab === "upcoming" ? upcoming : past;
+        setFixtures(combinedFixtures);
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Error loading fixtures:", err);
+      } finally {
         setLoading(false);
-      });
-  }, []); // Run once on mount
-  
-  // Add separate useEffect to react to tab changes
-  useEffect(() => {
-    if (activeTab === "fixtures") {
-      fetchFixtures();
-    } else if (activeTab === "results") {
-      fetchResults();
-    }
-  }, [activeTab]);
-
-  const fetchFixtures = async () => {
-    setLoading(true);
-    try {
-      // Direct database query to ensure fresh data
-      const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase.rest
-        .from("fixtures")
-        .select('*')
-        .gte('date', today)
-        .order('date', { ascending: true });
-        
-      if (error) throw error;
-      
-      if (data && data.length > 0) {
-        console.log("Fixtures data from direct DB query:", data);
-        setFixtures(data as Fixture[]);
-      } else {
-        // If no fixtures in database, create some hardcoded ones
-        // This is for initial setup or testing
-        const hardcodedFixtures = [
-          {
-            id: "fixture-1",
-            date: "2025-06-06",
-            opponent: "Aussie/Kiwi Exiles",
-            location: "Wasps FC, Twyford Avenue Sports Ground, Twyford Ave, London W3 9QA",
-            time: "TBC",
-            team: "Heritage Team",
-            competition: "Friendly",
-            is_home: true
-          },
-          {
-            id: "fixture-2",
-            date: "2025-08-23",
-            opponent: "Royal Engineers RL",
-            location: "Walton Sports Club, Walton Recreation Ground/Shay La WF2 6LA",
-            time: "TBC",
-            team: "Heritage Team",
-            competition: "Friendly",
-            is_home: false
-          }
-        ];
-        
-        console.log("Using hardcoded fixtures data:", hardcodedFixtures);
-        setFixtures(hardcodedFixtures);
       }
-    } catch (error) {
-      console.error("Error fetching fixtures:", error);
-      toast({
-        title: "Error",
-        description: "Could not load fixtures. Please try again later.",
-        variant: "destructive"
-      });
-      setFixtures([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchResults = async () => {
-    setLoading(true);
-    try {
-      // Direct database query to ensure fresh data
-      const { data, error } = await supabase.rest
-        .from("results")
-        .select('*')
-        .order('date', { ascending: false });
-        
-      if (error) throw error;
       
-      if (data && data.length > 0) {
-        console.log("Results data from direct DB query:", data);
-        
-        // Transform results to include location if not present
-        const resultsWithLocation: Result[] = data.map((result: any) => ({
-          ...result,
-          location: result.location || "Match Venue" // Fallback if location is not stored
-        }));
-        
-        setResults(resultsWithLocation || []);
-      } else {
-        // If no results in database, create a sample result
-        const sampleResult = {
-          id: "sample-1",
-          team: "Heritage Team",
-          opponent: "Rotterdam 9s",
-          date: "2024-03-15",
-          team_score: 24,
-          opponent_score: 12,
-          competition: "Friendly",
-          is_home: true,
-          motm: "Brad Billsborough",
-          location: "Rotterdam, Netherlands"
-        };
-        
-        console.log("Using sample result data:", sampleResult);
-        setResults([sampleResult]);
+      // Get player statistics
+      setStatsLoading(true);
+      try {
+        const stats = await getPlayerStats();
+        setPlayerStats(stats);
+      } catch (error) {
+        console.error("Error loading player stats:", error);
+      } finally {
+        setStatsLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching results:", error);
-      toast({
-        title: "Error",
-        description: "Could not load match results. Please try again later.",
-        variant: "destructive"
-      });
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+    };
+
+    fetchData();
+  }, [t, activeTab, i18n.language]);
+
   return (
-    <div className="pt-16 min-h-screen bg-black">
-      <PageHeader />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto py-12 px-4"
+    >
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-white">{t('fixtures.title')}</h1>
+        <Button variant="outline" onClick={() => navigate('/')}>{t('backToHome')}</Button>
+      </div>
 
-      <section className="py-16 bg-gradient-to-b from-black to-gray-900">
-        <div className="container mx-auto px-6">
-          <Tabs defaultValue="fixtures" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full md:w-[400px] grid-cols-2 mb-8 bg-gray-800 text-white">
-              <TabsTrigger 
-                value="fixtures" 
-                className="data-[state=active]:bg-german-red data-[state=active]:text-white"
-              >
-                {t("upcoming_fixtures")}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="results" 
-                className="data-[state=active]:bg-german-red data-[state=active]:text-white"
-              >
-                {t("match_results")}
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="fixtures" className="mt-0">
-              <FixturesList fixtures={fixtures} loading={loading} />
-            </TabsContent>
-            
-            <TabsContent value="results" className="mt-0">
-              <MatchResults results={results} loading={loading} />
-            </TabsContent>
-          </Tabs>
-
-          <PlayerStatsTable playerStats={playerStats} />
+      <div className="mb-6">
+        <div className="inline-flex items-center space-x-2 rounded-md bg-secondary p-1 text-secondary-foreground">
+          <Button
+            variant={activeTab === "upcoming" ? "default" : "ghost"}
+            onClick={() => setActiveTab("upcoming")}
+            className="h-9 rounded-md px-3"
+          >
+            {t('fixtures.upcoming')}
+          </Button>
+          <Button
+            variant={activeTab === "past" ? "default" : "ghost"}
+            onClick={() => setActiveTab("past")}
+            className="h-9 rounded-md px-3"
+          >
+            {t('fixtures.past')}
+          </Button>
         </div>
-      </section>
-    </div>
+      </div>
+
+      {loading && <p className="text-center text-gray-500">{t('loading')}</p>}
+      {error && <p className="text-center text-red-500">Error: {error}</p>}
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {fixtures.map((fixture) => (
+          <Card key={fixture.id} className="bg-gray-900 text-white">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">{fixture.competition}</CardTitle>
+              <CardDescription>
+                {formatDate(fixture.date)} - {formatTime(fixture.time)}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <p className="text-sm text-gray-400">{t('fixtures.opponent')}</p>
+                <p className="text-lg">{fixture.opponent}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">{t('fixtures.location')}</p>
+                <div className="flex items-center">
+                  <MapPinIcon className="h-4 w-4 mr-2 text-gray-500" />
+                  <p className="text-base">{fixture.location}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Player Statistics Table */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-white mb-4">Player Statistics</h2>
+        {statsLoading ? (
+          <p className="text-center text-gray-500">Loading player statistics...</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableCaption>A list of player statistics.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Name</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Games</TableHead>
+                  <TableHead>Trys</TableHead>
+                  <TableHead>Points</TableHead>
+                  <TableHead>Yellow Cards</TableHead>
+                  <TableHead>Red Cards</TableHead>
+                  <TableHead>MotM</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {playerStats.map((stat) => (
+                  <TableRow key={stat.id}>
+                    <TableCell className="font-medium">{stat.name}</TableCell>
+                    <TableCell>{stat.position}</TableCell>
+                    <TableCell>{stat.gamesPlayed}</TableCell>
+                    <TableCell>{stat.trysScored}</TableCell>
+                    <TableCell>{stat.pointsScored}</TableCell>
+                    <TableCell>{stat.yellowCards}</TableCell>
+                    <TableCell>{stat.redCards}</TableCell>
+                    <TableCell>{stat.manOfTheMatch}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 
