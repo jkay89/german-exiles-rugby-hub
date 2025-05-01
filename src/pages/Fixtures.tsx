@@ -197,18 +197,24 @@ const Fixtures = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {playerStats.map((stat) => (
-                  <TableRow key={stat.id}>
-                    <TableCell className="font-medium">{stat.name}</TableCell>
-                    <TableCell>{stat.position}</TableCell>
-                    <TableCell>{stat.gamesPlayed}</TableCell>
-                    <TableCell>{stat.trysScored}</TableCell>
-                    <TableCell>{stat.pointsScored}</TableCell>
-                    <TableCell>{stat.yellowCards}</TableCell>
-                    <TableCell>{stat.redCards}</TableCell>
-                    <TableCell>{stat.manOfTheMatch}</TableCell>
+                {playerStats.length > 0 ? (
+                  playerStats.map((stat) => (
+                    <TableRow key={stat.id}>
+                      <TableCell className="font-medium">{stat.name}</TableCell>
+                      <TableCell>{stat.position}</TableCell>
+                      <TableCell>{stat.gamesPlayed}</TableCell>
+                      <TableCell>{stat.trysScored}</TableCell>
+                      <TableCell>{stat.pointsScored}</TableCell>
+                      <TableCell>{stat.yellowCards}</TableCell>
+                      <TableCell>{stat.redCards}</TableCell>
+                      <TableCell>{stat.manOfTheMatch}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">No player statistics available.</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

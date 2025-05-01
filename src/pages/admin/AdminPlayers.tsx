@@ -141,6 +141,11 @@ const AdminPlayers = () => {
     setEditingStats(null);
   };
 
+  const handleEditStats = (stats: PlayerStats) => {
+    setEditingStats(stats);
+    setShowStatsForm(true);
+  };
+
   const handleTabChange = (value: string) => {
     setActiveView(value as "manage" | "stats");
     
@@ -363,12 +368,13 @@ const AdminPlayers = () => {
                       <th className="px-4 py-3">Yellow Cards</th>
                       <th className="px-4 py-3">Red Cards</th>
                       <th className="px-4 py-3">MotM</th>
+                      <th className="px-4 py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {statsLoading ? (
                       <tr>
-                        <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
+                        <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
                           Loading player statistics...
                         </td>
                       </tr>
@@ -394,12 +400,22 @@ const AdminPlayers = () => {
                             <td className="px-4 py-3 text-white">{stat.yellowCards}</td>
                             <td className="px-4 py-3 text-white">{stat.redCards}</td>
                             <td className="px-4 py-3 text-white">{stat.manOfTheMatch}</td>
+                            <td className="px-4 py-3">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleEditStats(stat)}
+                                className="text-gray-400 hover:text-white"
+                              >
+                                Edit
+                              </Button>
+                            </td>
                           </tr>
                         );
                       })
                     ) : (
                       <tr>
-                        <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
+                        <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
                           No player statistics found. Click "Update Player Stats" to add statistics.
                         </td>
                       </tr>
