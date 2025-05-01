@@ -27,8 +27,10 @@ export const LatestResultCard = () => {
 
   useEffect(() => {
     const fetchLatestResult = async () => {
+      setLoading(true);
       try {
         const result = await getLatestResult();
+        console.log("Latest result data:", result);
         setLatestResult(result);
       } catch (error) {
         console.error("Error fetching latest result:", error);
@@ -42,27 +44,15 @@ export const LatestResultCard = () => {
   }, []);
 
   const getResultText = (result: Result) => {
-    if (result.is_home) {
-      if (result.team_score > result.opponent_score) return "WIN";
-      if (result.team_score < result.opponent_score) return "LOSS";
-      return "DRAW";
-    } else {
-      if (result.team_score > result.opponent_score) return "WIN";
-      if (result.team_score < result.opponent_score) return "LOSS";
-      return "DRAW";
-    }
+    if (result.team_score > result.opponent_score) return "WIN";
+    if (result.team_score < result.opponent_score) return "LOSS";
+    return "DRAW";
   };
 
   const getResultClass = (result: Result) => {
-    if (result.is_home) {
-      if (result.team_score > result.opponent_score) return "bg-green-800";
-      if (result.team_score < result.opponent_score) return "bg-red-800";
-      return "bg-gray-700";
-    } else {
-      if (result.team_score > result.opponent_score) return "bg-green-800";
-      if (result.team_score < result.opponent_score) return "bg-red-800";
-      return "bg-gray-700";
-    }
+    if (result.team_score > result.opponent_score) return "bg-green-800";
+    if (result.team_score < result.opponent_score) return "bg-red-800";
+    return "bg-gray-700";
   };
 
   return (
@@ -99,7 +89,7 @@ export const LatestResultCard = () => {
             
             <div className="flex items-center justify-between">
               <div className="text-2xl font-bold">
-                {latestResult.is_home ? latestResult.team_score : latestResult.opponent_score} - {latestResult.is_home ? latestResult.opponent_score : latestResult.team_score}
+                {latestResult.team_score} - {latestResult.opponent_score}
               </div>
               <div className={`px-3 py-1 rounded-full text-sm font-bold ${getResultClass(latestResult)}`}>
                 {getResultText(latestResult)}

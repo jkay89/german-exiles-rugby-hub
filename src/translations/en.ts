@@ -1,3 +1,4 @@
+
 export default {
   home: "Home",
   about: "About Us",
@@ -15,6 +16,12 @@ export default {
   british_flag: "British Flag",
   swiss_flag: "Swiss Flag",
   latest_result: "Latest Result",
+  next_fixture: "Next Fixture",
+  man_of_the_match: "Man of the Match",
+  view_all_fixtures: "View All Fixtures",
+  view_all_results: "View All Results",
+  no_upcoming_fixtures: "No upcoming fixtures scheduled yet",
+  no_results_yet: "No match results available yet",
   match_results_soon: "Match results will be available soon. Stay tuned!",
   check_back: "Check back for updates!",
   player_highlights: "Player highlights and game analysis coming soon.",
@@ -114,4 +121,9 @@ export default {
   silver_sponsors: "Silver Sponsors",
   affiliate_sponsors: "Affiliate Sponsors",
   visit_website: "Visit Website",
+  
+  // Additional fixture and result related terms
+  back_to_media: "Back to Media",
+  no_media_items: "No media items available",
 };
+

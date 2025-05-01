@@ -9,23 +9,9 @@ import { sponsorData } from "@/data/sponsorData";
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [nextFixture, setNextFixture] = useState<Fixture | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
-    
-    // Properly handle the Promise returned by getNextFixture
-    const fetchNextFixture = async () => {
-      try {
-        const fixture = await getNextFixture();
-        setNextFixture(fixture);
-      } catch (error) {
-        console.error("Error fetching next fixture:", error);
-        setNextFixture(null);
-      }
-    };
-    
-    fetchNextFixture();
   }, []);
 
   return (
