@@ -15,10 +15,10 @@ const genericClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
-// Create a type for the rest client to avoid TypeScript errors
-type GenericSupabaseClient = {
+// Create a clearer type for the rest client to fix TypeScript errors
+interface GenericSupabaseClient {
   from: (table: string) => any;
-};
+}
 
 // Export the client with added rest property for non-typed tables
 export const supabase = {
