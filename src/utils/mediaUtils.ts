@@ -74,6 +74,47 @@ export async function createMediaFolder(folderData: {
   }
 }
 
+// Function to upload media file to storage
+export async function uploadMediaFile(file: File, bucketName: string = 'media') {
+  try {
+    // First check if the bucket exists, if not try to create it
+    const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucketName);
+    
+    if (bucketError && bucketError.message.includes('not found')) {
+      console.log(`Bucket '${bucketName}' not found, attempting to create it...`);
+      const { error: createError } = await supabase.storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (createError) {
+        console.error(`Error creating bucket '${bucketName}':`, createError);
+        throw new Error(`Failed to create storage bucket: ${createError.message}`);
+      }
+    }
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${fileName}`;
+    
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file);
+    
+    if (error) throw error;
+    
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(filePath);
+    
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error("Error uploading media file:", error);
+    throw error;
+  }
+}
+
 // Function to update a media folder
 export async function updateMediaFolder(id: string, folderData: {
   title: string;

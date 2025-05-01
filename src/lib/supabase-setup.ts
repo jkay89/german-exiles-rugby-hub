@@ -26,30 +26,53 @@ export async function setupSupabase() {
 
 async function createStorageBucket(id: string, name: string) {
   try {
-    // First check if bucket exists
-    const { data, error } = await supabase.storage.getBucket(id);
+    console.log(`Checking if bucket '${id}' exists...`);
     
-    if (error) {
-      if (error.message.includes('Bucket not found')) {
-        // Create the bucket if it doesn't exist
-        const { error: createError } = await supabase.storage.createBucket(id, {
-          public: true,
-          fileSizeLimit: 50000000, // 50MB
-        });
+    // Try to get the bucket - this will tell us if it exists
+    let { data: bucketData, error: bucketError } = await supabase.storage.getBucket(id);
+    
+    // If bucket doesn't exist, create it
+    if (bucketError && (bucketError.message.includes('Bucket not found') || bucketError.message.includes('not found'))) {
+      console.log(`Bucket '${id}' not found, attempting to create it...`);
+      
+      const { data, error: createError } = await supabase.storage.createBucket(id, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (createError) {
+        console.error(`Failed to create bucket '${id}':`, createError);
         
-        if (createError) {
-          console.error(`Error creating bucket ${id}:`, createError);
-        } else {
-          console.log(`Created bucket: ${id}`);
+        // If creation failed due to RLS, try with admin role if available
+        if (createError.message.includes('row-level security')) {
+          console.warn(`RLS policy preventing bucket creation for '${id}'. Please check your Supabase permissions.`);
         }
       } else {
-        console.error(`Error checking bucket ${id}:`, error);
+        console.log(`Successfully created bucket '${id}'`);
       }
+    } else if (bucketError) {
+      console.error(`Error checking bucket '${id}':`, bucketError);
     } else {
-      console.log(`Bucket exists: ${id}`);
+      console.log(`Bucket '${id}' already exists`);
+    }
+    
+    // After creating (or failing to create), verify the bucket exists and is properly configured
+    const { data: verifyData, error: verifyError } = await supabase.storage.getBucket(id);
+    if (!verifyError) {
+      // Make sure the bucket is public
+      const { error: updateError } = await supabase.storage.updateBucket(id, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (updateError) {
+        console.error(`Error updating bucket '${id}' to be public:`, updateError);
+      } else {
+        console.log(`Verified bucket '${id}' is correctly configured`);
+      }
     }
   } catch (error) {
-    console.error(`Error with bucket ${id}:`, error);
+    console.error(`Unexpected error with bucket '${id}':`, error);
   }
 }
 
