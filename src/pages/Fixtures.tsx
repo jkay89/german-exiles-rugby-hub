@@ -30,6 +30,7 @@ interface Fixture {
   location: string;
   is_home: boolean;
   competition: string;
+  team?: string;
 }
 
 const Fixtures = () => {
@@ -39,7 +40,7 @@ const Fixtures = () => {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [fixturesLoading, setFixturesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // Format functions
@@ -62,8 +63,8 @@ const Fixtures = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchFixtures = async () => {
+      setFixturesLoading(true);
       setError(null);
       console.log("Fetching fixtures data, activeTab:", activeTab);
 
@@ -82,51 +83,69 @@ const Fixtures = () => {
         if (!fixtureData || fixtureData.length === 0) {
           console.log("No fixtures data found");
           setFixtures([]);
-        } else {
-          // Filter fixtures based on date
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
-          
-          const upcoming = fixtureData.filter(fixture => {
+          setFixturesLoading(false);
+          return;
+        }
+
+        // Filter fixtures based on date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
+        
+        const upcoming = fixtureData.filter(fixture => {
+          try {
             const fixtureDate = new Date(fixture.date);
             fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
             return fixtureDate >= today;
-          });
-          
-          const past = fixtureData.filter(fixture => {
+          } catch (error) {
+            console.error("Error parsing fixture date:", fixture.date, error);
+            return false; // Skip fixtures with invalid dates
+          }
+        });
+        
+        const past = fixtureData.filter(fixture => {
+          try {
             const fixtureDate = new Date(fixture.date);
             fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
             return fixtureDate < today;
-          });
-          
-          console.log("Upcoming fixtures:", upcoming.length);
-          console.log("Past fixtures:", past.length);
+          } catch (error) {
+            console.error("Error parsing fixture date:", fixture.date, error);
+            return false; // Skip fixtures with invalid dates
+          }
+        });
+        
+        console.log("Upcoming fixtures:", upcoming.length);
+        console.log("Past fixtures:", past.length);
 
-          // Sort upcoming fixtures by date and time
-          upcoming.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            if (dateA.getTime() !== dateB.getTime()) {
-              return dateA.getTime() - dateB.getTime();
-            }
-            return a.time.localeCompare(b.time); // Sort by time if dates are equal
-          });
+        // Sort upcoming fixtures by date and time
+        upcoming.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateA.getTime() - dateB.getTime();
+          }
+          return a.time.localeCompare(b.time); // Sort by time if dates are equal
+        });
 
-          // Sort past fixtures by date in descending order
-          past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        // Sort past fixtures by date in descending order
+        past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-          // Set fixtures based on the active tab
-          setFixtures(activeTab === "upcoming" ? upcoming : past);
-          console.log("Set fixtures:", activeTab === "upcoming" ? upcoming : past);
-        }
+        // Set fixtures based on the active tab
+        setFixtures(activeTab === "upcoming" ? upcoming : past);
+        console.log("Set fixtures:", activeTab === "upcoming" ? upcoming : past);
       } catch (err: any) {
         console.error("Error loading fixtures:", err);
         setError(err.message || "Failed to load fixtures");
       } finally {
-        setLoading(false);
+        setFixturesLoading(false);
       }
-      
-      // Get player statistics in a separate state setter to prevent flickering
+    };
+    
+    fetchFixtures();
+  }, [activeTab, i18n.language]); // Only re-fetch when tab or language changes
+  
+  // Separate useEffect for player stats to avoid UI flickering
+  useEffect(() => {
+    const fetchPlayerStats = async () => {
       setStatsLoading(true);
       try {
         console.log("Fetching player stats");
@@ -140,9 +159,9 @@ const Fixtures = () => {
         setStatsLoading(false);
       }
     };
-
-    fetchData();
-  }, [activeTab, i18n.language]); // Only re-fetch when tab or language changes
+    
+    fetchPlayerStats();
+  }, []);
 
   return (
     <motion.div
@@ -175,20 +194,20 @@ const Fixtures = () => {
         </div>
       </div>
 
-      {loading && 
+      {fixturesLoading && 
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-8 h-8 text-primary animate-spin mr-2" />
           <p className="text-center text-gray-500">{t('loading')}</p>
         </div>
       }
       
-      {error && 
+      {error && !fixturesLoading && 
         <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
           <p className="text-center text-red-500">Error: {error}</p>
         </div>
       }
 
-      {!loading && !error && fixtures.length === 0 && (
+      {!fixturesLoading && !error && fixtures.length === 0 && (
         <div className="bg-gray-800 rounded-lg p-8 text-center">
           <p className="text-gray-400">
             {activeTab === "upcoming" 
@@ -198,7 +217,7 @@ const Fixtures = () => {
         </div>
       )}
 
-      {!loading && !error && fixtures.length > 0 && (
+      {!fixturesLoading && !error && fixtures.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {fixtures.map((fixture) => (
             <FixtureCard 
@@ -211,12 +230,13 @@ const Fixtures = () => {
               is_home={fixture.is_home}
               competition={fixture.competition}
               locale={i18n.language}
+              team={fixture.team}
             />
           ))}
         </div>
       )}
       
-      {/* Player Statistics Table - Use a separate loading state to prevent flickering */}
+      {/* Player Statistics Table - Completely separate loading state to prevent flickering */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-white mb-4">Player Statistics</h2>
         <Separator className="mb-6" />

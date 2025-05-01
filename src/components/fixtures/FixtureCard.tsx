@@ -13,6 +13,7 @@ interface FixtureCardProps {
   is_home: boolean;
   competition: string;
   locale: string;
+  team?: string; // Make team optional as it might not always be provided
 }
 
 const FixtureCard = ({
@@ -23,7 +24,8 @@ const FixtureCard = ({
   location,
   is_home,
   competition,
-  locale
+  locale,
+  team
 }: FixtureCardProps) => {
   
   const formatDate = (dateString: string) => {
@@ -52,7 +54,10 @@ const FixtureCard = ({
   return (
     <Card className="bg-gray-900 text-white h-full">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">{competition}</CardTitle>
+        <CardTitle className="text-lg font-semibold">
+          {competition}
+          {team && <span className="text-sm ml-2 text-gray-400">({team})</span>}
+        </CardTitle>
         <CardDescription className="text-gray-300">
           {formatDate(date)} - {formatTime(time)}
         </CardDescription>
@@ -61,6 +66,10 @@ const FixtureCard = ({
         <div className="mb-4">
           <p className="text-sm text-gray-400">Opponent</p>
           <p className="text-lg">{opponent}</p>
+        </div>
+        <div className="mb-2">
+          <p className="text-sm text-gray-400">Match Type</p>
+          <p className="text-base">{is_home ? 'Home' : 'Away'}</p>
         </div>
         <div>
           <p className="text-sm text-gray-400">Location</p>
