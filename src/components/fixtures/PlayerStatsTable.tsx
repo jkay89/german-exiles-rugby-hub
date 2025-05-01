@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
-  TableBody,
   TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  TableBody,
 } from "@/components/ui/table";
-import { Loader2 } from "lucide-react";
 import { getPlayerStats, PlayerStats } from "@/utils/playerStats";
+import StatsTableContent from "./StatsTableContent";
+import { LoadingState } from "./FixtureStates";
 
 const PlayerStatsTable = () => {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
@@ -46,10 +46,7 @@ const PlayerStatsTable = () => {
       <Separator className="mb-6 bg-gray-700" />
       
       {statsLoading ? (
-        <div className="flex justify-center items-center py-12 bg-gray-900 rounded-lg border border-gray-800">
-          <Loader2 className="w-8 h-8 text-german-gold animate-spin mr-2" />
-          <p className="text-center text-gray-400">Loading player statistics...</p>
-        </div>
+        <LoadingState message="Loading player statistics..." />
       ) : (
         <div className="overflow-x-auto bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-4 border border-gray-700">
           <Table>
@@ -67,24 +64,7 @@ const PlayerStatsTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {playerStats && playerStats.length > 0 ? (
-                playerStats.map((stat) => (
-                  <TableRow key={stat.id} className="hover:bg-gray-800 border-b border-gray-800">
-                    <TableCell className="font-medium text-white">{stat.name}</TableCell>
-                    <TableCell className="text-gray-300">{stat.position || "–"}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.gamesPlayed}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.trysScored}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.pointsScored}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.yellowCards}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.redCards}</TableCell>
-                    <TableCell className="text-center text-gray-300">{stat.manOfTheMatch}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center text-gray-400">No player statistics available.</TableCell>
-                </TableRow>
-              )}
+              <StatsTableContent playerStats={playerStats} />
             </TableBody>
           </Table>
         </div>
