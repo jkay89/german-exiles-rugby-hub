@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import PlayerImageResizer from "./PlayerImageResizer";
 
 interface PlayerFormProps {
   isEditing: boolean;
@@ -39,21 +40,40 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialValues?.photo_url || null);
+  const [showResizer, setShowResizer] = useState(false);
+  const [resizerFile, setResizerFile] = useState<File | null>(null);
+  const [playerName, setPlayerName] = useState(initialValues?.name || "");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedFile(file);
-      
-      // Create a preview URL for the selected file
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        if (typeof fileReader.result === 'string') {
-          setPreviewUrl(fileReader.result);
-        }
-      };
-      fileReader.readAsDataURL(file);
+      setResizerFile(file);
+      setShowResizer(true);
     }
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPlayerName(e.target.value);
+  };
+
+  const handleResizedImage = (resizedFile: File) => {
+    setSelectedFile(resizedFile);
+    
+    // Create a preview URL for the resized file
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      if (typeof fileReader.result === 'string') {
+        setPreviewUrl(fileReader.result);
+      }
+    };
+    fileReader.readAsDataURL(resizedFile);
+    
+    setShowResizer(false);
+  };
+
+  const handleCancelResize = () => {
+    setShowResizer(false);
+    setResizerFile(null);
   };
 
   return (
@@ -67,6 +87,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
             placeholder="Player name"
             className="bg-gray-800 border-gray-700 text-white"
             defaultValue={initialValues?.name || ""}
+            onChange={handleNameChange}
           />
         </div>
 
@@ -157,7 +178,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
               <Avatar className="h-16 w-16">
                 <AvatarImage src={previewUrl} alt="Player" />
                 <AvatarFallback className="bg-gray-700">
-                  {initialValues?.name?.split(' ').map(n => n[0]).join('') || 'PL'}
+                  {playerName?.split(' ').map(n => n[0]).join('') || 'PL'}
                 </AvatarFallback>
               </Avatar>
             )}
@@ -180,6 +201,15 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Image Resizer Dialog */}
+      <PlayerImageResizer
+        open={showResizer}
+        onClose={handleCancelResize}
+        onSave={handleResizedImage}
+        initialImage={resizerFile}
+        playerName={playerName}
+      />
 
       <div className="flex justify-end gap-2">
         {onCancel && (
