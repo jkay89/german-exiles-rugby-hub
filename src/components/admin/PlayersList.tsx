@@ -115,7 +115,10 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }:
             {players.map((player) => (
               <TableRow key={player.id}>
                 <TableCell className="text-gray-300">
-                  <Avatar className={`h-${imageSize} w-${imageSize} transition-all duration-200`}>
+                  <Avatar 
+                    style={{ height: `${imageSize * 4}px`, width: `${imageSize * 4}px` }}
+                    className="transition-all duration-200"
+                  >
                     {player.photo_url ? (
                       <AvatarImage src={player.photo_url} alt={player.name} />
                     ) : (
