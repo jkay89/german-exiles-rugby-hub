@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client-extensions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, ZoomIn, ZoomOut } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 interface PlayersListProps {
   players: Player[];
@@ -27,10 +26,16 @@ const PlayersList = ({ players, activeTeam, onEdit, onPlayersChanged, loading }:
 
   // Use useMemo to prevent unnecessary re-renders of the flag icons
   const getFlagIcon = useMemo(() => (heritage: string | null) => {
-    if (heritage === "DE" || heritage?.toLowerCase() === "german") {
+    if (!heritage) return null;
+    
+    const heritageLower = heritage.toLowerCase();
+    
+    if (heritageLower === "de" || heritageLower === "german") {
       return "/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png";
-    } else if (heritage === "GB" || heritage?.toLowerCase() === "british") {
+    } else if (heritageLower === "gb" || heritageLower === "british") {
       return "/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png";
+    } else if (heritageLower === "ch" || heritageLower === "swiss") {
+      return "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg";
     }
     return null;
   }, []);

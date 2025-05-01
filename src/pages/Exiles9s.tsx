@@ -34,6 +34,23 @@ const Exiles9s = () => {
     return roleMatch ? roleMatch[1] : null;
   };
 
+  // Function to get the correct flag based on heritage
+  const getHeritageFlag = (heritage: string | null): string | null => {
+    if (!heritage) return null;
+    
+    const heritageLower = heritage.toLowerCase();
+    
+    if (heritageLower === "de" || heritageLower === "german") {
+      return "/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png";
+    } else if (heritageLower === "gb" || heritageLower === "british") {
+      return "/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png";
+    } else if (heritageLower === "ch" || heritageLower === "swiss") {
+      return "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg";
+    }
+    
+    return null;
+  };
+
   return (
     <div className="pt-16 min-h-screen bg-black">
       <motion.section
@@ -106,26 +123,12 @@ const Exiles9s = () => {
                         </div>
 
                         <div className="flex flex-col items-center">
-                          {player.heritage === "DE" || player.heritage === "German" ? (
+                          {player.heritage && (
                             <img 
-                              src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
-                              alt={t("german_flag")}
+                              src={getHeritageFlag(player.heritage)}
+                              alt={`${player.heritage} Flag`}
                               className="w-8 h-5 object-cover rounded"
                             />
-                          ) : player.heritage === "GB" || player.heritage === "British" ? (
-                            <img 
-                              src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                              alt={t("british_flag")}
-                              className="w-8 h-5 object-cover rounded"
-                            />
-                          ) : player.heritage === "CH" ? (
-                            <img 
-                              src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg"
-                              alt="Swiss Flag"
-                              className="w-8 h-5 object-cover rounded"
-                            />
-                          ) : (
-                            <div className="w-8 h-5 bg-gray-700 rounded"></div>
                           )}
                         </div>
                       </div>
