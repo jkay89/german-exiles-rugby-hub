@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, MapPinIcon } from "lucide-react";
+import { CalendarIcon, MapPinIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { getPlayerStats, PlayerStats } from "@/utils/playerStats";
 
@@ -146,44 +146,69 @@ const Fixtures = () => {
         </div>
       </div>
 
-      {loading && <p className="text-center text-gray-500">{t('loading')}</p>}
-      {error && <p className="text-center text-red-500">Error: {error}</p>}
+      {loading && 
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-8 h-8 text-primary animate-spin mr-2" />
+          <p className="text-center text-gray-500">{t('loading')}</p>
+        </div>
+      }
+      
+      {error && 
+        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
+          <p className="text-center text-red-500">Error: {error}</p>
+        </div>
+      }
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {fixtures.map((fixture) => (
-          <Card key={fixture.id} className="bg-gray-900 text-white">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">{fixture.competition}</CardTitle>
-              <CardDescription>
-                {formatDate(fixture.date)} - {formatTime(fixture.time)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <p className="text-sm text-gray-400">{t('fixtures.opponent')}</p>
-                <p className="text-lg">{fixture.opponent}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">{t('fixtures.location')}</p>
-                <div className="flex items-center">
-                  <MapPinIcon className="h-4 w-4 mr-2 text-gray-500" />
-                  <p className="text-base">{fixture.location}</p>
+      {!loading && !error && fixtures.length === 0 && (
+        <div className="bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-400">
+            {activeTab === "upcoming" 
+              ? "No upcoming fixtures available." 
+              : "No past fixtures available."}
+          </p>
+        </div>
+      )}
+
+      {!loading && !error && fixtures.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {fixtures.map((fixture) => (
+            <Card key={fixture.id} className="bg-gray-900 text-white">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">{fixture.competition}</CardTitle>
+                <CardDescription>
+                  {formatDate(fixture.date)} - {formatTime(fixture.time)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4">
+                  <p className="text-sm text-gray-400">{t('fixtures.opponent')}</p>
+                  <p className="text-lg">{fixture.opponent}</p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div>
+                  <p className="text-sm text-gray-400">{t('fixtures.location')}</p>
+                  <div className="flex items-center">
+                    <MapPinIcon className="h-4 w-4 mr-2 text-gray-500" />
+                    <p className="text-base">{fixture.location}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
       
       {/* Player Statistics Table */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-white mb-4">Player Statistics</h2>
         {statsLoading ? (
-          <p className="text-center text-gray-500">Loading player statistics...</p>
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 text-primary animate-spin mr-2" />
+            <p className="text-center text-gray-500">Loading player statistics...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
-              <TableCaption>A list of player statistics.</TableCaption>
+              <TableCaption>A list of player statistics for the current season.</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Name</TableHead>
