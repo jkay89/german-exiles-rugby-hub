@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -70,11 +71,18 @@ const AdminPlayers = () => {
   };
 
   const handleTeamChange = (value: string) => {
+    // First update the active team state
     setActiveTeam(value);
+    
+    // Reset form states to avoid showing stale data
     setShowAddForm(false);
     setEditingPlayer(null);
-    // Clear state when switching tabs to avoid showing wrong data
-    loadPlayers();
+    
+    // Load players for the new team after the state has been updated
+    // We're explicitly passing the new team value to ensure we're loading the correct data
+    setTimeout(() => {
+      loadPlayers();
+    }, 50);
   };
 
   const handleImport = async () => {
