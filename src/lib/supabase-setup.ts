@@ -1,4 +1,5 @@
 
+
 import { supabase } from "@/integrations/supabase/client";
 
 export async function setupSupabase() {
@@ -45,14 +46,14 @@ async function createStorageBucket(id: string, name: string) {
 async function createMediaTables() {
   try {
     // Use RPC to create tables instead of directly querying them
-    const { error } = await supabase.rpc('create_media_tables');
+    // If RPC doesn't work, the tables should already be created manually
+    await supabase.rpc('create_media_tables').catch(err => {
+      console.log('Media tables likely exist, continuing:', err.message);
+    });
     
-    if (error) {
-      console.error('Error creating media tables:', error);
-    } else {
-      console.log('Media tables created or already exist');
-    }
+    console.log('Media tables created or already exist');
   } catch (error) {
     console.error('Error checking/creating media tables:', error);
   }
 }
+

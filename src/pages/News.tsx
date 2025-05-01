@@ -1,12 +1,44 @@
-
 import { motion } from "framer-motion";
 import { Newspaper } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { newsArticles } from "@/data/newsData";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client-extensions";
+
+interface NewsArticle {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  image_url?: string;
+  created_at: string;
+}
 
 const News = () => {
   const { t } = useLanguage();
+  const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function fetchNews() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.rest
+          .from('news')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setNewsArticles(data as NewsArticle[] || []);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchNews();
+  }, []);
   
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -21,9 +53,13 @@ const News = () => {
           <h1 className="text-4xl font-bold text-white">{t("latest_news")}</h1>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {newsArticles.length > 0 ? (
-            newsArticles.map((article) => (
+        {loading ? (
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-german-gold"></div>
+          </div>
+        ) : newsArticles.length > 0 ? (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {newsArticles.map((article) => (
               <motion.div
                 key={article.id}
                 initial={{ opacity: 0 }}
@@ -33,9 +69,9 @@ const News = () => {
               >
                 <Link to={`/news/${article.id}`}>
                   <div className="aspect-video bg-gray-800 flex items-center justify-center overflow-hidden">
-                    {article.featuredImage ? (
+                    {article.image_url ? (
                       <img 
-                        src={article.featuredImage} 
+                        src={article.image_url} 
                         alt={article.title} 
                         className="w-full h-full object-cover"
                       />
@@ -44,30 +80,32 @@ const News = () => {
                     )}
                   </div>
                   <div className="p-6">
-                    <p className="text-sm text-gray-400 mb-2">{article.date}</p>
+                    <p className="text-sm text-gray-400 mb-2">
+                      {new Date(article.created_at).toLocaleDateString()}
+                    </p>
                     <h3 className="text-xl font-bold text-white mb-2">{article.title}</h3>
                     <p className="text-gray-400">{article.summary}</p>
                   </div>
                 </Link>
               </motion.div>
-            ))
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gray-900 rounded-lg overflow-hidden border border-german-red hover:border-german-gold transition-colors duration-300"
-            >
-              <div className="aspect-video bg-gray-800 flex items-center justify-center">
-                <Newspaper className="h-12 w-12 text-gray-600" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">{t("coming_soon")}</h3>
-                <p className="text-gray-400">{t("news_coming_soon")}</p>
-              </div>
-            </motion.div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-gray-900 rounded-lg overflow-hidden border border-german-red hover:border-german-gold transition-colors duration-300"
+          >
+            <div className="aspect-video bg-gray-800 flex items-center justify-center">
+              <Newspaper className="h-12 w-12 text-gray-600" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2">{t("coming_soon")}</h3>
+              <p className="text-gray-400">{t("news_coming_soon")}</p>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );

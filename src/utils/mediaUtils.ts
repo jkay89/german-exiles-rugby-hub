@@ -1,5 +1,4 @@
-
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 // Define interfaces for our media types
 export interface MediaFolder {
@@ -27,8 +26,8 @@ export async function fetchMediaFolders() {
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_folders');
     
     if (rpcError && rpcError.message.includes('function "get_media_folders" does not exist')) {
-      // Fallback to raw query if RPC function doesn't exist
-      const { data, error } = await supabase.from('media_folders').select('*').order('created_at', { ascending: false });
+      // Fallback to raw REST API if RPC function doesn't exist
+      const { data, error } = await supabase.rest.from('media_folders').select('*').order('created_at', { ascending: false });
       
       if (error) throw error;
       return data as MediaFolder[];
@@ -50,8 +49,8 @@ export async function fetchMediaItems(folderId: string) {
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
     
     if (rpcError && rpcError.message.includes('function "get_media_items" does not exist')) {
-      // Fallback to raw query if RPC function doesn't exist
-      const { data, error } = await supabase.from('media_items')
+      // Fallback to raw REST API if RPC function doesn't exist
+      const { data, error } = await supabase.rest.from('media_items')
         .select('*')
         .eq('folder_id', folderId)
         .order('created_at', { ascending: true });
@@ -77,7 +76,7 @@ export async function createMediaFolder(folderData: {
   thumbnail_url?: string;
 }) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from('media_folders')
       .insert([folderData])
       .select();
@@ -98,7 +97,7 @@ export async function updateMediaFolder(id: string, folderData: {
   thumbnail_url?: string;
 }) {
   try {
-    const { error } = await supabase
+    const { error } = await supabase.rest
       .from('media_folders')
       .update(folderData)
       .eq('id', id);
@@ -115,7 +114,7 @@ export async function updateMediaFolder(id: string, folderData: {
 export async function deleteMediaFolder(id: string) {
   try {
     // First delete all media items in this folder
-    const { error: itemsDeleteError } = await supabase
+    const { error: itemsDeleteError } = await supabase.rest
       .from('media_items')
       .delete()
       .eq('folder_id', id);
@@ -123,7 +122,7 @@ export async function deleteMediaFolder(id: string) {
     if (itemsDeleteError) throw itemsDeleteError;
     
     // Then delete the folder
-    const { error: folderDeleteError } = await supabase
+    const { error: folderDeleteError } = await supabase.rest
       .from('media_folders')
       .delete()
       .eq('id', id);
@@ -145,7 +144,7 @@ export async function createMediaItem(itemData: {
   title?: string;
 }) {
   try {
-    const { error } = await supabase
+    const { error } = await supabase.rest
       .from('media_items')
       .insert([itemData]);
     
@@ -160,7 +159,7 @@ export async function createMediaItem(itemData: {
 // Function to delete a media item
 export async function deleteMediaItem(id: string) {
   try {
-    const { error } = await supabase
+    const { error } = await supabase.rest
       .from('media_items')
       .delete()
       .eq('id', id);

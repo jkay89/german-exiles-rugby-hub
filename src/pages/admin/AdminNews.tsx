@@ -7,21 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Edit, Upload, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
-
-interface NewsArticle {
-  id: string;
-  title: string;
-  summary: string;
-  content: string;
-  image_url?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { NewsArticle, fetchNewsArticles, createNewsArticle, updateNewsArticle, deleteNewsArticle } from "@/utils/newsUtils";
 
 const AdminNews = () => {
   const { isAuthenticated } = useAdmin();
@@ -41,20 +32,15 @@ const AdminNews = () => {
     if (!isAuthenticated) {
       navigate("/admin");
     } else {
-      fetchNewsArticles();
+      loadNewsArticles();
     }
   }, [isAuthenticated, navigate]);
 
-  const fetchNewsArticles = async () => {
+  const loadNewsArticles = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('news')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setNewsArticles(data || []);
+      const articles = await fetchNewsArticles();
+      setNewsArticles(articles);
     } catch (error: any) {
       toast({
         title: "Error fetching news articles",
@@ -123,11 +109,7 @@ const AdminNews = () => {
         image_url: imageUrl,
       };
       
-      const { error } = await supabase
-        .from('news')
-        .insert([articleData]);
-        
-      if (error) throw error;
+      await createNewsArticle(articleData);
       
       toast({
         title: "Article created",
@@ -135,7 +117,7 @@ const AdminNews = () => {
       });
       
       resetForm();
-      fetchNewsArticles();
+      loadNewsArticles();
     } catch (error: any) {
       toast({
         title: "Error creating article",
@@ -184,12 +166,7 @@ const AdminNews = () => {
         updated_at: new Date().toISOString(),
       };
       
-      const { error } = await supabase
-        .from('news')
-        .update(articleData)
-        .eq('id', editingArticle.id);
-        
-      if (error) throw error;
+      await updateNewsArticle(editingArticle.id, articleData);
       
       toast({
         title: "Article updated",
@@ -197,7 +174,7 @@ const AdminNews = () => {
       });
       
       resetForm();
-      fetchNewsArticles();
+      loadNewsArticles();
     } catch (error: any) {
       toast({
         title: "Error updating article",
@@ -214,12 +191,7 @@ const AdminNews = () => {
     
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from('news')
-        .delete()
-        .eq('id', deleteArticleId);
-        
-      if (error) throw error;
+      await deleteNewsArticle(deleteArticleId);
       
       toast({
         title: "Article deleted",
@@ -227,7 +199,7 @@ const AdminNews = () => {
       });
       
       setDeleteArticleId(null);
-      fetchNewsArticles();
+      loadNewsArticles();
     } catch (error: any) {
       toast({
         title: "Error deleting article",
