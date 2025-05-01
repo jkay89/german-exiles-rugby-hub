@@ -1,10 +1,7 @@
 
 import { motion } from "framer-motion";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const PageHeader = () => {
-  const { t } = useLanguage();
-  
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -32,7 +29,7 @@ const PageHeader = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="text-4xl font-bold mb-4 text-german-gold"
         >
-          {t("fixtures_results")}
+          Fixtures & Results
         </motion.h1>
         
         <motion.p 
@@ -41,7 +38,7 @@ const PageHeader = () => {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="text-gray-300 max-w-2xl mx-auto"
         >
-          {t("fixtures_description")}
+          Stay up to date with all German Exiles Rugby matches - view upcoming fixtures and check past results.
         </motion.p>
       </div>
     </motion.section>

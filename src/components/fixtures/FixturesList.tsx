@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { MapPin, Loader2 } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Fixture {
   id: string;
@@ -21,8 +20,6 @@ interface FixturesListProps {
 }
 
 const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
-  const { t } = useLanguage();
-  
   // Function to generate Google Maps URL from a location string
   const getGoogleMapsUrl = (location: string) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
@@ -39,7 +36,7 @@ const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
 
   return (
     <div className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300">
-      <h2 className="text-2xl font-bold mb-4 text-white">{t("upcoming_fixtures")}</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">Upcoming Fixtures</h2>
       
       {loading ? (
         <div className="flex justify-center items-center py-12">
@@ -89,7 +86,7 @@ const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
         </div>
       ) : (
         <div className="text-center py-8">
-          <p className="text-gray-400">{t("no_fixtures_yet")}</p>
+          <p className="text-gray-400">No fixtures available yet</p>
         </div>
       )}
     </div>

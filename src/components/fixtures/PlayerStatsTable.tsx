@@ -1,124 +1,94 @@
 
-import { useState } from "react";
-import { Search, Star, CalendarCheck, Trophy, Zap, Shield } from "lucide-react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import React, { useState, useEffect } from "react";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { PlayerStats } from "@/utils/playerStats";
+import { Loader2 } from "lucide-react";
+import { getPlayerStats, PlayerStats } from "@/utils/playerStats";
 
-interface PlayerStatsTableProps {
-  playerStats: PlayerStats[];
-}
+const PlayerStatsTable = () => {
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
 
-const PlayerStatsTable = ({ playerStats }: PlayerStatsTableProps) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  
-  // Filter players based on search query
-  const filteredPlayers = playerStats.filter(player => 
-    player.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchPlayerStats = async () => {
+      setStatsLoading(true);
+      try {
+        console.log("Fetching player stats");
+        const stats = await getPlayerStats();
+        console.log("Player stats received:", stats);
+        setPlayerStats(stats);
+      } catch (error) {
+        console.error("Error loading player stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    
+    fetchPlayerStats();
+  }, []);
 
   return (
     <div className="mt-12">
-      <div className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300">
-        <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
-          <Star className="h-6 w-6 text-german-gold" /> Player Statistics
-        </h2>
-        
-        <div className="mb-6 relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
-          <Input 
-            type="search" 
-            placeholder="Find player..." 
-            className="pl-10 bg-gray-900 border-gray-700 text-white w-full md:w-1/3" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-white">Player Statistics</h2>
+        <div className="px-3 py-1 bg-gray-800 text-xs font-medium text-gray-300 rounded-full">
+          2024-25 Season
         </div>
-        
-        <ScrollArea className="h-80">
-          <div className="overflow-x-auto">
-            <Table className="w-full text-white">
-              <TableHeader className="bg-gray-900 sticky top-0 z-10">
-                <TableRow>
-                  <TableHead className="text-white">Player</TableHead>
-                  <TableHead className="text-white">Position</TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <CalendarCheck className="h-4 w-4 mb-1" />
-                      <span>Games</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <Trophy className="h-4 w-4 mb-1" />
-                      <span>Tries</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <Zap className="h-4 w-4 mb-1" />
-                      <span>Points</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <Shield className="h-4 w-4 mb-1 text-yellow-400" />
-                      <span>Yellow</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <Shield className="h-4 w-4 mb-1 text-red-500" />
-                      <span>Red</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-white text-center">
-                    <div className="flex flex-col items-center">
-                      <Star className="h-4 w-4 mb-1 text-german-gold" />
-                      <span>MotM</span>
-                    </div>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPlayers.length > 0 ? (
-                  filteredPlayers.map((player, index) => (
-                    <TableRow 
-                      key={player.id}
-                      className={index % 2 === 0 ? "bg-gray-800/40" : "bg-gray-900/40"}
-                    >
-                      <TableCell className="font-medium">{player.name}</TableCell>
-                      <TableCell>{player.position}</TableCell>
-                      <TableCell className="text-center">{player.gamesPlayed}</TableCell>
-                      <TableCell className="text-center">{player.trysScored}</TableCell>
-                      <TableCell className="text-center">{player.pointsScored}</TableCell>
-                      <TableCell className="text-center">{player.yellowCards}</TableCell>
-                      <TableCell className="text-center">{player.redCards}</TableCell>
-                      <TableCell className="text-center">{player.manOfTheMatch}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
-                      <p className="text-gray-400">No players found matching "{searchQuery}"</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </ScrollArea>
       </div>
+      <Separator className="mb-6 bg-gray-700" />
+      
+      {statsLoading ? (
+        <div className="flex justify-center items-center py-12 bg-gray-900 rounded-lg border border-gray-800">
+          <Loader2 className="w-8 h-8 text-german-gold animate-spin mr-2" />
+          <p className="text-center text-gray-400">Loading player statistics...</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-4 border border-gray-700">
+          <Table>
+            <TableCaption>A list of player statistics for the current season.</TableCaption>
+            <TableHeader>
+              <TableRow className="border-b border-gray-700">
+                <TableHead className="text-german-gold w-[180px]">Name</TableHead>
+                <TableHead className="text-german-gold">Position</TableHead>
+                <TableHead className="text-german-gold text-center">Games</TableHead>
+                <TableHead className="text-german-gold text-center">Trys</TableHead>
+                <TableHead className="text-german-gold text-center">Points</TableHead>
+                <TableHead className="text-german-gold text-center">Yellow Cards</TableHead>
+                <TableHead className="text-german-gold text-center">Red Cards</TableHead>
+                <TableHead className="text-german-gold text-center">MotM</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {playerStats && playerStats.length > 0 ? (
+                playerStats.map((stat) => (
+                  <TableRow key={stat.id} className="hover:bg-gray-800 border-b border-gray-800">
+                    <TableCell className="font-medium text-white">{stat.name}</TableCell>
+                    <TableCell className="text-gray-300">{stat.position || "–"}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.gamesPlayed}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.trysScored}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.pointsScored}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.yellowCards}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.redCards}</TableCell>
+                    <TableCell className="text-center text-gray-300">{stat.manOfTheMatch}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center text-gray-400">No player statistics available.</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 };
