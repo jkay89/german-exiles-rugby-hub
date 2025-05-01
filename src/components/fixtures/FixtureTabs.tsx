@@ -3,10 +3,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Trophy } from "lucide-react";
 import { NavigateFunction } from "react-router-dom";
+import { FixtureTabType } from "@/hooks/useFixtures";
 
 interface FixtureTabsProps {
-  activeTab: "upcoming" | "past";
-  setActiveTab: (tab: "upcoming" | "past") => void;
+  activeTab: FixtureTabType;
+  setActiveTab: (tab: FixtureTabType) => void;
   navigate: NavigateFunction;
 }
 

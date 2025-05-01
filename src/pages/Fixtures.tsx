@@ -1,121 +1,22 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, Calendar, Trophy } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client-extensions";
-import { getPlayerStats } from "@/utils/playerStats";
+import { Loader2 } from "lucide-react";
 import FixtureCard from "@/components/fixtures/FixtureCard";
 import PageHeader from "@/components/fixtures/PageHeader";
 import FixtureTabs from "@/components/fixtures/FixtureTabs";
 import FixturesList from "@/components/fixtures/FixturesList";
 import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
-
-interface Fixture {
-  id: string;
-  date: string;
-  time: string;
-  opponent: string;
-  location: string;
-  is_home: boolean;
-  competition: string;
-  team?: string;
-}
+import { useFixtures, FixtureTabType } from "@/hooks/useFixtures";
 
 const Fixtures = () => {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+  const [activeTab, setActiveTab] = useState<FixtureTabType>("upcoming");
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const [fixtures, setFixtures] = useState<Fixture[]>([]);
-  const [fixturesLoading, setFixturesLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch fixtures with separate useEffect to avoid UI flickering
-  useEffect(() => {
-    const fetchFixtures = async () => {
-      setFixturesLoading(true);
-      setError(null);
-      console.log("Fetching fixtures data, activeTab:", activeTab);
-
-      try {
-        const { data: fixtureData, error: fixtureError } = await supabase.rest
-          .from('fixtures')
-          .select('*');
-
-        if (fixtureError) {
-          console.error("Fixtures error:", fixtureError);
-          throw new Error(`Error fetching fixtures: ${fixtureError.message}`);
-        }
-
-        console.log("Fixture data received:", fixtureData);
-
-        if (!fixtureData || fixtureData.length === 0) {
-          console.log("No fixtures data found");
-          setFixtures([]);
-          setFixturesLoading(false);
-          return;
-        }
-
-        // Filter fixtures based on date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
-        
-        const upcoming = fixtureData.filter(fixture => {
-          try {
-            const fixtureDate = new Date(fixture.date);
-            fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
-            return fixtureDate >= today;
-          } catch (error) {
-            console.error("Error parsing fixture date:", fixture.date, error);
-            return false; // Skip fixtures with invalid dates
-          }
-        });
-        
-        const past = fixtureData.filter(fixture => {
-          try {
-            const fixtureDate = new Date(fixture.date);
-            fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
-            return fixtureDate < today;
-          } catch (error) {
-            console.error("Error parsing fixture date:", fixture.date, error);
-            return false; // Skip fixtures with invalid dates
-          }
-        });
-        
-        console.log("Upcoming fixtures:", upcoming.length);
-        console.log("Past fixtures:", past.length);
-
-        // Sort upcoming fixtures by date and time
-        upcoming.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (dateA.getTime() !== dateB.getTime()) {
-            return dateA.getTime() - dateB.getTime();
-          }
-          return a.time?.localeCompare(b.time || ""); // Sort by time if dates are equal
-        });
-
-        // Sort past fixtures by date in descending order
-        past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-        // Set fixtures based on the active tab
-        const fixturesList = activeTab === "upcoming" ? upcoming : past;
-        console.log(`Setting ${fixturesList.length} ${activeTab} fixtures`);
-        setFixtures(fixturesList);
-      } catch (err: any) {
-        console.error("Error loading fixtures:", err);
-        setError(err.message || "Failed to load fixtures");
-      } finally {
-        setFixturesLoading(false);
-      }
-    };
-    
-    fetchFixtures();
-  }, [activeTab, i18n.language]);
+  const { fixtures, loading: fixturesLoading, error } = useFixtures(activeTab);
 
   return (
     <div className="min-h-screen bg-black">
@@ -181,7 +82,7 @@ const Fixtures = () => {
           </div>
         )}
         
-        {/* Player Statistics section moved to a separate component */}
+        {/* Player Statistics section */}
         <PlayerStatsTable />
       </motion.div>
     </div>

@@ -2,17 +2,7 @@
 import { motion } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { MapPin, Loader2 } from "lucide-react";
-
-interface Fixture {
-  id: string;
-  team: string;
-  opponent: string;
-  date: string;
-  time: string;
-  location: string;
-  competition: string;
-  is_home: boolean;
-}
+import { Fixture } from "@/hooks/useFixtures";
 
 interface FixturesListProps {
   fixtures: Fixture[];
