@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -123,7 +122,7 @@ const Fixtures = () => {
     };
     
     fetchFixtures();
-  }, [activeTab, i18n.language]); // Only re-fetch when tab or language changes
+  }, [activeTab, i18n.language]);
   
   // Separate useEffect for player stats to avoid UI flickering
   useEffect(() => {
@@ -146,7 +145,7 @@ const Fixtures = () => {
   }, []);
 
   return (
-    <>
+    <div className="min-h-screen bg-black">
       <PageHeader />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -288,7 +287,7 @@ const Fixtures = () => {
           )}
         </div>
       </motion.div>
-    </>
+    </div>
   );
 };
 
