@@ -3,16 +3,7 @@ import { Newspaper } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client-extensions";
-
-interface NewsArticle {
-  id: string;
-  title: string;
-  summary: string;
-  content: string;
-  image_url?: string;
-  created_at: string;
-}
+import { NewsArticle, fetchNewsArticles } from "@/utils/newsUtils";
 
 const News = () => {
   const { t } = useLanguage();
@@ -23,13 +14,8 @@ const News = () => {
     async function fetchNews() {
       setLoading(true);
       try {
-        const { data, error } = await supabase.rest
-          .from('news')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setNewsArticles(data as NewsArticle[] || []);
+        const articles = await fetchNewsArticles();
+        setNewsArticles(articles);
       } catch (error) {
         console.error("Error fetching news:", error);
       } finally {

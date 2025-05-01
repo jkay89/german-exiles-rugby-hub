@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client-extensions";
 
 // Define interfaces for our media types
@@ -23,19 +24,21 @@ export interface MediaItem {
 export async function fetchMediaFolders() {
   try {
     // Try to use the RPC function first
-    const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_folders');
-    
-    if (rpcError && rpcError.message.includes('function "get_media_folders" does not exist')) {
-      // Fallback to raw REST API if RPC function doesn't exist
-      const { data, error } = await supabase.rest.from('media_folders').select('*').order('created_at', { ascending: false });
+    try {
+      const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_folders');
       
-      if (error) throw error;
+      if (rpcError) throw rpcError;
+      return rpcData as MediaFolder[];
+    } catch (error) {
+      // Fallback to raw REST API if RPC function doesn't exist
+      const { data, error: restError } = await supabase.rest
+        .from('media_folders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (restError) throw restError;
       return data as MediaFolder[];
-    } else if (rpcError) {
-      throw rpcError;
     }
-    
-    return rpcData as MediaFolder[];
   } catch (error) {
     console.error("Error fetching media folders:", error);
     return [];
@@ -46,22 +49,22 @@ export async function fetchMediaFolders() {
 export async function fetchMediaItems(folderId: string) {
   try {
     // Try to use the RPC function first
-    const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
-    
-    if (rpcError && rpcError.message.includes('function "get_media_items" does not exist')) {
+    try {
+      const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
+      
+      if (rpcError) throw rpcError;
+      return rpcData as MediaItem[];
+    } catch (error) {
       // Fallback to raw REST API if RPC function doesn't exist
-      const { data, error } = await supabase.rest.from('media_items')
+      const { data, error: restError } = await supabase.rest
+        .from('media_items')
         .select('*')
         .eq('folder_id', folderId)
         .order('created_at', { ascending: true });
       
-      if (error) throw error;
+      if (restError) throw restError;
       return data as MediaItem[];
-    } else if (rpcError) {
-      throw rpcError;
     }
-    
-    return rpcData as MediaItem[];
   } catch (error) {
     console.error("Error fetching media items:", error);
     return [];

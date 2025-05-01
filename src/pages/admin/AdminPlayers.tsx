@@ -1,27 +1,14 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import PlayerForm from "@/components/admin/PlayerForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-
-interface Player {
-  id: string;
-  name: string;
-  number?: number;
-  position?: string;
-  team: string;
-  heritage?: string;
-  club?: string;
-  bio?: string;
-  photo_url?: string;
-  created_at?: string;
-}
+import { supabase } from "@/integrations/supabase/client-extensions";
+import { Player, fetchPlayersByTeam, createPlayer, updatePlayer, deletePlayer } from "@/utils/playerUtils";
 
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
@@ -39,20 +26,14 @@ const AdminPlayers = () => {
     if (!isAuthenticated) {
       navigate("/admin");
     } else {
-      fetchPlayers();
+      loadPlayers();
     }
   }, [isAuthenticated, navigate, activeTeam]);
 
-  const fetchPlayers = async () => {
+  const loadPlayers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('players')
-        .select('*')
-        .eq('team', activeTeam)
-        .order('number', { ascending: true });
-
-      if (error) throw error;
+      const data = await fetchPlayersByTeam(activeTeam);
       setPlayers(data || []);
     } catch (error: any) {
       toast({
@@ -103,11 +84,7 @@ const AdminPlayers = () => {
         photo_url: photoUrl,
       };
       
-      const { error } = await supabase
-        .from('players')
-        .insert([playerData]);
-        
-      if (error) throw error;
+      await createPlayer(playerData);
       
       toast({
         title: "Player added",
@@ -115,7 +92,7 @@ const AdminPlayers = () => {
       });
       
       setShowAddForm(false);
-      fetchPlayers();
+      loadPlayers();
     } catch (error: any) {
       toast({
         title: "Error adding player",
@@ -166,12 +143,7 @@ const AdminPlayers = () => {
         photo_url: photoUrl,
       };
       
-      const { error } = await supabase
-        .from('players')
-        .update(playerData)
-        .eq('id', editingPlayer.id);
-        
-      if (error) throw error;
+      await updatePlayer(editingPlayer.id, playerData);
       
       toast({
         title: "Player updated",
@@ -179,7 +151,7 @@ const AdminPlayers = () => {
       });
       
       setEditingPlayer(null);
-      fetchPlayers();
+      loadPlayers();
     } catch (error: any) {
       toast({
         title: "Error updating player",
@@ -194,12 +166,7 @@ const AdminPlayers = () => {
     
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from('players')
-        .delete()
-        .eq('id', deletePlayerId);
-        
-      if (error) throw error;
+      await deletePlayer(deletePlayerId);
       
       toast({
         title: "Player deleted",
@@ -207,7 +174,7 @@ const AdminPlayers = () => {
       });
       
       setDeletePlayerId(null);
-      fetchPlayers();
+      loadPlayers();
     } catch (error: any) {
       toast({
         title: "Error deleting player",

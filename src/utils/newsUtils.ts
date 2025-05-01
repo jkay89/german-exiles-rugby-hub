@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client-extensions";
 
 // Define interfaces for our news types
