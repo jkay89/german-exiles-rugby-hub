@@ -49,7 +49,7 @@ async function createStorageBucket(id: string, name: string) {
 async function createMediaTables() {
   try {
     // Check if media_folders table exists using the generic client
-    const { data, error } = await supabase.rest.from('media_folders').select('count');
+    const { error } = await supabase.rest.from('media_folders').select('count');
     
     if (error) {
       console.log('Media tables likely need to be created:', error.message);

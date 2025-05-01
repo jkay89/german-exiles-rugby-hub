@@ -111,45 +111,33 @@ export async function seedInitialContent() {
     console.log("Checking for existing content...");
     
     // Check for news articles
-    const { data: existingNews, error: newsError } = await supabase.rest
-      .from('news')
-      .select('id');
+    const { data: existingNews, error: newsError } = await supabase.rest.from('news').select('id');
     
     if (!newsError && (!existingNews || existingNews.length === 0)) {
       console.log("Creating news articles...");
       // Insert one by one to handle potential errors better
       for (const article of newsArticles) {
-        await supabase.rest
-          .from('news')
-          .insert([article]);
+        await supabase.rest.from('news').insert([article]);
       }
     }
     
     // Check for players
-    const { data: existingPlayers, error: playersError } = await supabase.rest
-      .from('players')
-      .select('id');
+    const { data: existingPlayers, error: playersError } = await supabase.rest.from('players').select('id');
     
     if (!playersError && (!existingPlayers || existingPlayers.length === 0)) {
       console.log("Creating players...");
       for (const player of players) {
-        await supabase.rest
-          .from('players')
-          .insert([player]);
+        await supabase.rest.from('players').insert([player]);
       }
     }
     
     // Check for media folders
-    const { data: existingMedia, error: mediaError } = await supabase.rest
-      .from('media_folders')
-      .select('id');
+    const { data: existingMedia, error: mediaError } = await supabase.rest.from('media_folders').select('id');
     
     if (!mediaError && (!existingMedia || existingMedia.length === 0)) {
       console.log("Creating media folders...");
       for (const folder of mediaFolders) {
-        await supabase.rest
-          .from('media_folders')
-          .insert([folder]);
+        await supabase.rest.from('media_folders').insert([folder]);
       }
     }
     
