@@ -41,8 +41,8 @@ export const getPlayerStats = async (): Promise<PlayerStats[]> => {
     if (data && data.length > 0) {
       console.log(`Found ${data.length} player stats records.`);
       return data.map(item => ({
-        id: item.id,
-        name: item.name,
+        id: item.id || "",
+        name: item.name || "",
         position: item.position || "",
         gamesPlayed: item.games_played || 0,
         trysScored: item.trys_scored || 0,
@@ -83,8 +83,8 @@ export const getPlayerStatsById = async (id: string): Promise<PlayerStats | null
     
     if (data) {
       return {
-        id: data.id,
-        name: data.name,
+        id: data.id || "",
+        name: data.name || "",
         position: data.position || "",
         gamesPlayed: data.games_played || 0,
         trysScored: data.trys_scored || 0,
@@ -171,8 +171,8 @@ export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<Play
     
     // Convert back to PlayerStats interface
     return {
-      id: result.id,
-      name: result.name,
+      id: result.id || "",
+      name: result.name || "",
       position: result.position || "",
       gamesPlayed: result.games_played || 0,
       trysScored: result.trys_scored || 0,

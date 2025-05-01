@@ -28,6 +28,15 @@ const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
   };
 
+  const formatDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), "dd MMMM yyyy");
+    } catch (error) {
+      console.error("Error formatting date in FixturesList:", error, dateString);
+      return dateString;
+    }
+  };
+
   return (
     <div className="bg-black border border-german-red rounded-lg p-6 hover:border-german-gold transition-colors duration-300">
       <h2 className="text-2xl font-bold mb-4 text-white">{t("upcoming_fixtures")}</h2>
@@ -36,7 +45,7 @@ const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-8 h-8 text-german-gold animate-spin" />
         </div>
-      ) : fixtures.length > 0 ? (
+      ) : fixtures && fixtures.length > 0 ? (
         <div className="space-y-4">
           {fixtures.map((fixture, index) => (
             <motion.div
@@ -50,17 +59,17 @@ const FixturesList = ({ fixtures, loading = false }: FixturesListProps) => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium bg-gray-800 text-german-gold px-2 py-0.5 rounded">
-                      {fixture.team}
+                      {fixture.team || "Team"}
                     </span>
                     <span className="text-xs font-medium bg-gray-800 text-white px-2 py-0.5 rounded">
-                      {fixture.competition}
+                      {fixture.competition || "Friendly"}
                     </span>
                   </div>
                   <p className="font-bold text-white mt-1">
                     {fixture.is_home ? "German Exiles" : fixture.opponent} vs {fixture.is_home ? fixture.opponent : "German Exiles"}
                   </p>
                   <p className="text-sm text-gray-300">
-                    {format(parseISO(fixture.date), "dd MMMM yyyy")} at {fixture.time}
+                    {formatDate(fixture.date)} at {fixture.time || "TBC"}
                   </p>
                   <p className="text-sm text-german-gold flex items-start gap-1">
                     <MapPin className="h-3 w-3 min-w-3 mt-1" /> 

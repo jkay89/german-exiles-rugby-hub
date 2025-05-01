@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { format, parseISO } from 'date-fns';
-import { enGB, de } from 'date-fns/locale';
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -42,26 +40,8 @@ const Fixtures = () => {
   const [statsLoading, setStatsLoading] = useState(true);
   const [fixturesLoading, setFixturesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Format functions
-  const formatDate = (dateString: string) => {
-    const parsedDate = parseISO(dateString);
-    const locale = i18n.language === 'de' ? de : enGB;
-    return format(parsedDate, 'EEE, d MMM yyyy', { locale });
-  };
 
-  const formatTime = (timeString: string) => {
-    if (timeString === "TBC") return "TBC";
-    
-    try {
-      const parsedTime = parseISO(`2000-01-01T${timeString}`);
-      return format(parsedTime, 'HH:mm');
-    } catch (error) {
-      console.error("Error formatting time:", error);
-      return timeString;
-    }
-  };
-
+  // Fetch fixtures with separate useEffect to avoid UI flickering
   useEffect(() => {
     const fetchFixtures = async () => {
       setFixturesLoading(true);
@@ -123,15 +103,16 @@ const Fixtures = () => {
           if (dateA.getTime() !== dateB.getTime()) {
             return dateA.getTime() - dateB.getTime();
           }
-          return a.time.localeCompare(b.time); // Sort by time if dates are equal
+          return a.time?.localeCompare(b.time || ""); // Sort by time if dates are equal
         });
 
         // Sort past fixtures by date in descending order
         past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
         // Set fixtures based on the active tab
-        setFixtures(activeTab === "upcoming" ? upcoming : past);
-        console.log("Set fixtures:", activeTab === "upcoming" ? upcoming : past);
+        const fixturesList = activeTab === "upcoming" ? upcoming : past;
+        console.log(`Setting ${fixturesList.length} ${activeTab} fixtures`);
+        setFixtures(fixturesList);
       } catch (err: any) {
         console.error("Error loading fixtures:", err);
         setError(err.message || "Failed to load fixtures");
@@ -224,7 +205,7 @@ const Fixtures = () => {
               key={fixture.id}
               id={fixture.id}
               date={fixture.date} 
-              time={fixture.time}
+              time={fixture.time || "TBC"}
               opponent={fixture.opponent} 
               location={fixture.location}
               is_home={fixture.is_home}

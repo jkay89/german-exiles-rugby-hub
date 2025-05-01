@@ -34,20 +34,20 @@ const FixtureCard = ({
       const localeObj = locale === 'de' ? de : enGB;
       return format(parsedDate, 'EEE, d MMM yyyy', { locale: localeObj });
     } catch (error) {
-      console.error("Error formatting date:", error);
-      return dateString;
+      console.error("Error formatting date:", error, "for date:", dateString);
+      return dateString; // Return original string if parsing fails
     }
   };
 
   const formatTime = (timeString: string) => {
-    if (timeString === "TBC") return "TBC";
+    if (!timeString || timeString === "TBC") return "TBC";
     
     try {
       const parsedTime = parseISO(`2000-01-01T${timeString}`);
       return format(parsedTime, 'HH:mm');
     } catch (error) {
-      console.error("Error formatting time:", error);
-      return timeString;
+      console.error("Error formatting time:", error, "for time:", timeString);
+      return timeString; // Return original string if parsing fails
     }
   };
 
@@ -55,7 +55,7 @@ const FixtureCard = ({
     <Card className="bg-gray-900 text-white h-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
-          {competition}
+          {competition || "Friendly"}
           {team && <span className="text-sm ml-2 text-gray-400">({team})</span>}
         </CardTitle>
         <CardDescription className="text-gray-300">
