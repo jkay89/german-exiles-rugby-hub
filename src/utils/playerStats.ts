@@ -1,6 +1,6 @@
 
 import { compareAsc } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 export interface PlayerStats {
   id: string;
@@ -28,13 +28,18 @@ export interface MatchResult {
 // Get player stats from database
 export const getPlayerStats = async (): Promise<PlayerStats[]> => {
   try {
-    const { data, error } = await supabase
+    console.log("Fetching player stats from database...");
+    const { data, error } = await supabase.rest
       .from('player_stats')
       .select('*');
       
-    if (error) throw error;
+    if (error) {
+      console.error("Error in getPlayerStats:", error);
+      throw error;
+    }
     
     if (data && data.length > 0) {
+      console.log(`Found ${data.length} player stats records.`);
       return data.map(item => ({
         id: item.id,
         name: item.name,
@@ -50,6 +55,7 @@ export const getPlayerStats = async (): Promise<PlayerStats[]> => {
       }));
     }
     
+    console.log("No player stats found in database.");
     // Return empty array if no data
     return [];
   } catch (error) {
@@ -61,7 +67,7 @@ export const getPlayerStats = async (): Promise<PlayerStats[]> => {
 // Get player stats by ID
 export const getPlayerStatsById = async (id: string): Promise<PlayerStats | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase.rest
       .from('player_stats')
       .select('*')
       .eq('player_id', id)
@@ -102,7 +108,7 @@ export const getPlayerStatsById = async (id: string): Promise<PlayerStats | null
 export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<PlayerStats> => {
   // Format the data for the database
   const dbStats = {
-    player_id: stats.id,
+    player_id: stats.playerId,
     name: stats.name,
     position: stats.position,
     games_played: stats.gamesPlayed || 0,
@@ -115,39 +121,53 @@ export const savePlayerStats = async (stats: Partial<PlayerStats>): Promise<Play
   };
 
   try {
+    console.log("Saving player stats:", dbStats);
     // Check if stats already exist for this player
-    const { data: existingStats, error: fetchError } = await supabase
+    const { data: existingStats, error: fetchError } = await supabase.rest
       .from('player_stats')
       .select('id')
-      .eq('player_id', stats.id)
+      .eq('player_id', stats.playerId)
       .maybeSingle();
     
-    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error("Error checking existing stats:", fetchError);
+      throw fetchError;
+    }
     
     let result;
     
     if (existingStats) {
+      console.log("Updating existing stats for player:", stats.playerId);
       // Update existing stats
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('player_stats')
         .update(dbStats)
         .eq('id', existingStats.id)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating stats:", error);
+        throw error;
+      }
       result = data;
     } else {
+      console.log("Creating new stats for player:", stats.playerId);
       // Insert new stats
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('player_stats')
         .insert(dbStats)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting stats:", error);
+        throw error;
+      }
       result = data;
     }
+    
+    console.log("Stats saved successfully:", result);
     
     // Convert back to PlayerStats interface
     return {
