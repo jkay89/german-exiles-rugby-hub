@@ -18,7 +18,7 @@ type GenericSupabaseClient = {
 // Export the client with added rest property for non-typed tables
 export const supabase = {
   ...originalSupabase,
-  // Pass through storage capabilities directly from generic client for maximum compatibility
+  // Direct access to storage with no wrapping to ensure maximum compatibility
   storage: genericClient.storage,
   // Add rest property for accessing tables not in the types
   rest: {

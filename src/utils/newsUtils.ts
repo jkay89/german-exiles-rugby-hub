@@ -45,69 +45,33 @@ export async function fetchNewsArticle(id: string) {
   }
 }
 
-// Improved function to upload image for news with better bucket handling
+// Direct upload function that doesn't try to create buckets
 export async function uploadNewsImage(file: File) {
-  const bucketName = 'news';
-  
   try {
-    console.log(`Starting upload to ${bucketName} bucket with file: ${file.name}`);
+    console.log(`Uploading file ${file.name} to news bucket...`);
     
-    // Force bucket creation regardless of check - this is a more aggressive approach
-    console.log(`Ensuring ${bucketName} bucket exists...`);
-    try {
-      const { error: createError } = await supabase.storage.createBucket(bucketName, {
-        public: true,
-        fileSizeLimit: 50000000, // 50MB
-      });
-      
-      if (createError) {
-        // Log error but continue - the bucket might already exist
-        console.log(`Note: Couldn't create bucket '${bucketName}'. It might already exist: ${createError.message}`);
-      } else {
-        console.log(`Successfully created or confirmed bucket '${bucketName}'`);
-      }
-    } catch (err) {
-      console.log(`Exception when creating bucket ${bucketName}:`, err);
-      // Continue anyway - the bucket might exist
-    }
-    
-    // Force bucket to be public
-    try {
-      const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
-        public: true,
-        fileSizeLimit: 50000000, // 50MB
-      });
-      
-      if (updateError) {
-        console.log(`Note: Couldn't update bucket '${bucketName}' settings: ${updateError.message}`);
-      } else {
-        console.log(`Successfully updated bucket '${bucketName}' to be public`);
-      }
-    } catch (err) {
-      console.log(`Exception when updating bucket ${bucketName}:`, err);
-      // Continue anyway
-    }
-    
-    // Proceed with upload regardless of bucket creation/update success
+    // Generate a unique file name
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     
-    console.log(`Attempting to upload file ${fileName} to ${bucketName}...`);
-    
+    // Upload directly without checking if bucket exists first
     const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(fileName, file);
+      .from('news')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
     
     if (error) {
-      console.error(`Error uploading file to ${bucketName}:`, error);
+      console.error(`Error uploading file:`, error);
       throw error;
     }
     
-    console.log(`File uploaded successfully to ${bucketName}/${fileName}`);
+    console.log(`File uploaded successfully: ${fileName}`);
     
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from(bucketName)
+      .from('news')
       .getPublicUrl(fileName);
     
     console.log(`Public URL generated: ${urlData.publicUrl}`);
