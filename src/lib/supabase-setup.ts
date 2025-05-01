@@ -28,11 +28,22 @@ async function createStorageBucket(id: string, name: string) {
   try {
     console.log(`Checking if bucket '${id}' exists...`);
     
-    // Try to get the bucket - this will tell us if it exists
-    let { data: bucketData, error: bucketError } = await supabase.storage.getBucket(id);
+    // First try to list all buckets to check if the bucket exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error(`Error listing buckets:`, listError);
+      // Continue anyway, we'll try to create the bucket
+    }
+    
+    let bucketExists = false;
+    
+    if (buckets) {
+      bucketExists = buckets.some(bucket => bucket.name === id);
+    }
     
     // If bucket doesn't exist, create it
-    if (bucketError && (bucketError.message.includes('Bucket not found') || bucketError.message.includes('not found'))) {
+    if (!bucketExists) {
       console.log(`Bucket '${id}' not found, attempting to create it...`);
       
       const { data, error: createError } = await supabase.storage.createBucket(id, {
@@ -50,16 +61,13 @@ async function createStorageBucket(id: string, name: string) {
       } else {
         console.log(`Successfully created bucket '${id}'`);
       }
-    } else if (bucketError) {
-      console.error(`Error checking bucket '${id}':`, bucketError);
     } else {
       console.log(`Bucket '${id}' already exists`);
     }
     
     // After creating (or failing to create), verify the bucket exists and is properly configured
-    const { data: verifyData, error: verifyError } = await supabase.storage.getBucket(id);
-    if (!verifyError) {
-      // Make sure the bucket is public
+    try {
+      // Use updateBucket to make sure the bucket is public
       const { error: updateError } = await supabase.storage.updateBucket(id, {
         public: true,
         fileSizeLimit: 50000000, // 50MB
@@ -70,6 +78,8 @@ async function createStorageBucket(id: string, name: string) {
       } else {
         console.log(`Verified bucket '${id}' is correctly configured`);
       }
+    } catch (error) {
+      console.error(`Error verifying bucket '${id}':`, error);
     }
   } catch (error) {
     console.error(`Unexpected error with bucket '${id}':`, error);

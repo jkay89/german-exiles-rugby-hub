@@ -45,43 +45,78 @@ export async function fetchNewsArticle(id: string) {
   }
 }
 
+// Improved function to check if a bucket exists
+async function checkBucketExists(bucketName: string): Promise<boolean> {
+  try {
+    // Using listBuckets instead of getBucket which might have stricter permissions
+    const { data: buckets, error } = await supabase.storage.listBuckets();
+    
+    if (error) {
+      console.error("Error checking buckets:", error);
+      return false;
+    }
+    
+    return buckets?.some(bucket => bucket.name === bucketName) || false;
+  } catch (error) {
+    console.error("Error in checkBucketExists:", error);
+    return false;
+  }
+}
+
 // Function to upload image for news
 export async function uploadNewsImage(file: File) {
+  const bucketName = 'news';
+  
   try {
-    // First check if the bucket exists, if not try to create it
-    const { data: bucketData, error: bucketError } = await supabase.storage.getBucket('news');
+    console.log("Checking if news bucket exists...");
     
-    if (bucketError && bucketError.message.includes('not found')) {
+    // First check if the bucket exists
+    const bucketExists = await checkBucketExists(bucketName);
+    
+    if (!bucketExists) {
       console.log("News bucket not found, attempting to create it...");
-      const { error: createError } = await supabase.storage.createBucket('news', {
-        public: true,
-        fileSizeLimit: 50000000, // 50MB
-      });
-      
-      if (createError) {
-        console.error("Error creating news bucket:", createError);
-        throw new Error(`Failed to create news bucket: ${createError.message}`);
+      try {
+        const { error: createError } = await supabase.storage.createBucket(bucketName, {
+          public: true,
+          fileSizeLimit: 50000000, // 50MB
+        });
+        
+        if (createError) {
+          console.error("Error creating news bucket:", createError);
+          throw new Error(`Failed to create news bucket: ${createError.message}`);
+        }
+        
+        console.log("Successfully created news bucket");
+      } catch (error: any) {
+        console.error("Failed to create bucket, will still try to upload:", error);
+        // Continue with upload attempt even if bucket creation fails
+        // as the bucket might exist but we don't have permission to list it
       }
     }
     
+    // Proceed with upload regardless of bucket creation success
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${fileName}`;
+    
+    console.log(`Attempting to upload file ${fileName} to ${bucketName}...`);
     
     const { data, error } = await supabase.storage
-      .from('news')
-      .upload(filePath, file);
+      .from(bucketName)
+      .upload(fileName, file);
     
-    if (error) throw error;
+    if (error) {
+      console.error("Error uploading file:", error);
+      throw error;
+    }
     
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('news')
-      .getPublicUrl(filePath);
+      .from(bucketName)
+      .getPublicUrl(fileName);
     
     return urlData.publicUrl;
   } catch (error) {
-    console.error("Error uploading news image:", error);
+    console.error("Error in uploadNewsImage:", error);
     throw error;
   }
 }
