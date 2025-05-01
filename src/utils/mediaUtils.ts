@@ -74,7 +74,7 @@ export async function createMediaFolder(folderData: {
   }
 }
 
-// Direct upload function that assumes the bucket already exists
+// Direct upload function that handles RLS and assumes the bucket exists
 export async function uploadMediaFile(file: File, bucketName: string = 'media') {
   try {
     console.log(`Uploading file ${file.name} to ${bucketName} bucket...`);
@@ -83,12 +83,22 @@ export async function uploadMediaFile(file: File, bucketName: string = 'media') 
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     
-    // Upload directly to the existing bucket
+    // Additional logging to debug the upload process
+    console.log(`Generated filename: ${fileName}`);
+    console.log(`File type: ${file.type}`);
+    console.log(`File size: ${file.size} bytes`);
+    
+    // Make sure we're authenticated for the upload
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log(`Auth session status: ${sessionData?.session ? 'Active' : 'No active session'}`);
+    
+    // Upload directly to the existing bucket with public path
     const { data, error } = await supabase.storage
       .from(bucketName)
-      .upload(fileName, file, {
+      .upload(`public/${fileName}`, file, {
         cacheControl: '3600',
-        upsert: false
+        upsert: false,
+        contentType: file.type
       });
     
     if (error) {
@@ -101,7 +111,7 @@ export async function uploadMediaFile(file: File, bucketName: string = 'media') 
     // Get public URL
     const { data: urlData } = supabase.storage
       .from(bucketName)
-      .getPublicUrl(fileName);
+      .getPublicUrl(`public/${fileName}`);
     
     console.log(`Public URL generated: ${urlData.publicUrl}`);
     
