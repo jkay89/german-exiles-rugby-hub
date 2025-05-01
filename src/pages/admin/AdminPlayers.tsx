@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -8,7 +9,7 @@ import PlayerForm from "@/components/admin/PlayerForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client-extensions";
-import { Player, fetchPlayersByTeam, createPlayer, updatePlayer, deletePlayer } from "@/utils/playerUtils";
+import { Player } from "@/utils/playerUtils";
 
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
@@ -33,7 +34,17 @@ const AdminPlayers = () => {
   const loadPlayers = async () => {
     setLoading(true);
     try {
-      const data = await fetchPlayersByTeam(activeTeam);
+      // Direct database query to ensure fresh data
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .eq('team', activeTeam)
+        .order('number', { ascending: true })
+        .order('name');
+        
+      if (error) throw error;
+      
+      console.log(`Found ${data?.length || 0} players for team ${activeTeam}:`, data);
       setPlayers(data || []);
     } catch (error: any) {
       toast({
@@ -41,6 +52,7 @@ const AdminPlayers = () => {
         description: error.message,
         variant: "destructive",
       });
+      setPlayers([]);
     } finally {
       setLoading(false);
     }
@@ -84,7 +96,12 @@ const AdminPlayers = () => {
         photo_url: photoUrl,
       };
       
-      await createPlayer(playerData);
+      const { data, error } = await supabase
+        .from('players')
+        .insert(playerData)
+        .select();
+        
+      if (error) throw error;
       
       toast({
         title: "Player added",
@@ -136,14 +153,18 @@ const AdminPlayers = () => {
         name: formData.get('name') as string,
         number: formData.get('number') ? parseInt(formData.get('number') as string) : null,
         position: formData.get('position') as string || null,
-        team: activeTeam,
         heritage: formData.get('heritage') as string || null,
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
         photo_url: photoUrl,
       };
       
-      await updatePlayer(editingPlayer.id, playerData);
+      const { error } = await supabase
+        .from('players')
+        .update(playerData)
+        .eq('id', editingPlayer.id);
+        
+      if (error) throw error;
       
       toast({
         title: "Player updated",
@@ -166,7 +187,12 @@ const AdminPlayers = () => {
     
     setIsDeleting(true);
     try {
-      await deletePlayer(deletePlayerId);
+      const { error } = await supabase
+        .from('players')
+        .delete()
+        .eq('id', deletePlayerId);
+        
+      if (error) throw error;
       
       toast({
         title: "Player deleted",

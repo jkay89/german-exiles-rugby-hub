@@ -1,12 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { getNextFixture } from "@/utils/fixtureUtils";
 import HeroSection from "@/components/home/HeroSection";
 import MissionSection from "@/components/home/MissionSection";
 import FeatureGrid from "@/components/home/FeatureGrid";
 import SponsorCarousel from "@/components/home/SponsorCarousel";
 import { sponsorData } from "@/data/sponsorData";
-import { importExistingPlayers, syncExistingPlayers } from "@/utils/playerUtils";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
@@ -16,66 +15,73 @@ const Index = () => {
   useEffect(() => {
     setIsLoaded(true);
 
-    // Check for fixtures and results
+    // Check for database setup and integrity
     const checkDatabaseData = async () => {
       try {
-        // Force fresh data from database
-        const fixture = await getNextFixture();
-        console.log("Next fixture on homepage:", fixture);
+        // Check if we have fixtures
+        const { data: fixturesData, error: fixturesError } = await supabase
+          .from("fixtures")
+          .select('count')
+          .single();
+          
+        if (fixturesError) throw fixturesError;
+        
+        // Check if we have results
+        const { data: resultsData, error: resultsError } = await supabase
+          .from("results")
+          .select('count')
+          .single();
+          
+        if (resultsError) throw resultsError;
+        
+        console.log("Database status check - Fixtures:", fixturesData, "Results:", resultsData);
       } catch (error) {
-        console.error("Error checking fixtures:", error);
-        toast({
-          title: "Data Error",
-          description: "Could not check fixture data. Please try refreshing the page.",
-          variant: "destructive",
-        });
+        console.error("Error checking database data:", error);
       }
     };
     
-    // First try to import all players
-    const syncPlayers = async () => {
+    // Check for player data
+    const checkPlayerData = async () => {
       try {
-        console.log("Starting player data initialization...");
-        // First try to import
-        const importResult = await importExistingPlayers();
-        if (importResult.success) {
-          console.log("Players imported successfully");
-          toast({
-            title: "Player Data",
-            description: "Initial player data imported successfully",
-          });
-          return;
-        } else {
-          console.log("Players not imported:", importResult.message);
+        // Get player counts by team
+        const { data: heritagePlayers, error: heritageError } = await supabase
+          .from('players')
+          .select('count')
+          .eq('team', 'heritage')
+          .single();
           
-          // If players exist but might be incomplete, sync missing ones
-          console.log("Syncing any missing players...");
-          const syncResult = await syncExistingPlayers();
+        if (heritageError) throw heritageError;
+        
+        const { data: communityPlayers, error: communityError } = await supabase
+          .from('players')
+          .select('count')
+          .eq('team', 'community')
+          .single();
           
-          if (syncResult?.success) {
-            console.log("Players synchronized successfully:", syncResult.message);
-          } else {
-            console.error("Player sync failed:", syncResult?.message);
-            toast({
-              title: "Player Data Warning",
-              description: "Could not synchronize all player data",
-              variant: "destructive",
-            });
-          }
-        }
+        if (communityError) throw communityError;
+        
+        const { data: exiles9sPlayers, error: exiles9sError } = await supabase
+          .from('players')
+          .select('count')
+          .eq('team', 'exiles9s')
+          .single();
+          
+        if (exiles9sError) throw exiles9sError;
+        
+        console.log("Player data check - Heritage:", heritagePlayers, "Community:", communityPlayers, "Exiles 9s:", exiles9sPlayers);
       } catch (error) {
-        console.error("Error in player initialization:", error);
+        console.error("Error checking player data:", error);
         toast({
-          title: "Player Data Error",
-          description: "Failed to initialize player data. Please refresh and try again.",
+          title: "Player Data Warning",
+          description: "Could not verify player data. Some information might be missing.",
           variant: "destructive",
         });
       }
     };
       
-    // Run initialization in parallel
-    syncPlayers();
+    // Run checks in parallel
     checkDatabaseData();
+    checkPlayerData();
     
   }, [toast]);
 

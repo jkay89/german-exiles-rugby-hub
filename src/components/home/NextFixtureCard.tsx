@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { getNextFixture } from "@/utils/fixtureUtils";
 import { Fixture } from "@/utils/fixtureUtils";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const NextFixtureCard = () => {
   const { t } = useLanguage();
@@ -20,10 +21,26 @@ export const NextFixtureCard = () => {
     const fetchNextFixture = async () => {
       setLoading(true);
       try {
-        // Force fresh data fetch by bypassing cache
-        const fixture = await getNextFixture();
-        console.log("Next fixture from database in NextFixtureCard:", fixture);
-        setNextFixture(fixture);
+        // Direct database query to ensure fresh data
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase
+          .from("fixtures")
+          .select('*')
+          .gte('date', today)
+          .order('date', { ascending: true })
+          .limit(1);
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          console.log("Next fixture from direct DB query:", data[0]);
+          setNextFixture(data[0] as Fixture);
+        } else {
+          // Fallback to hardcoded fixture from utils if no data in DB
+          const fallbackFixture = await getNextFixture();
+          console.log("Using fallback fixture data:", fallbackFixture);
+          setNextFixture(fallbackFixture);
+        }
       } catch (error) {
         console.error("Error fetching next fixture:", error);
         toast({

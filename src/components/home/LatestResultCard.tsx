@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { getLatestResult } from "@/utils/fixtureUtils";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Result {
   id: string;
@@ -19,6 +20,7 @@ interface Result {
   competition: string;
   is_home: boolean;
   motm?: string;
+  location?: string;
 }
 
 export const LatestResultCard = () => {
@@ -31,10 +33,24 @@ export const LatestResultCard = () => {
     const fetchLatestResult = async () => {
       setLoading(true);
       try {
-        // Force fresh data fetch
-        const result = await getLatestResult();
-        console.log("Latest result data in LatestResultCard:", result);
-        setLatestResult(result);
+        // Direct database query to ensure fresh data
+        const { data, error } = await supabase
+          .from("results")
+          .select('*')
+          .order('date', { ascending: false })
+          .limit(1);
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          console.log("Latest result from direct DB query:", data[0]);
+          setLatestResult(data[0]);
+        } else {
+          // Fallback to hardcoded result from utils if no data in DB
+          const fallbackResult = await getLatestResult();
+          console.log("Using fallback result data:", fallbackResult);
+          setLatestResult(fallbackResult);
+        }
       } catch (error) {
         console.error("Error fetching latest result:", error);
         toast({
