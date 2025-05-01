@@ -1,120 +1,19 @@
 
+import { createClient } from '@supabase/supabase-js';
 import { supabase as originalSupabase } from "./client";
 
-// Define a simplified interface for the REST methods that work with tables not in the current types
-interface RestMethods {
-  from: (table: string) => {
-    select: (query?: string) => {
-      eq: (column: string, value: any) => {
-        order: (column: string, options?: { ascending?: boolean }) => Promise<{ data: any; error: any }>;
-        single: () => Promise<{ data: any; error: any }>;
-      };
-      order: (column: string, options?: { ascending?: boolean }) => Promise<{ data: any; error: any }>;
-      single: () => Promise<{ data: any; error: any }>;
-    };
-    insert: (values: any, options?: any) => {
-      select: () => Promise<{ data: any; error: any }>;
-    };
-    update: (values: any, options?: any) => {
-      eq: (column: string, value: any) => Promise<{ data: any; error: any }>;
-    };
-    delete: () => {
-      eq: (column: string, value: any) => Promise<{ data: any; error: any }>;
-    };
-    eq: (column: string, value: any) => {
-      order: (column: string, options?: { ascending?: boolean }) => Promise<{ data: any; error: any }>;
-    };
-  };
-}
+// Create a separate client instance specifically for non-typed tables
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://hmjwfnsygwzijjgrygia.supabase.co";
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtandmbnN5Z3d6aWpqZ3J5Z2lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1Njc4NzQsImV4cCI6MjA2MTE0Mzg3NH0.2Dq0R0-LZ4mjT0Wi5oueCIGOh__GDwoY7fJx4-YPEPo";
 
-// Create a type that includes our original client plus the rest property
-type ExtendedSupabaseClient = typeof originalSupabase & {
-  rest: RestMethods;
-};
+// Create a direct client without type definitions for generic tables
+const genericClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Cast the original client to include our rest property
-const supabase = originalSupabase as ExtendedSupabaseClient;
-
-// Implement the rest property with methods that proxy to the original client
-supabase.rest = {
-  from: (table: string) => {
-    return {
-      select: (selectQuery?: string) => {
-        return {
-          eq: (column: string, value: any) => {
-            return {
-              order: (orderColumn: string, options?: { ascending?: boolean }) => {
-                return originalSupabase
-                  .from(table)
-                  .select(selectQuery)
-                  .eq(column, value)
-                  .order(orderColumn, options);
-              },
-              single: () => {
-                return originalSupabase
-                  .from(table)
-                  .select(selectQuery)
-                  .eq(column, value)
-                  .single();
-              }
-            };
-          },
-          order: (column: string, options?: { ascending?: boolean }) => {
-            return originalSupabase
-              .from(table)
-              .select(selectQuery)
-              .order(column, options);
-          },
-          single: () => {
-            return originalSupabase
-              .from(table)
-              .select(selectQuery)
-              .single();
-          }
-        };
-      },
-      insert: (values: any, options?: any) => {
-        return {
-          select: () => {
-            return originalSupabase
-              .from(table)
-              .insert(values, options)
-              .select();
-          }
-        };
-      },
-      update: (values: any, options?: any) => {
-        return {
-          eq: (column: string, value: any) => {
-            return originalSupabase
-              .from(table)
-              .update(values, options)
-              .eq(column, value);
-          }
-        };
-      },
-      delete: () => {
-        return {
-          eq: (column: string, value: any) => {
-            return originalSupabase
-              .from(table)
-              .delete()
-              .eq(column, value);
-          }
-        };
-      },
-      eq: (column: string, value: any) => {
-        return {
-          order: (orderColumn: string, options?: { ascending?: boolean }) => {
-            return originalSupabase
-              .from(table)
-              .eq(column, value)
-              .order(orderColumn, options);
-          }
-        };
-      }
-    };
+// Export the original typed client with our generic one
+export const supabase = {
+  ...originalSupabase,
+  // Expose a separate rest property for accessing tables not in the types
+  rest: {
+    from: (table: string) => genericClient.from(table)
   }
 };
-
-export { supabase };

@@ -35,7 +35,7 @@ const players = [
     name: "Thomas Müller",
     number: 10,
     position: "Center",
-    team: "Heritage",
+    team: "heritage",
     heritage: "German",
     club: "Munich RL",
     bio: "Thomas has been playing rugby league for over 10 years and brings valuable experience to the team.",
@@ -45,7 +45,7 @@ const players = [
     name: "Marcus Schmidt",
     number: 8,
     position: "Prop",
-    team: "Heritage",
+    team: "heritage",
     heritage: "German",
     club: "Berlin RL",
     bio: "Known for his powerful runs and solid defense, Marcus is a cornerstone of the forward pack.",
@@ -55,7 +55,7 @@ const players = [
     name: "Jan Fischer",
     number: 7,
     position: "Halfback",
-    team: "Heritage",
+    team: "heritage",
     heritage: "German",
     club: "Hamburg RL",
     bio: "Jan's exceptional kicking game and vision make him a key playmaker for the team.",
@@ -65,7 +65,7 @@ const players = [
     name: "James Wilson",
     number: 1,
     position: "Fullback",
-    team: "Community",
+    team: "community",
     heritage: "British",
     club: "London Exiles",
     bio: "James brings speed and agility to the backline, with a safe pair of hands under the high ball.",
@@ -75,7 +75,7 @@ const players = [
     name: "Ryan O'Connor",
     number: 13,
     position: "Lock",
-    team: "Community",
+    team: "community",
     heritage: "Irish",
     club: "Dublin Raiders",
     bio: "Ryan's work rate and tackling ability make him an invaluable member of the forward pack.",
@@ -108,46 +108,53 @@ const mediaFolders = [
 // Function to seed initial content
 export async function seedInitialContent() {
   try {
-    console.log("Seeding initial content...");
+    console.log("Checking for existing content...");
     
-    // Seed news articles
-    const { error: newsError } = await supabase.rest
+    // Check for news articles
+    const { data: existingNews, error: newsError } = await supabase.rest
       .from('news')
-      .select('*');
+      .select('id');
     
-    if (newsError) {
+    if (!newsError && (!existingNews || existingNews.length === 0)) {
       console.log("Creating news articles...");
-      await Promise.all(newsArticles.map(article => 
-        supabase.rest.from('news').insert([article]).select()
-      ));
+      // Insert one by one to handle potential errors better
+      for (const article of newsArticles) {
+        await supabase.rest
+          .from('news')
+          .insert([article]);
+      }
     }
     
-    // Seed players
-    const { error: playersError } = await supabase.rest
+    // Check for players
+    const { data: existingPlayers, error: playersError } = await supabase.rest
       .from('players')
-      .select('*');
+      .select('id');
     
-    if (playersError) {
+    if (!playersError && (!existingPlayers || existingPlayers.length === 0)) {
       console.log("Creating players...");
-      await Promise.all(players.map(player => 
-        supabase.rest.from('players').insert([player]).select()
-      ));
+      for (const player of players) {
+        await supabase.rest
+          .from('players')
+          .insert([player]);
+      }
     }
     
-    // Seed media folders
-    const { error: mediaError } = await supabase.rest
+    // Check for media folders
+    const { data: existingMedia, error: mediaError } = await supabase.rest
       .from('media_folders')
-      .select('*');
+      .select('id');
     
-    if (mediaError) {
+    if (!mediaError && (!existingMedia || existingMedia.length === 0)) {
       console.log("Creating media folders...");
-      await Promise.all(mediaFolders.map(folder => 
-        supabase.rest.from('media_folders').insert([folder]).select()
-      ));
+      for (const folder of mediaFolders) {
+        await supabase.rest
+          .from('media_folders')
+          .insert([folder]);
+      }
     }
     
-    console.log("Initial content seeding completed");
+    console.log("Content seeding check completed");
   } catch (error) {
-    console.error("Error seeding initial content:", error);
+    console.error("Error checking/seeding initial content:", error);
   }
 }

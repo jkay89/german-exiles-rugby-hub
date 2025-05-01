@@ -48,15 +48,15 @@ async function createStorageBucket(id: string, name: string) {
 
 async function createMediaTables() {
   try {
-    // Use direct SQL queries as a workaround since RPC might not work
-    try {
-      // Check if media_folders table exists
-      const { data: existingFolders } = await supabase.from('media_folders').select('count').single();
-      console.log('Media tables already exist');
-    } catch (err) {
-      console.log('Media tables likely need to be created:', (err as Error).message);
+    // Check if media_folders table exists using the generic client
+    const { data, error } = await supabase.rest.from('media_folders').select('count');
+    
+    if (error) {
+      console.log('Media tables likely need to be created:', error.message);
       // Tables don't exist, but we can't create them directly here
       // They should be created via SQL migrations
+    } else {
+      console.log('Media tables already exist');
     }
   } catch (error) {
     console.error('Error checking/creating media tables:', error);
