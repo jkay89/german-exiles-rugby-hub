@@ -35,7 +35,7 @@ const AdminPlayers = () => {
     setLoading(true);
     try {
       // Direct database query to ensure fresh data
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('players')
         .select('*')
         .eq('team', activeTeam)
@@ -96,7 +96,7 @@ const AdminPlayers = () => {
         photo_url: photoUrl,
       };
       
-      const { data, error } = await supabase
+      const { data, error } = await supabase.rest
         .from('players')
         .insert(playerData)
         .select();
@@ -159,7 +159,7 @@ const AdminPlayers = () => {
         photo_url: photoUrl,
       };
       
-      const { error } = await supabase
+      const { error } = await supabase.rest
         .from('players')
         .update(playerData)
         .eq('id', editingPlayer.id);
@@ -187,7 +187,7 @@ const AdminPlayers = () => {
     
     setIsDeleting(true);
     try {
-      const { error } = await supabase
+      const { error } = await supabase.rest
         .from('players')
         .delete()
         .eq('id', deletePlayerId);
