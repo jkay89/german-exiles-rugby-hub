@@ -7,7 +7,6 @@ import { format, parseISO } from 'date-fns';
 import { enGB, de } from 'date-fns/locale';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -17,11 +16,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, MapPinIcon, Loader2 } from "lucide-react";
+} from "@/components/ui/table";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { getPlayerStats, PlayerStats } from "@/utils/playerStats";
+import FixtureCard from "@/components/fixtures/FixtureCard";
 
 interface Fixture {
   id: string;
@@ -39,10 +38,11 @@ const Fixtures = () => {
   const { t, i18n } = useTranslation();
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  
+  // Format functions
   const formatDate = (dateString: string) => {
     const parsedDate = parseISO(dateString);
     const locale = i18n.language === 'de' ? de : enGB;
@@ -50,70 +50,99 @@ const Fixtures = () => {
   };
 
   const formatTime = (timeString: string) => {
-    const parsedTime = parseISO(`2000-01-01T${timeString}`);
-    return format(parsedTime, 'HH:mm');
+    if (timeString === "TBC") return "TBC";
+    
+    try {
+      const parsedTime = parseISO(`2000-01-01T${timeString}`);
+      return format(parsedTime, 'HH:mm');
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return timeString;
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      console.log("Fetching fixtures data, activeTab:", activeTab);
 
       try {
         const { data: fixtureData, error: fixtureError } = await supabase.rest
           .from('fixtures')
-          .select('*')
-          .order('date', { ascending: true });
+          .select('*');
 
         if (fixtureError) {
+          console.error("Fixtures error:", fixtureError);
           throw new Error(`Error fetching fixtures: ${fixtureError.message}`);
         }
 
-        if (!fixtureData) {
-          throw new Error('No fixtures data received');
+        console.log("Fixture data received:", fixtureData);
+
+        if (!fixtureData || fixtureData.length === 0) {
+          console.log("No fixtures data found");
+          setFixtures([]);
+        } else {
+          // Filter fixtures based on date
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
+          
+          const upcoming = fixtureData.filter(fixture => {
+            const fixtureDate = new Date(fixture.date);
+            fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
+            return fixtureDate >= today;
+          });
+          
+          const past = fixtureData.filter(fixture => {
+            const fixtureDate = new Date(fixture.date);
+            fixtureDate.setHours(0, 0, 0, 0); // Set to start of day
+            return fixtureDate < today;
+          });
+          
+          console.log("Upcoming fixtures:", upcoming.length);
+          console.log("Past fixtures:", past.length);
+
+          // Sort upcoming fixtures by date and time
+          upcoming.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            if (dateA.getTime() !== dateB.getTime()) {
+              return dateA.getTime() - dateB.getTime();
+            }
+            return a.time.localeCompare(b.time); // Sort by time if dates are equal
+          });
+
+          // Sort past fixtures by date in descending order
+          past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+          // Set fixtures based on the active tab
+          setFixtures(activeTab === "upcoming" ? upcoming : past);
+          console.log("Set fixtures:", activeTab === "upcoming" ? upcoming : past);
         }
-
-        // Filter fixtures based on date
-        const today = new Date();
-        const upcoming = fixtureData.filter(fixture => new Date(fixture.date) >= today);
-        const past = fixtureData.filter(fixture => new Date(fixture.date) < today);
-
-        // Sort upcoming fixtures by date and time
-        upcoming.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (dateA < dateB) return -1;
-          if (dateA > dateB) return 1;
-          return a.time.localeCompare(b.time); // Sort by time if dates are equal
-        });
-
-        // Sort past fixtures by date in descending order
-        past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-        // Combine and set fixtures based on the active tab
-        const combinedFixtures = activeTab === "upcoming" ? upcoming : past;
-        setFixtures(combinedFixtures);
       } catch (err: any) {
-        setError(err.message);
         console.error("Error loading fixtures:", err);
+        setError(err.message || "Failed to load fixtures");
       } finally {
         setLoading(false);
       }
       
-      // Get player statistics
+      // Get player statistics in a separate state setter to prevent flickering
       setStatsLoading(true);
       try {
+        console.log("Fetching player stats");
         const stats = await getPlayerStats();
+        console.log("Player stats received:", stats);
         setPlayerStats(stats);
       } catch (error) {
         console.error("Error loading player stats:", error);
+        // Don't set error here to avoid overriding fixture errors
       } finally {
         setStatsLoading(false);
       }
     };
 
     fetchData();
-  }, [t, activeTab, i18n.language]);
+  }, [activeTab, i18n.language]); // Only re-fetch when tab or language changes
 
   return (
     <motion.div
@@ -163,8 +192,8 @@ const Fixtures = () => {
         <div className="bg-gray-800 rounded-lg p-8 text-center">
           <p className="text-gray-400">
             {activeTab === "upcoming" 
-              ? "No upcoming fixtures available." 
-              : "No past fixtures available."}
+              ? t('fixtures.noUpcoming', "No upcoming fixtures available.")
+              : t('fixtures.noPast', "No past fixtures available.")}
           </p>
         </div>
       )}
@@ -172,72 +201,64 @@ const Fixtures = () => {
       {!loading && !error && fixtures.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {fixtures.map((fixture) => (
-            <Card key={fixture.id} className="bg-gray-900 text-white">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">{fixture.competition}</CardTitle>
-                <CardDescription>
-                  {formatDate(fixture.date)} - {formatTime(fixture.time)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-400">{t('fixtures.opponent')}</p>
-                  <p className="text-lg">{fixture.opponent}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-400">{t('fixtures.location')}</p>
-                  <div className="flex items-center">
-                    <MapPinIcon className="h-4 w-4 mr-2 text-gray-500" />
-                    <p className="text-base">{fixture.location}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <FixtureCard 
+              key={fixture.id}
+              id={fixture.id}
+              date={fixture.date} 
+              time={fixture.time}
+              opponent={fixture.opponent} 
+              location={fixture.location}
+              is_home={fixture.is_home}
+              competition={fixture.competition}
+              locale={i18n.language}
+            />
           ))}
         </div>
       )}
       
-      {/* Player Statistics Table */}
+      {/* Player Statistics Table - Use a separate loading state to prevent flickering */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-white mb-4">Player Statistics</h2>
+        <Separator className="mb-6" />
+        
         {statsLoading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 text-primary animate-spin mr-2" />
             <p className="text-center text-gray-500">Loading player statistics...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto bg-gray-900 rounded-lg p-4">
             <Table>
               <TableCaption>A list of player statistics for the current season.</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Name</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Games</TableHead>
-                  <TableHead>Trys</TableHead>
-                  <TableHead>Points</TableHead>
-                  <TableHead>Yellow Cards</TableHead>
-                  <TableHead>Red Cards</TableHead>
-                  <TableHead>MotM</TableHead>
+                  <TableHead className="text-white w-[180px]">Name</TableHead>
+                  <TableHead className="text-white">Position</TableHead>
+                  <TableHead className="text-white text-center">Games</TableHead>
+                  <TableHead className="text-white text-center">Trys</TableHead>
+                  <TableHead className="text-white text-center">Points</TableHead>
+                  <TableHead className="text-white text-center">Yellow Cards</TableHead>
+                  <TableHead className="text-white text-center">Red Cards</TableHead>
+                  <TableHead className="text-white text-center">MotM</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {playerStats.length > 0 ? (
+                {playerStats && playerStats.length > 0 ? (
                   playerStats.map((stat) => (
-                    <TableRow key={stat.id}>
-                      <TableCell className="font-medium">{stat.name}</TableCell>
-                      <TableCell>{stat.position}</TableCell>
-                      <TableCell>{stat.gamesPlayed}</TableCell>
-                      <TableCell>{stat.trysScored}</TableCell>
-                      <TableCell>{stat.pointsScored}</TableCell>
-                      <TableCell>{stat.yellowCards}</TableCell>
-                      <TableCell>{stat.redCards}</TableCell>
-                      <TableCell>{stat.manOfTheMatch}</TableCell>
+                    <TableRow key={stat.id} className="hover:bg-gray-800">
+                      <TableCell className="font-medium text-white">{stat.name}</TableCell>
+                      <TableCell className="text-gray-300">{stat.position || "–"}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.gamesPlayed}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.trysScored}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.pointsScored}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.yellowCards}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.redCards}</TableCell>
+                      <TableCell className="text-center text-gray-300">{stat.manOfTheMatch}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">No player statistics available.</TableCell>
+                    <TableCell colSpan={8} className="text-center text-gray-400">No player statistics available.</TableCell>
                   </TableRow>
                 )}
               </TableBody>
