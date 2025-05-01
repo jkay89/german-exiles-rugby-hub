@@ -23,22 +23,13 @@ export interface MediaItem {
 // Function to fetch media folders
 export async function fetchMediaFolders() {
   try {
-    // Try to use the RPC function first
-    try {
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_folders');
-      
-      if (rpcError) throw rpcError;
-      return rpcData as MediaFolder[];
-    } catch (error) {
-      // Fallback to raw REST API if RPC function doesn't exist
-      const { data, error: restError } = await supabase.rest
-        .from('media_folders')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (restError) throw restError;
-      return data as MediaFolder[];
-    }
+    const { data, error } = await supabase.rest
+      .from('media_folders')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data as MediaFolder[];
   } catch (error) {
     console.error("Error fetching media folders:", error);
     return [];
@@ -48,23 +39,14 @@ export async function fetchMediaFolders() {
 // Function to fetch media items by folder
 export async function fetchMediaItems(folderId: string) {
   try {
-    // Try to use the RPC function first
-    try {
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_media_items', { folder_id_param: folderId });
-      
-      if (rpcError) throw rpcError;
-      return rpcData as MediaItem[];
-    } catch (error) {
-      // Fallback to raw REST API if RPC function doesn't exist
-      const { data, error: restError } = await supabase.rest
-        .from('media_items')
-        .select('*')
-        .eq('folder_id', folderId)
-        .order('created_at', { ascending: true });
-      
-      if (restError) throw restError;
-      return data as MediaItem[];
-    }
+    const { data, error } = await supabase.rest
+      .from('media_items')
+      .select('*')
+      .eq('folder_id', folderId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return data as MediaItem[];
   } catch (error) {
     console.error("Error fetching media items:", error);
     return [];
@@ -149,7 +131,8 @@ export async function createMediaItem(itemData: {
   try {
     const { error } = await supabase.rest
       .from('media_items')
-      .insert([itemData]);
+      .insert([itemData])
+      .select();
     
     if (error) throw error;
     return true;

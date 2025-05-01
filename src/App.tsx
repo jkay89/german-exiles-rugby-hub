@@ -30,11 +30,15 @@ import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminFixtures from "./pages/admin/AdminFixtures";
 import { AdminProvider } from "./contexts/AdminContext";
 import { setupSupabase } from "./lib/supabase-setup";
+import { seedInitialContent } from "./utils/seedInitialContent";
 
 const queryClient = new QueryClient();
 
-// Initialize Supabase setup
-setupSupabase().catch(console.error);
+// Initialize Supabase setup and seed initial data
+Promise.all([
+  setupSupabase().catch(console.error),
+  seedInitialContent().catch(console.error)
+]);
 
 function ScrollToTop() {
   const { pathname } = useLocation();

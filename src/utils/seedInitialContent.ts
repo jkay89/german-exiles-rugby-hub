@@ -1,0 +1,153 @@
+
+import { supabase } from "@/integrations/supabase/client-extensions";
+
+// Sample news article content
+const newsArticles = [
+  {
+    title: "German Exiles Win Local Derby",
+    summary: "In a thrilling match, German Exiles RL secured a victory against their local rivals.",
+    content: `<p>In a thrilling match that kept fans on the edge of their seats until the final whistle, German Exiles Rugby League secured an impressive victory against their local rivals this weekend.</p>
+    <p>The team demonstrated excellent teamwork and strategy throughout the game, with standout performances from several key players. The victory marks an important milestone in the team's journey this season.</p>
+    <p>Head Coach commented after the match, "I'm incredibly proud of the effort our players put in today. This win is the result of months of dedication and hard work in training."</p>`,
+    image_url: null
+  },
+  {
+    title: "New Player Signings Announced",
+    summary: "German Exiles RL is excited to announce several new player additions to strengthen the squad.",
+    content: `<p>German Exiles Rugby League is thrilled to announce the signing of several new talented players who will be joining the squad for the upcoming season.</p>
+    <p>These strategic additions bring a wealth of experience and skill to the team, strengthening several key positions and adding depth to the squad. The new signings are expected to make an immediate impact as the team prepares for the challenging season ahead.</p>
+    <p>Club Chairman said, "These signings represent our continued commitment to building a competitive team capable of challenging for honors. We're excited to welcome these players to our club family."</p>`,
+    image_url: null
+  },
+  {
+    title: "Community Outreach Program Launches",
+    summary: "German Exiles RL launches new community initiative to promote rugby league in local schools.",
+    content: `<p>German Exiles Rugby League is proud to announce the launch of a new community outreach program aimed at introducing rugby league to local schools and community centers.</p>
+    <p>The initiative will involve team members visiting schools to conduct workshops and training sessions, sharing their passion for the sport with young people across the region. The program aims to promote physical activity, teamwork, and the core values of rugby league.</p>
+    <p>Community Coordinator stated, "Rugby league has given so much to all of us, and this program is our way of giving back. We hope to inspire the next generation of players and supporters through this initiative."</p>`,
+    image_url: null
+  }
+];
+
+// Sample players data
+const players = [
+  {
+    name: "Thomas Müller",
+    number: 10,
+    position: "Center",
+    team: "Heritage",
+    heritage: "German",
+    club: "Munich RL",
+    bio: "Thomas has been playing rugby league for over 10 years and brings valuable experience to the team.",
+    photo_url: null
+  },
+  {
+    name: "Marcus Schmidt",
+    number: 8,
+    position: "Prop",
+    team: "Heritage",
+    heritage: "German",
+    club: "Berlin RL",
+    bio: "Known for his powerful runs and solid defense, Marcus is a cornerstone of the forward pack.",
+    photo_url: null
+  },
+  {
+    name: "Jan Fischer",
+    number: 7,
+    position: "Halfback",
+    team: "Heritage",
+    heritage: "German",
+    club: "Hamburg RL",
+    bio: "Jan's exceptional kicking game and vision make him a key playmaker for the team.",
+    photo_url: null
+  },
+  {
+    name: "James Wilson",
+    number: 1,
+    position: "Fullback",
+    team: "Community",
+    heritage: "British",
+    club: "London Exiles",
+    bio: "James brings speed and agility to the backline, with a safe pair of hands under the high ball.",
+    photo_url: null
+  },
+  {
+    name: "Ryan O'Connor",
+    number: 13,
+    position: "Lock",
+    team: "Community",
+    heritage: "Irish",
+    club: "Dublin Raiders",
+    bio: "Ryan's work rate and tackling ability make him an invaluable member of the forward pack.",
+    photo_url: null
+  }
+];
+
+// Sample media folders
+const mediaFolders = [
+  {
+    title: "2024 Season Launch",
+    description: "Photos from our 2024 season launch event",
+    date: "2024-03-15",
+    thumbnail_url: null
+  },
+  {
+    title: "Heritage Team Training",
+    description: "Training session with our Heritage team",
+    date: "2024-04-10",
+    thumbnail_url: null
+  },
+  {
+    title: "Community Outreach Day",
+    description: "Team members visiting local schools",
+    date: "2024-04-22",
+    thumbnail_url: null
+  }
+];
+
+// Function to seed initial content
+export async function seedInitialContent() {
+  try {
+    console.log("Seeding initial content...");
+    
+    // Seed news articles
+    const { error: newsError } = await supabase.rest
+      .from('news')
+      .select('*');
+    
+    if (newsError) {
+      console.log("Creating news articles...");
+      await Promise.all(newsArticles.map(article => 
+        supabase.rest.from('news').insert([article]).select()
+      ));
+    }
+    
+    // Seed players
+    const { error: playersError } = await supabase.rest
+      .from('players')
+      .select('*');
+    
+    if (playersError) {
+      console.log("Creating players...");
+      await Promise.all(players.map(player => 
+        supabase.rest.from('players').insert([player]).select()
+      ));
+    }
+    
+    // Seed media folders
+    const { error: mediaError } = await supabase.rest
+      .from('media_folders')
+      .select('*');
+    
+    if (mediaError) {
+      console.log("Creating media folders...");
+      await Promise.all(mediaFolders.map(folder => 
+        supabase.rest.from('media_folders').insert([folder]).select()
+      ));
+    }
+    
+    console.log("Initial content seeding completed");
+  } catch (error) {
+    console.error("Error seeding initial content:", error);
+  }
+}

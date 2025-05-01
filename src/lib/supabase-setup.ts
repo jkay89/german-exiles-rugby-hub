@@ -21,36 +21,42 @@ export async function setupSupabase() {
 }
 
 async function createStorageBucket(id: string, name: string) {
-  const { data, error } = await supabase.storage.getBucket(id);
-  
-  if (error && error.message.includes('The resource was not found')) {
-    // Bucket doesn't exist, create it
-    const { error: createError } = await supabase.storage.createBucket(id, {
-      public: true,
-      fileSizeLimit: 50000000, // 50MB
-    });
+  try {
+    const { data, error } = await supabase.storage.getBucket(id);
     
-    if (createError) {
-      console.error(`Error creating bucket ${id}:`, createError);
+    if (error && error.message.includes('The resource was not found')) {
+      // Bucket doesn't exist, create it
+      const { error: createError } = await supabase.storage.createBucket(id, {
+        public: true,
+        fileSizeLimit: 50000000, // 50MB
+      });
+      
+      if (createError) {
+        console.error(`Error creating bucket ${id}:`, createError);
+      } else {
+        console.log(`Created bucket: ${id}`);
+      }
+    } else if (error) {
+      console.error(`Error checking bucket ${id}:`, error);
     } else {
-      console.log(`Created bucket: ${id}`);
+      console.log(`Bucket exists: ${id}`);
     }
-  } else if (error) {
-    console.error(`Error checking bucket ${id}:`, error);
-  } else {
-    console.log(`Bucket exists: ${id}`);
+  } catch (error) {
+    console.error(`Error with bucket ${id}:`, error);
   }
 }
 
 async function createMediaTables() {
   try {
-    // Use RPC to create tables instead of directly querying them
-    // If RPC doesn't work, the tables should already be created manually
+    // Use direct SQL queries as a workaround since RPC might not work
     try {
-      await supabase.rpc('create_media_tables');
-      console.log('Media tables created or already exist');
+      // Check if media_folders table exists
+      const { data: existingFolders } = await supabase.from('media_folders').select('count').single();
+      console.log('Media tables already exist');
     } catch (err) {
-      console.log('Media tables likely exist, continuing:', (err as Error).message);
+      console.log('Media tables likely need to be created:', (err as Error).message);
+      // Tables don't exist, but we can't create them directly here
+      // They should be created via SQL migrations
     }
   } catch (error) {
     console.error('Error checking/creating media tables:', error);

@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Newspaper } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
