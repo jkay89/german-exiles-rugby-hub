@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -83,7 +83,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 
         <div>
           <Label className="text-gray-400">Position</Label>
-          <Select name="position" defaultValue={initialValues?.position}>
+          <Select name="position" defaultValue={initialValues?.position || ""}>
             <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
@@ -97,13 +97,16 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
               <SelectItem value="center">Center</SelectItem>
               <SelectItem value="wing">Wing</SelectItem>
               <SelectItem value="fullBack">Full Back</SelectItem>
+              <SelectItem value="forward">Forward</SelectItem>
+              <SelectItem value="utility">Utility</SelectItem>
+              <SelectItem value="halfback">Halfback</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label className="text-gray-400">Team</Label>
-          <Select name="team" required defaultValue={initialValues?.team}>
+          <Select name="team" required defaultValue={initialValues?.team || ""}>
             <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
               <SelectValue placeholder="Select team" />
             </SelectTrigger>

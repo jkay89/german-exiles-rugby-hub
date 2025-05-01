@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { getNextFixture } from "@/utils/fixtureUtils";
 import { Fixture } from "@/utils/fixtureUtils";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 export const NextFixtureCard = () => {
   const { t } = useLanguage();
@@ -23,7 +23,7 @@ export const NextFixtureCard = () => {
       try {
         // Direct database query to ensure fresh data
         const today = new Date().toISOString().split('T')[0];
-        const { data, error } = await supabase
+        const { data, error } = await supabase.rest
           .from("fixtures")
           .select('*')
           .gte('date', today)

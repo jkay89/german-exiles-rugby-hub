@@ -10,6 +10,7 @@ import PlayersList from "@/components/admin/PlayersList";
 import PlayerTeamSelector from "@/components/admin/PlayerTeamSelector";
 import { usePlayerManagement } from "@/hooks/usePlayerManagement";
 import { Player } from "@/utils/playerUtils";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
@@ -34,6 +35,27 @@ const AdminPlayers = () => {
     if (!isAuthenticated) {
       navigate("/admin");
     } else {
+      // Check if storage bucket exists, create if it doesn't
+      const ensureStorageBucket = async () => {
+        try {
+          const { data: buckets } = await supabase.storage.listBuckets();
+          const playersBucketExists = buckets?.some(bucket => bucket.name === 'players');
+          
+          if (!playersBucketExists) {
+            console.log('Creating players storage bucket...');
+            await supabase.storage.createBucket('players', {
+              public: true,
+              fileSizeLimit: 10485760, // 10MB
+              allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+            });
+            console.log('Players storage bucket created successfully');
+          }
+        } catch (error) {
+          console.error('Error checking/creating storage bucket:', error);
+        }
+      };
+      
+      ensureStorageBucket();
       loadPlayers();
     }
   }, [isAuthenticated, navigate, activeTeam, loadPlayers]);

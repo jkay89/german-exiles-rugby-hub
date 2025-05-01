@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { getLatestResult } from "@/utils/fixtureUtils";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-extensions";
 
 interface Result {
   id: string;
@@ -34,7 +34,7 @@ export const LatestResultCard = () => {
       setLoading(true);
       try {
         // Direct database query to ensure fresh data
-        const { data, error } = await supabase
+        const { data, error } = await supabase.rest
           .from("results")
           .select('*')
           .order('date', { ascending: false })
