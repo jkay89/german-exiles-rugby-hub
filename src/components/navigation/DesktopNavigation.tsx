@@ -71,6 +71,21 @@ export const DesktopNavigation = () => {
           // Skip rendering About Us again since it's handled above
           if (index === 1) return null;
 
+          // Handle external links differently
+          if (link.external) {
+            return (
+              <a 
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1"
+              >
+                {link.label} <ExternalLink className="h-3 w-3" />
+              </a>
+            );
+          }
+
           return (
             <Link
               key={link.href}

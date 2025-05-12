@@ -1,3 +1,4 @@
+
 export default {
   home: "Home",
   about: "About Us",
@@ -10,6 +11,7 @@ export default {
   nrld: "NRLD",
   sponsors: "Sponsors",
   contact: "Contact",
+  live_stream: "Live Stream",
   club: "Club",
   german_flag: "German Flag",
   british_flag: "British Flag",
