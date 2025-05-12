@@ -1,4 +1,3 @@
-
 import { SponsorLogo } from "@/components/home/types";
 
 export const sponsorData: SponsorLogo[] = [
@@ -67,6 +66,14 @@ export const sponsorData: SponsorLogo[] = [
     logo: "/lovable-uploads/792d38c5-2df1-44a3-9961-07579b56c10a.png",
     website: null,
     tier: "silver"
+  },
+  // Media Partners
+  {
+    id: "davidgray",
+    name: "David Gray TV",
+    logo: "/lovable-uploads/16188376-5748-432a-abef-0098489ceeab.png",
+    website: "https://davidgray.tv/",
+    tier: "media"
   },
   // Affiliate Sponsors
   {

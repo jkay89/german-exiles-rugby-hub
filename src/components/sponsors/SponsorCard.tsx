@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -12,6 +13,7 @@ interface SponsorCardProps {
   delay?: number;
   isMajorSponsor?: boolean;
   isAffiliate?: boolean;
+  isMediaPartner?: boolean;
 }
 
 const SponsorCard = ({ 
@@ -21,7 +23,8 @@ const SponsorCard = ({
   websiteUrl, 
   delay = 0.2,
   isMajorSponsor = true,
-  isAffiliate = false
+  isAffiliate = false,
+  isMediaPartner = false
 }: SponsorCardProps) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAdmin();
@@ -36,7 +39,7 @@ const SponsorCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={`bg-black border border-german-red rounded-lg ${isMajorSponsor ? 'p-8' : 'p-6'} hover:border-german-gold transition-colors duration-300 h-full relative`}
+      className={`bg-black border ${isMediaPartner ? 'border-blue-500' : 'border-german-red'} rounded-lg ${isMajorSponsor ? 'p-8' : 'p-6'} ${isMediaPartner ? 'hover:border-blue-400' : 'hover:border-german-gold'} transition-colors duration-300 h-full relative`}
     >
       {isAuthenticated && (
         <EditSponsorForm
@@ -45,7 +48,7 @@ const SponsorCard = ({
           description={description}
           logoSrc={logoSrc}
           websiteUrl={websiteUrl}
-          tier={isMajorSponsor ? (isAffiliate ? "affiliate" : "gold") : "silver"}
+          tier={isMediaPartner ? "media" : (isMajorSponsor ? (isAffiliate ? "affiliate" : "gold") : "silver")}
           onSave={handleSave}
         />
       )}
@@ -63,6 +66,7 @@ const SponsorCard = ({
               alt={`${name} Logo`}
               className={`w-full h-auto ${
                 isAffiliate ? 'max-h-24 object-contain mx-auto' : 
+                isMediaPartner ? 'max-h-40 object-contain mx-auto' :
                 !isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''
               }`}
             />
@@ -74,13 +78,14 @@ const SponsorCard = ({
               alt={`${name} Logo`}
               className={`w-full h-auto ${
                 isAffiliate ? 'max-h-24 object-contain mx-auto' : 
+                isMediaPartner ? 'max-h-40 object-contain mx-auto' :
                 !isMajorSponsor ? 'max-h-32 object-contain mx-auto' : ''
               }`}
             />
           </div>
         )}
         <div className={`${isMajorSponsor ? 'w-full md:w-2/3' : 'text-center'}`}>
-          <h3 className={`text-${isMajorSponsor ? '2xl' : 'xl'} font-bold text-german-gold mb-${isMajorSponsor ? '4' : '2'}`}>{name}</h3>
+          <h3 className={`text-${isMajorSponsor ? '2xl' : 'xl'} font-bold ${isMediaPartner ? 'text-blue-400' : 'text-german-gold'} mb-${isMajorSponsor ? '4' : '2'}`}>{name}</h3>
           <p className={`text-gray-300 ${isAffiliate ? 'text-xs' : !isMajorSponsor ? 'text-sm' : ''} mb-${isMajorSponsor ? '6' : '4'}`}>
             {description}
           </p>
@@ -92,7 +97,7 @@ const SponsorCard = ({
             >
               <Button 
                 variant="default" 
-                className="bg-german-red hover:bg-red-700 text-white"
+                className={`${isMediaPartner ? 'bg-blue-500 hover:bg-blue-600' : 'bg-german-red hover:bg-red-700'} text-white`}
                 size={isMajorSponsor ? "default" : isAffiliate ? "sm" : "sm"}
               >
                 {t("visit_website")}

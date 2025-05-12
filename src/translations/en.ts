@@ -1,4 +1,3 @@
-
 export default {
   home: "Home",
   about: "About Us",
@@ -119,6 +118,7 @@ export default {
   platinum_sponsor: "Platinum Sponsor",
   gold_sponsor: "Gold Sponsor",
   silver_sponsors: "Silver Sponsors",
+  media_partner: "Media Partner",
   affiliate_sponsors: "Affiliate Sponsors",
   visit_website: "Visit Website",
   
@@ -126,4 +126,3 @@ export default {
   back_to_media: "Back to Media",
   no_media_items: "No media items available",
 };
-
