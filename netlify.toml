@@ -3,7 +3,26 @@
   command = "npm run build"
   publish = "dist"
 
+# Force HTTPS redirect
+[[redirects]]
+  from = "http://germanexilesrl.co.uk/*"
+  to = "https://germanexilesrl.co.uk/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.germanexilesrl.co.uk/*"
+  to = "https://germanexilesrl.co.uk/:splat"
+  status = 301
+  force = true
+
 # Redirect www to non-www
+[[redirects]]
+  from = "https://www.germanexilesrl.co.uk/*"
+  to = "https://germanexilesrl.co.uk/:splat"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "https://www.germanexilesrugbyleague.com/*"
   to = "https://germanexilesrugbyleague.com/:splat"
@@ -15,3 +34,13 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
