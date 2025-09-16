@@ -29,6 +29,7 @@ import AdminPlayers from "./pages/admin/AdminPlayers";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSponsors from "./pages/admin/AdminSponsors";
+import AdminFixtures from "./pages/admin/AdminFixtures";
 import AdminCommittee from "./pages/admin/AdminCommittee";
 import AdminDocuments from "./pages/admin/AdminDocuments";
 import { AdminProvider } from "./contexts/AdminContext";
