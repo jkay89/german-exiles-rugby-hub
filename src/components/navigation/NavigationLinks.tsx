@@ -20,7 +20,9 @@ export const useNavigationLinks = () => {
     { href: "/heritage-team", label: t("heritage_team") },
     { href: "/community-team", label: t("community_team") },
     { href: "/exiles-9s", label: "Exiles 9s" },
-    { href: "/staff", label: t("staff") },
+    { href: "/committee-members", label: t("committee_members") },
+    { href: "/coaching-team", label: t("coaching_team") },
+    { href: "/documents", label: t("documents") },
   ];
 
   const CLUB_SHOP_URL = "https://prontoteamwear.co.uk/product-category/club-shops/rugby-club-shops/german-exiles/";

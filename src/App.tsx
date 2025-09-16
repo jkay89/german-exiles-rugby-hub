@@ -12,7 +12,9 @@ import AboutUs from "./pages/AboutUs";
 import HeritageTeam from "./pages/HeritageTeam";
 import CommunityTeam from "./pages/CommunityTeam";
 import Exiles9s from "./pages/Exiles9s";
-import Staff from "./pages/Staff";
+import CoachingTeam from "./pages/CoachingTeam";
+import CommitteeMembers from "./pages/CommitteeMembers";
+import Documents from "./pages/Documents";
 import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
@@ -27,7 +29,8 @@ import AdminPlayers from "./pages/admin/AdminPlayers";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSponsors from "./pages/admin/AdminSponsors";
-import AdminFixtures from "./pages/admin/AdminFixtures";
+import AdminCommittee from "./pages/admin/AdminCommittee";
+import AdminDocuments from "./pages/admin/AdminDocuments";
 import { AdminProvider } from "./contexts/AdminContext";
 import { setupSupabase } from "./lib/supabase-setup";
 import { seedInitialContent } from "./utils/seedInitialContent";
@@ -67,7 +70,9 @@ const App = () => (
               <Route path="/heritage-team" element={<HeritageTeam />} />
               <Route path="/community-team" element={<CommunityTeam />} />
               <Route path="/exiles-9s" element={<Exiles9s />} />
-              <Route path="/staff" element={<Staff />} />
+              <Route path="/coaching-team" element={<CoachingTeam />} />
+              <Route path="/committee-members" element={<CommitteeMembers />} />
+              <Route path="/documents" element={<Documents />} />
               <Route path="/fixtures" element={<Fixtures />} />
               <Route path="/nrld" element={<NRLD />} />
               <Route path="/sponsors" element={<Sponsors />} />
@@ -83,6 +88,8 @@ const App = () => (
               <Route path="/admin/media" element={<AdminMedia />} />
               <Route path="/admin/sponsors" element={<AdminSponsors />} />
               <Route path="/admin/fixtures" element={<AdminFixtures />} />
+              <Route path="/admin/committee" element={<AdminCommittee />} />
+              <Route path="/admin/documents" element={<AdminDocuments />} />
             </Routes>
           </BrowserRouter>
         </LanguageProvider>

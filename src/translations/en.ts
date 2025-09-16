@@ -2,8 +2,11 @@
 export default {
   home: "Home",
   about: "About Us",
-  heritage_team: "Heritage Team",
-  community_team: "Community Team",
+  heritage_team: "Heritage Players",
+  community_team: "Community Players",
+  committee_members: "Committee Members",
+  coaching_team: "Coaching and Support Team",
+  documents: "Documents",
   staff: "Staff",
   fixtures: "Fixtures",
   latest_news: "Latest News",
@@ -29,9 +32,9 @@ export default {
   season_starting_soon: "The season is starting soon!",
   coming_soon: "Coming Soon",
   news_coming_soon: "More news articles coming soon!",
-  schlicht_exiles_9s: "Schlicht Exiles 9s",
-  schlicht_exiles_9s_logo: "Schlicht Exiles 9s Logo",
-  exiles_9s_description: "The Schlicht German Exiles 9s team is a symbol of the growth of rugby league in Germany, bringing together talent from Germany and the UK to compete at the Rotterdam 9s tournament.",
+  exiles_9s: "Exiles 9s",
+  exiles_9s_logo: "Exiles 9s Logo",
+  exiles_9s_description: "The German Exiles 9s team is a symbol of the growth of rugby league in Germany, bringing together talent from Germany and the UK to compete at the Rotterdam 9s tournament.",
   german_exiles_logo: "German Exiles Logo",
   media: "Media",
   folder_not_found: "Folder Not Found",
@@ -62,19 +65,32 @@ export default {
   skill_development_text: "Offering coaching, training camps, and educational resources to enhance player skills and rugby league knowledge in Germany.",
   
   // Heritage Team translations
-  heritage_team_title: "Heritage Team",
-  heritage_team_description: "The German Exiles Heritage Team consists of players with German ancestry who represent their heritage on the international stage. These players bring experience from various competitive leagues to strengthen German rugby league.",
+  heritage_team_title: "Heritage Players",
+  heritage_team_description: "The German Exiles Heritage Players consist of players with German ancestry who represent their heritage on the international stage. These players bring experience from various competitive leagues to strengthen German rugby league.",
   heritage: "Heritage",
   german: "German",
   british: "British",
   
   // Community Team translations
-  community_team_title: "Community Team",
-  community_team_description: "The German Exiles Community Team focuses on grassroots development and community engagement. This team provides opportunities for players from diverse backgrounds to participate in rugby league and contribute to the sport's growth in Germany.",
+  community_team_title: "Community Players",
+  community_team_description: "The German Exiles Community Players focuses on grassroots development and community engagement. This team provides opportunities for players from diverse backgrounds to participate in rugby league and contribute to the sport's growth in Germany.",
   
   // Staff page translations
-  staff_title: "Coaching & Support Staff",
+  staff_title: "Coaching and Support Team",
   staff_description: "Meet the dedicated individuals who work behind the scenes to develop our players and promote the growth of rugby league in Germany.",
+  
+  // Committee Members translations
+  committee_members_title: "Committee Members",
+  committee_members_description: "Meet the dedicated committee members who govern and guide the German Exiles Rugby League.",
+  
+  // Documents translations
+  documents_title: "Documents",
+  documents_description: "Access important club documents including our constitution, code of conduct, and meeting minutes.",
+  constitution: "Constitution",
+  code_of_conduct: "Code of Conduct",
+  meeting_minutes: "Meeting Minutes",
+  agm_minutes: "AGM Minutes",
+  download_document: "Download",
   
   // Fixtures page translations
   fixtures_results: "Fixtures & Results",

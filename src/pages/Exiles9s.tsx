@@ -67,17 +67,10 @@ const Exiles9s = () => {
           />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <h1 className="text-4xl font-bold mb-4 text-german-gold text-center">{t("schlicht_exiles_9s")}</h1>
+          <h1 className="text-4xl font-bold mb-4 text-german-gold text-center">{t("exiles_9s")}</h1>
           
           <div className="flex flex-col md:flex-row items-center justify-center mb-10 gap-8">
-            <div className="w-64 h-64">
-              <img 
-                src="/lovable-uploads/51da26a8-d895-4a08-91d5-1c75e6c64b39.png" 
-                alt={t("schlicht_exiles_9s_logo")}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <p className="text-gray-300 max-w-2xl">
+            <p className="text-gray-300 max-w-2xl text-center">
               {t("exiles_9s_description")}
             </p>
           </div>
