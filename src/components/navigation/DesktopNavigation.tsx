@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useNavigationLinks } from "./NavigationLinks";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const DesktopNavigation = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   const { mainLinks, teamLinks, CLUB_SHOP_URL } = useNavigationLinks();
 
   const isActive = (path: string) => location.pathname === path;
@@ -45,7 +47,7 @@ export const DesktopNavigation = () => {
                         : "text-gray-300 hover:bg-gray-900 hover:text-white"
                     } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1`}
                   >
-                    Teams <ChevronDown className="h-4 w-4" />
+                    {t("the_club")} <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-black border border-gray-700">
                     {teamLinks.map((teamLink) => (

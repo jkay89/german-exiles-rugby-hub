@@ -8,6 +8,7 @@ export default {
   coaching_team: "Coaching and Support Team",
   documents: "Documents",
   staff: "Staff",
+  the_club: "The Club",
   fixtures: "Fixtures",
   latest_news: "Latest News",
   news: "News",
