@@ -33,7 +33,9 @@ interface LotteryDraw {
 }
 
 const AdminLottery = () => {
+  console.log("AdminLottery component rendering...");
   const { isAuthenticated } = useAdmin();
+  console.log("isAuthenticated:", isAuthenticated);
   const navigate = useNavigate();
   const { toast } = useToast();
   
