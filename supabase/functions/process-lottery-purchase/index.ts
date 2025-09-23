@@ -51,7 +51,7 @@ serve(async (req) => {
       .from('lottery_entries')
       .select('id')
       .eq('user_id', user.id)
-      .eq('stripe_subscription_id', sessionId);
+      .ilike('stripe_subscription_id', `%${sessionId}%`);
 
     if (existingEntries && existingEntries.length > 0) {
       return new Response(JSON.stringify({ 
@@ -73,6 +73,16 @@ serve(async (req) => {
     const entryType = metadata.entry_type || 'one_time';
     const promoCode = metadata.promo_code || null;
 
+    // For subscriptions, get the actual subscription ID from Stripe
+    let subscriptionId = null;
+    if (entryType === 'subscription' && session.subscription) {
+      subscriptionId = session.subscription as string;
+      console.log('Using subscription ID:', subscriptionId);
+    } else if (entryType === 'one_time') {
+      subscriptionId = sessionId; // Use session ID for one-time payments
+      console.log('Using session ID for one-time payment:', sessionId);
+    }
+
     // Save lottery entries to database
     const nextDrawDate = new Date();
     nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
@@ -83,7 +93,7 @@ serve(async (req) => {
       numbers: numbers,
       line_number: index + 1,
       is_active: true,
-      stripe_subscription_id: sessionId,
+      stripe_subscription_id: subscriptionId,
       draw_date: nextDrawDate.toISOString().split('T')[0] // Format as YYYY-MM-DD
     }));
 
@@ -127,14 +137,14 @@ serve(async (req) => {
     }
 
     // If it's a subscription, also create/update subscription record
-    if (entryType === 'subscription') {
+    if (entryType === 'subscription' && subscriptionId) {
       const { error: subscriptionError } = await supabaseClient
         .from('lottery_subscriptions')
         .upsert({
           user_id: user.id,
           lines_count: lotteryLines.length,
           stripe_customer_id: session.customer as string,
-          stripe_subscription_id: sessionId,
+          stripe_subscription_id: subscriptionId,
           status: 'active'
         }, {
           onConflict: 'user_id'
