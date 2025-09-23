@@ -275,8 +275,8 @@ const LotteryDashboard = () => {
                 e.id === entry.id ? { ...e, numbers: newNumbers } : e
               ));
             }}
-            maxNumbers={6}
-            maxValue={49}
+            maxNumbers={4}
+            maxValue={32}
           />
           <div className="flex gap-2">
             <Button
