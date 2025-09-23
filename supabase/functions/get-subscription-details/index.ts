@@ -37,11 +37,14 @@ serve(async (req) => {
       .eq('status', 'active')
       .maybeSingle();
 
+    console.log('Database subscription query result:', { subscriptionData, subscriptionError });
+
     if (subscriptionError && subscriptionError.code !== 'PGRST116') {
       throw subscriptionError;
     }
 
     if (!subscriptionData) {
+      console.log('No active subscription found in database');
       return new Response(JSON.stringify({ 
         hasSubscription: false,
         message: 'No active subscription found'
@@ -51,12 +54,20 @@ serve(async (req) => {
       });
     }
 
+    console.log('Found subscription, stripe_subscription_id:', subscriptionData.stripe_subscription_id);
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
     // Get Stripe subscription details
+    console.log('Retrieving subscription from Stripe...');
     const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionData.stripe_subscription_id);
+    console.log('Stripe subscription retrieved successfully:', {
+      id: stripeSubscription.id,
+      status: stripeSubscription.status,
+      items: stripeSubscription.items.data.length
+    });
     
     // Calculate next payment date (1st of next month)
     const nextPaymentDate = new Date();
@@ -90,10 +101,18 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error getting subscription details:', error);
+    console.error('Detailed error in get-subscription-details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      type: error.type || 'unknown',
+      code: error.code || 'unknown'
+    });
     return new Response(JSON.stringify({ 
       error: error.message,
-      hasSubscription: false
+      hasSubscription: false,
+      errorType: error.type || 'unknown',
+      errorCode: error.code || 'unknown'
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
