@@ -27,7 +27,6 @@ const AdminLottery = () => {
   
   const [draws, setDraws] = useState<LotteryDraw[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentJackpot, setCurrentJackpot] = useState(1000);
   const [newDraw, setNewDraw] = useState({
     draw_date: "",
     winning_numbers: [0, 0, 0, 0],
@@ -35,6 +34,8 @@ const AdminLottery = () => {
     lucky_dip_amount: 50
   });
   const [nextDrawDate, setNextDrawDate] = useState("");
+  const [currentJackpot, setCurrentJackpot] = useState(1000);
+  const [newJackpotAmount, setNewJackpotAmount] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -84,36 +85,50 @@ const AdminLottery = () => {
         .from('lottery_settings')
         .select('setting_value')
         .eq('setting_key', 'current_jackpot')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) {
         setCurrentJackpot(Number(data.setting_value));
+        setNewJackpotAmount(data.setting_value);
       }
     } catch (error) {
       console.error('Error fetching current jackpot:', error);
     }
   };
 
-  const updateCurrentJackpot = async (newAmount: number) => {
+  const updateCurrentJackpot = async () => {
+    if (!newJackpotAmount || Number(newJackpotAmount) <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid jackpot amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('lottery_settings')
-        .update({ setting_value: newAmount.toString() })
-        .eq('setting_key', 'current_jackpot');
+        .upsert({
+          setting_key: 'current_jackpot',
+          setting_value: newJackpotAmount
+        }, {
+          onConflict: 'setting_key'
+        });
 
       if (error) throw error;
 
-      setCurrentJackpot(newAmount);
+      setCurrentJackpot(Number(newJackpotAmount));
       toast({
         title: "Success",
-        description: "Current jackpot updated successfully",
+        description: "Current jackpot amount updated successfully",
       });
     } catch (error) {
-      console.error('Error updating current jackpot:', error);
+      console.error('Error updating jackpot:', error);
       toast({
         title: "Error",
-        description: "Failed to update current jackpot",
+        description: "Failed to update jackpot amount",
         variant: "destructive",
       });
     }
@@ -130,12 +145,14 @@ const AdminLottery = () => {
     }
 
     try {
+      const finalJackpotAmount = newDraw.jackpot_amount || currentJackpot;
+      
       const { error } = await supabase
         .from('lottery_draws')
         .insert([{
           draw_date: newDraw.draw_date,
           winning_numbers: newDraw.winning_numbers,
-          jackpot_amount: newDraw.jackpot_amount,
+          jackpot_amount: finalJackpotAmount,
           lucky_dip_amount: newDraw.lucky_dip_amount
         }]);
 
@@ -212,31 +229,34 @@ const AdminLottery = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Save className="w-5 h-5 text-yellow-400" />
-              Current Jackpot Management
+              Current Jackpot Prize Management
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <Label htmlFor="current-jackpot">Current Jackpot Amount (£)</Label>
-                <Input
-                  id="current-jackpot"
-                  type="number"
-                  value={currentJackpot}
-                  onChange={(e) => setCurrentJackpot(Number(e.target.value))}
-                  className="bg-gray-800 border-gray-700 text-white"
-                />
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-gray-400 mb-4">
+                Current jackpot prize: <span className="text-2xl font-bold text-yellow-400">£{currentJackpot.toLocaleString()}</span>
+              </p>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="new-jackpot">New Jackpot Amount (£)</Label>
+                  <Input
+                    id="new-jackpot"
+                    type="number"
+                    value={newJackpotAmount}
+                    onChange={(e) => setNewJackpotAmount(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    placeholder="Enter new jackpot amount"
+                  />
+                </div>
+                <Button 
+                  onClick={updateCurrentJackpot}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Update Jackpot
+                </Button>
               </div>
-              <Button 
-                onClick={() => updateCurrentJackpot(currentJackpot)} 
-                className="bg-yellow-600 hover:bg-yellow-700 mt-6"
-              >
-                Update Jackpot
-              </Button>
             </div>
-            <p className="text-sm text-gray-400 mt-2">
-              This amount will be displayed on the lottery page as the current jackpot prize
-            </p>
           </CardContent>
         </Card>
 
@@ -283,10 +303,12 @@ const AdminLottery = () => {
                 <Input
                   id="jackpot-amount"
                   type="number"
-                  value={newDraw.jackpot_amount}
+                  value={newDraw.jackpot_amount || currentJackpot}
                   onChange={(e) => setNewDraw({ ...newDraw, jackpot_amount: Number(e.target.value) })}
                   className="bg-gray-800 border-gray-700 text-white"
+                  placeholder={`Default: ${currentJackpot}`}
                 />
+                <p className="text-xs text-gray-500 mt-1">Leave empty to use current jackpot (£{currentJackpot.toLocaleString()})</p>
               </div>
             </div>
 

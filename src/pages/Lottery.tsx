@@ -23,7 +23,7 @@ const Lottery = () => {
         .from('lottery_settings')
         .select('setting_value')
         .eq('setting_key', 'current_jackpot')
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching current jackpot:', error);
