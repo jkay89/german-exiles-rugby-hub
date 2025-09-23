@@ -42,6 +42,7 @@ const LotteryEntriesTable = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("LotteryEntriesTable mounted, fetching entries...");
     fetchEntries();
   }, []);
 
@@ -50,6 +51,7 @@ const LotteryEntriesTable = () => {
   }, [entries, drawDateFilter, entryTypeFilter, statusFilter]);
 
   const fetchEntries = async () => {
+    console.log("LotteryEntriesTable fetchEntries called");
     try {
       setLoading(true);
       console.log('Fetching lottery entries...');
@@ -74,11 +76,14 @@ const LotteryEntriesTable = () => {
       const userIds = [...new Set((entriesData || []).map(entry => entry.user_id))];
       
       if (userIds.length > 0) {
+        console.log('Fetching user emails for:', userIds.length, 'users');
         try {
+          console.log('Fetching user emails for:', userIds.length, 'users');
           const { data: emailData, error: emailError } = await supabase.functions.invoke('get-user-emails', {
             body: { userIds }
           });
           
+          console.log('Email data result:', emailData, 'Email error:', emailError);
           if (emailError) {
             console.error('Error fetching user emails:', emailError);
           } else {
@@ -87,6 +92,7 @@ const LotteryEntriesTable = () => {
               profilesMap[userId] = { email: email as string };
             });
             setUserProfiles(profilesMap);
+            console.log('User profiles set:', Object.keys(profilesMap).length, 'profiles');
           }
         } catch (error) {
           console.error('Failed to fetch user emails:', error);
@@ -100,6 +106,7 @@ const LotteryEntriesTable = () => {
         variant: "destructive",
       });
     } finally {
+      console.log("LotteryEntriesTable fetchEntries finally block - setting loading to false");
       setLoading(false);
       setRefreshing(false);
     }

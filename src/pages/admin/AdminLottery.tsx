@@ -64,7 +64,9 @@ const AdminLottery = () => {
   }, [isAuthenticated, adminLoading, navigate]);
 
   useEffect(() => {
+    console.log("AdminLottery useEffect - isAuthenticated:", isAuthenticated, "adminLoading:", adminLoading);
     if (isAuthenticated) {
+      console.log("Fetching lottery data...");
       fetchDraws();
       fetchNextDrawDate();
       fetchCurrentJackpot();
@@ -73,12 +75,14 @@ const AdminLottery = () => {
   }, [isAuthenticated]);
 
   const fetchDraws = async () => {
+    console.log("fetchDraws called");
     try {
       const { data, error } = await supabase
         .from('lottery_draws')
         .select('*')
         .order('draw_date', { ascending: false });
 
+      console.log("Draws fetch result:", { data, error });
       if (error) throw error;
       setDraws(data || []);
     } catch (error) {
@@ -94,13 +98,17 @@ const AdminLottery = () => {
   };
 
   const fetchNextDrawDate = () => {
-    // Calculate next draw date (last day of next month)
+    console.log("fetchNextDrawDate called");
+    // Calculate next draw date (last day of current month)
     const now = new Date();
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    setNextDrawDate(nextMonth.toISOString().split('T')[0]);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const formattedDate = lastDayOfMonth.toISOString().split('T')[0];
+    console.log("Next draw date calculated:", formattedDate);
+    setNextDrawDate(formattedDate);
   };
 
   const fetchCurrentJackpot = async () => {
+    console.log("fetchCurrentJackpot called");
     try {
       const { data, error } = await supabase
         .from('lottery_settings')
@@ -108,6 +116,7 @@ const AdminLottery = () => {
         .eq('setting_key', 'current_jackpot')
         .maybeSingle();
 
+      console.log("Current jackpot fetch result:", { data, error });
       if (error) throw error;
       if (data) {
         setCurrentJackpot(Number(data.setting_value));
@@ -119,6 +128,7 @@ const AdminLottery = () => {
   };
 
   const updateCurrentJackpot = async () => {
+    console.log("updateCurrentJackpot called with amount:", newJackpotAmount);
     if (!newJackpotAmount || Number(newJackpotAmount) <= 0) {
       toast({
         title: "Invalid Amount",
@@ -138,6 +148,7 @@ const AdminLottery = () => {
           onConflict: 'setting_key'
         });
 
+      console.log("Update jackpot result:", { error });
       if (error) throw error;
 
       setCurrentJackpot(Number(newJackpotAmount));
@@ -156,12 +167,14 @@ const AdminLottery = () => {
   };
 
   const fetchPromoCodes = async () => {
+    console.log("fetchPromoCodes called");
     try {
       const { data, error } = await supabase
         .from('lottery_promo_codes')
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log("Promo codes fetch result:", { data, error });
       if (error) throw error;
       setPromoCodes(data || []);
     } catch (error) {
@@ -360,6 +373,17 @@ const AdminLottery = () => {
   };
 
   if (!isAuthenticated && !adminLoading) return null;
+  
+  if (adminLoading) {
+    return (
+      <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading admin panel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16 min-h-screen bg-black">
