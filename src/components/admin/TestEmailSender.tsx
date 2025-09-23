@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const TestEmailSender = () => {
-  console.log("TestEmailSender component rendering...");
   const [emailAddress, setEmailAddress] = useState("jay@germanexilesrl.co.uk");
   const [isLoading, setIsLoading] = useState(false);
 

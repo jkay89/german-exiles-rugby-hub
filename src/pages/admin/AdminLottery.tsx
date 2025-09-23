@@ -33,9 +33,7 @@ interface LotteryDraw {
 }
 
 const AdminLottery = () => {
-  console.log("AdminLottery component rendering...");
-  const { isAuthenticated } = useAdmin();
-  console.log("isAuthenticated:", isAuthenticated);
+  const { isAuthenticated, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -60,10 +58,10 @@ const AdminLottery = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !adminLoading) {
       navigate("/admin");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, adminLoading, navigate]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -361,7 +359,7 @@ const AdminLottery = () => {
     setNewDraw({ ...newDraw, winning_numbers: newNumbers });
   };
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated && !adminLoading) return null;
 
   return (
     <div className="pt-16 min-h-screen bg-black">

@@ -40,39 +40,6 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
         
         if (session?.user) {
           // Check if user has admin role
-          setTimeout(async () => {
-            try {
-              const { data, error } = await supabase
-                .rpc('is_admin', { _user_id: session.user.id });
-              
-              if (error) {
-                console.error('Error checking admin role:', error);
-                setIsAuthenticated(false);
-              } else {
-                setIsAuthenticated(data === true);
-              }
-            } catch (error) {
-              console.error('Error checking admin role:', error);
-              setIsAuthenticated(false);
-            } finally {
-              setLoading(false);
-            }
-          }, 0);
-        } else {
-          setIsAuthenticated(false);
-          setLoading(false);
-        }
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        // Check if user has admin role
-        setTimeout(async () => {
           try {
             const { data, error } = await supabase
               .rpc('is_admin', { _user_id: session.user.id });
@@ -89,7 +56,36 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
           } finally {
             setLoading(false);
           }
-        }, 0);
+        } else {
+          setIsAuthenticated(false);
+          setLoading(false);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        // Check if user has admin role
+        try {
+          const { data, error } = await supabase
+            .rpc('is_admin', { _user_id: session.user.id });
+          
+          if (error) {
+            console.error('Error checking admin role:', error);
+            setIsAuthenticated(false);
+          } else {
+            setIsAuthenticated(data === true);
+          }
+        } catch (error) {
+          console.error('Error checking admin role:', error);
+          setIsAuthenticated(false);
+        } finally {
+          setLoading(false);
+        }
       } else {
         setIsAuthenticated(false);
         setLoading(false);
