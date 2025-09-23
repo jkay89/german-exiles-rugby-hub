@@ -34,28 +34,15 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if user has admin role
-          try {
-            const { data, error } = await supabase
-              .rpc('is_admin', { _user_id: session.user.id });
-            
-            if (error) {
-              console.error('Error checking admin role:', error);
-              setIsAuthenticated(false);
-            } else {
-              setIsAuthenticated(data === true);
-            }
-          } catch (error) {
-            console.error('Error checking admin role:', error);
-            setIsAuthenticated(false);
-          } finally {
-            setLoading(false);
-          }
+          // Defer admin role check to prevent auth deadlock
+          setTimeout(() => {
+            checkAdminRole(session.user.id);
+          }, 0);
         } else {
           setIsAuthenticated(false);
           setLoading(false);
@@ -64,28 +51,15 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // Check if user has admin role
-        try {
-          const { data, error } = await supabase
-            .rpc('is_admin', { _user_id: session.user.id });
-          
-          if (error) {
-            console.error('Error checking admin role:', error);
-            setIsAuthenticated(false);
-          } else {
-            setIsAuthenticated(data === true);
-          }
-        } catch (error) {
-          console.error('Error checking admin role:', error);
-          setIsAuthenticated(false);
-        } finally {
-          setLoading(false);
-        }
+        // Defer admin role check to prevent auth deadlock
+        setTimeout(() => {
+          checkAdminRole(session.user.id);
+        }, 0);
       } else {
         setIsAuthenticated(false);
         setLoading(false);
@@ -95,52 +69,57 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    console.log("AdminContext login called with email:", email);
+  const checkAdminRole = async (userId: string) => {
     try {
-      setLoading(true);
+      const { data, error } = await supabase
+        .rpc('is_admin', { _user_id: userId });
       
+      if (error) {
+        console.error('Error checking admin role:', error);
+        setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(data === true);
+      }
+    } catch (error) {
+      console.error('Error checking admin role:', error);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      console.log("Supabase auth response:", { data: !!data, error });
 
       if (error) {
-        console.log("Auth error:", error);
         return { success: false, error: error.message };
       }
 
       if (data.user) {
-        console.log("User authenticated, checking admin role for user:", data.user.id);
         // Check if user has admin role
         const { data: isAdminResult, error: roleError } = await supabase
           .rpc('is_admin', { _user_id: data.user.id });
         
-        console.log("Admin role check result:", { isAdminResult, roleError });
-        
         if (roleError) {
-          console.log("Role check error, signing out:", roleError);
-          await supabase.auth.signOut(); // Sign out if role check fails
+          await supabase.auth.signOut();
           return { success: false, error: 'Failed to verify admin permissions' };
         }
 
         if (!isAdminResult) {
-          console.log("User is not admin, signing out");
-          await supabase.auth.signOut(); // Sign out if not admin
+          await supabase.auth.signOut();
           return { success: false, error: 'You do not have admin permissions' };
         }
 
-        console.log("Login successful!");
         return { success: true };
       }
 
       return { success: false, error: 'Authentication failed' };
     } catch (error) {
-      console.log("Login exception:", error);
       return { success: false, error: 'An unexpected error occurred' };
-    } finally {
-      setLoading(false);
     }
   };
 

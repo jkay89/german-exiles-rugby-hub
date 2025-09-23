@@ -11,7 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const AdminAuthButton = () => {
-  const { isAuthenticated, logout, currentAdmin } = useAdmin();
+  const { isAuthenticated, logout, currentAdmin, loading } = useAdmin();
+
+  if (loading) {
+    return null; // Don't render anything while loading
+  }
 
   if (!isAuthenticated) {
     return (

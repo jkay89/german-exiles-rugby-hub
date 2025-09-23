@@ -24,11 +24,9 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Admin login form submitted with email:", email);
     
     try {
       const result = await login(email, password);
-      console.log("Login form result:", result);
       
       if (result.success) {
         toast({
@@ -44,7 +42,6 @@ const AdminLogin = () => {
         });
       }
     } catch (error) {
-      console.error("Login form error:", error);
       toast({
         title: "Login error",
         description: "An error occurred during login",
