@@ -5,15 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAdmin();
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -26,9 +26,9 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      const success = await login(email, password);
+      const result = await login(email, password);
       
-      if (success) {
+      if (result.success) {
         toast({
           title: "Login successful",
           description: "Welcome to the admin dashboard",
@@ -37,7 +37,7 @@ const AdminLogin = () => {
       } else {
         toast({
           title: "Login failed",
-          description: "Invalid email or password",
+          description: result.error || "Invalid credentials",
           variant: "destructive",
         });
       }

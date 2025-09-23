@@ -1,13 +1,14 @@
-
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdminContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
   currentAdmin: string | null;
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -15,58 +16,144 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 export const useAdmin = () => {
   const context = useContext(AdminContext);
   if (context === undefined) {
-    throw new Error("useAdmin must be used within an AdminProvider");
+    throw new Error('useAdmin must be used within an AdminProvider');
   }
   return context;
 };
 
 interface AdminProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AdminProvider = ({ children }: AdminProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentAdmin, setCurrentAdmin] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setIsAuthenticated(!!session);
-        setCurrentAdmin(session?.user?.email ?? null);
+      async (event, session) => {
         setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Check if user has admin role
+          setTimeout(async () => {
+            try {
+              const { data, error } = await supabase
+                .rpc('is_admin', { _user_id: session.user.id });
+              
+              if (error) {
+                console.error('Error checking admin role:', error);
+                setIsAuthenticated(false);
+              } else {
+                setIsAuthenticated(data === true);
+              }
+            } catch (error) {
+              console.error('Error checking admin role:', error);
+              setIsAuthenticated(false);
+            } finally {
+              setLoading(false);
+            }
+          }, 0);
+        } else {
+          setIsAuthenticated(false);
+          setLoading(false);
+        }
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-      setCurrentAdmin(session?.user?.email ?? null);
       setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        // Check if user has admin role
+        setTimeout(async () => {
+          try {
+            const { data, error } = await supabase
+              .rpc('is_admin', { _user_id: session.user.id });
+            
+            if (error) {
+              console.error('Error checking admin role:', error);
+              setIsAuthenticated(false);
+            } else {
+              setIsAuthenticated(data === true);
+            }
+          } catch (error) {
+            console.error('Error checking admin role:', error);
+            setIsAuthenticated(false);
+          } finally {
+            setLoading(false);
+          }
+        }, 0);
+      } else {
+        setIsAuthenticated(false);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return !error;
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      if (data.user) {
+        // Check if user has admin role
+        const { data: isAdminResult, error: roleError } = await supabase
+          .rpc('is_admin', { _user_id: data.user.id });
+        
+        if (roleError) {
+          await supabase.auth.signOut(); // Sign out if role check fails
+          return { success: false, error: 'Failed to verify admin permissions' };
+        }
+
+        if (!isAdminResult) {
+          await supabase.auth.signOut(); // Sign out if not admin
+          return { success: false, error: 'You do not have admin permissions' };
+        }
+
+        return { success: true };
+      }
+
+      return { success: false, error: 'Authentication failed' };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
-    setCurrentAdmin(null);
-    setSession(null);
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
-  return (
-    <AdminContext.Provider value={{ isAuthenticated, login, logout, currentAdmin }}>
-      {children}
-    </AdminContext.Provider>
-  );
+  const value = {
+    isAuthenticated,
+    currentAdmin: user?.email || null,
+    user,
+    loading,
+    login,
+    logout,
+  };
+
+  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
 };
