@@ -143,6 +143,9 @@ const Lottery = () => {
                     Match all 4 numbers to win the jackpot. If multiple winners, 
                     the jackpot is shared equally.
                   </p>
+                  <p className="text-2xl font-bold text-yellow-400 mb-2">
+                    £1,000 Jackpot
+                  </p>
                   <p className="text-sm text-gray-400">
                     Maximum prize: £25,000 (by law)
                   </p>
@@ -180,7 +183,7 @@ const Lottery = () => {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <h2 className="text-3xl font-bold text-center mb-12">Important Information</h2>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-white">Who Can Play</CardTitle>
@@ -215,16 +218,6 @@ const Lottery = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-white">Where Your Money Goes</CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-300 space-y-2">
-                  <p>• At least 20% supports club activities</p>
-                  <p>• Remainder used for prizes and running costs</p>
-                  <p>• Helping German Exiles Rugby League grow</p>
-                </CardContent>
-              </Card>
             </div>
           </motion.div>
         </div>
