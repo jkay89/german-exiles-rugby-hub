@@ -76,6 +76,7 @@ const LotteryDashboard = () => {
   const nextDrawDateString = nextDrawDate.toISOString().split('T')[0];
 
   useEffect(() => {
+    console.log("LotteryDashboard useEffect - authLoading:", authLoading, "user:", !!user);
     if (!authLoading && user) {
       loadUserData();
     }
@@ -282,6 +283,7 @@ const LotteryDashboard = () => {
   };
 
   if (authLoading) {
+    console.log("LotteryDashboard: auth loading...");
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
@@ -290,21 +292,26 @@ const LotteryDashboard = () => {
   }
 
   if (!user) {
+    console.log("LotteryDashboard: no user, redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
   const userSlug = user.email?.split('@')[0] || '';
   if (username !== userSlug) {
+    console.log("LotteryDashboard: username mismatch, redirecting", { username, userSlug });
     return <Navigate to={`/lottery/${userSlug}`} replace />;
   }
 
   if (loading) {
+    console.log("LotteryDashboard: loading data...");
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
   }
+
+  console.log("LotteryDashboard: rendering main content");
 
   return (
     <div className="min-h-screen bg-gray-900 text-white pt-20 pb-8">
