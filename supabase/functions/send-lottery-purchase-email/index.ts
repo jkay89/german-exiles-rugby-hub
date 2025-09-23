@@ -48,7 +48,7 @@ serve(async (req) => {
 
     // Send the email
     const { data, error } = await resend.emails.send({
-      from: 'German Exiles Lottery <noreply@resend.dev>',
+      from: 'German Exiles Lottery <noreply@mail.germanexilesrl.co.uk>',
       to: [userEmail],
       subject: '🎰 Your Lottery Numbers Are Confirmed!',
       html: html,
