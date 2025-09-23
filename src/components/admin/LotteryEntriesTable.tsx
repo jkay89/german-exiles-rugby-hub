@@ -34,8 +34,7 @@ const LotteryEntriesTable = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [deletingEntry, setDeletingEntry] = useState<string | null>(null);
   
-  // Filter states
-  const [drawDateFilter, setDrawDateFilter] = useState<string>('');
+  const [drawDateFilter, setDrawDateFilter] = useState<string>('all');
   const [entryTypeFilter, setEntryTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
@@ -116,7 +115,7 @@ const LotteryEntriesTable = () => {
     let filtered = [...entries];
 
     // Filter by draw date
-    if (drawDateFilter) {
+    if (drawDateFilter && drawDateFilter !== 'all') {
       filtered = filtered.filter(entry => entry.draw_date === drawDateFilter);
     }
 
@@ -139,7 +138,7 @@ const LotteryEntriesTable = () => {
   };
 
   const clearFilters = () => {
-    setDrawDateFilter('');
+    setDrawDateFilter('all');
     setEntryTypeFilter('all');
     setStatusFilter('all');
   };
@@ -278,7 +277,7 @@ const LotteryEntriesTable = () => {
                 <SelectValue placeholder="All dates" />
               </SelectTrigger>
               <SelectContent className="bg-gray-700 border-gray-600">
-                <SelectItem value="">All dates</SelectItem>
+                <SelectItem value="all">All dates</SelectItem>
                 {getUniqueDrawDates().map((date) => (
                   <SelectItem key={date} value={date}>
                     {formatDrawDate(new Date(date))}
