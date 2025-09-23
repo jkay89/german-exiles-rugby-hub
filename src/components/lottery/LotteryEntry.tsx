@@ -195,11 +195,7 @@ const LotteryEntry = () => {
       if (error) throw error;
 
       if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecting to payment",
-          description: "Please complete your payment in the new tab."
-        });
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Payment error:', error);
