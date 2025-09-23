@@ -30,7 +30,6 @@ serve(async (req) => {
       userName, 
       numbers, 
       drawDate, 
-      jackpotAmount, 
       lineNumber,
       nextPaymentDate,
       emailType = 'confirmation', // 'confirmation' or 'monthly'
@@ -38,6 +37,19 @@ serve(async (req) => {
     } = await req.json();
 
     console.log(`Sending ${emailType} email to:`, userEmail);
+
+    // Get current jackpot amount from database
+    const { data: jackpotData, error: jackpotError } = await supabaseClient
+      .from('lottery_settings')
+      .select('setting_value')
+      .eq('setting_key', 'current_jackpot')
+      .maybeSingle();
+
+    const currentJackpot = jackpotData ? parseInt(jackpotData.setting_value) : 50000;
+    
+    if (jackpotError) {
+      console.warn('Could not fetch current jackpot, using default:', jackpotError);
+    }
 
     let html;
     let subject;
@@ -49,7 +61,7 @@ serve(async (req) => {
           customerName: userName,
           numbers: numbers,
           drawDate: drawDate,
-          jackpotAmount: jackpotAmount,
+          jackpotAmount: currentJackpot,
           lineNumber: lineNumber,
           paymentAmount: paymentAmount,
         })
@@ -62,7 +74,7 @@ serve(async (req) => {
           customerName: userName,
           numbers: numbers,
           drawDate: drawDate,
-          jackpotAmount: jackpotAmount,
+          jackpotAmount: currentJackpot,
           lineNumber: lineNumber,
           nextPaymentDate: nextPaymentDate,
         })
