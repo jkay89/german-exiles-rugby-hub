@@ -8,12 +8,6 @@ const LotteryNavigation = () => {
   return (
     <div className="flex items-center gap-6">
       <Link 
-        to="/" 
-        className="text-white hover:text-gray-300 transition-colors font-medium"
-      >
-        Home
-      </Link>
-      <Link 
         to="/lottery" 
         className="text-white hover:text-gray-300 transition-colors font-medium"
       >
