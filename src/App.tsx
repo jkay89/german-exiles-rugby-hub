@@ -27,6 +27,7 @@ import MediaFolder from "./pages/MediaFolder";
 import Lottery from "./pages/Lottery";
 import LotteryTerms from "./pages/LotteryTerms";
 import LotterySuccess from "./pages/LotterySuccess";
+import LotteryDashboard from "./pages/LotteryDashboard";
 import AuthPage from "./pages/auth/AuthPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -91,6 +92,7 @@ const App = () => (
                 <Route path="/lottery" element={<Lottery />} />
                 <Route path="/lottery/terms" element={<LotteryTerms />} />
                 <Route path="/lottery/success" element={<LotterySuccess />} />
+                <Route path="/lottery/:username" element={<LotteryDashboard />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/admin" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />

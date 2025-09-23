@@ -39,6 +39,12 @@ const AuthButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
         <DropdownMenuItem asChild>
+          <Link to={`/lottery/${user.email?.split('@')[0] || ''}`} className="flex items-center gap-2 text-white">
+            <User className="w-4 h-4" />
+            My Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link to="/lottery" className="flex items-center gap-2 text-white">
             Play Lottery
           </Link>

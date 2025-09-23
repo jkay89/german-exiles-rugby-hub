@@ -3,10 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trophy, Calendar, Users, Banknote } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
 import SubscriptionManager from "@/components/lottery/SubscriptionManager";
 
 const Lottery = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
@@ -242,6 +245,17 @@ const Lottery = () => {
           
           {/* Subscription Management for logged-in users */}
           <SubscriptionManager />
+          
+          {/* Dashboard Link for logged-in users */}
+          {user && (
+            <div className="text-center">
+              <Button asChild variant="outline">
+                <Link to={`/lottery/${user.email?.split('@')[0] || ''}`}>
+                  View My Dashboard
+                </Link>
+              </Button>
+            </div>
+          )}
             
             <div className="text-center pt-8">
               <Button size="lg" variant="outline" asChild>
