@@ -55,13 +55,13 @@ const PrivacyPolicy = () => {
                   <h4 className="font-semibold text-white mb-2">Organisation Details:</h4>
                   <p><strong>Name:</strong> German Exiles Rugby League</p>
                   <p><strong>Type:</strong> Amateur Sports Club</p>
-                  <p><strong>Registration:</strong> Registered Sports Association in Germany</p>
-                  <p><strong>Contact Email:</strong> privacy@germanexilesrl.co.uk</p>
+                  <p><strong>Registration:</strong> Registered Sports Association in United Kingdom</p>
+                  <p><strong>Contact Email:</strong> info@germanexilesrl.co.uk</p>
                   <p><strong>General Enquiries:</strong> info@germanexilesrl.co.uk</p>
                 </div>
                 <div>
                   <h4 className="font-semibold text-white mb-2">Data Protection Contact:</h4>
-                  <p>For all data protection enquiries, please contact us at: <strong>privacy@germanexilesrl.co.uk</strong></p>
+                  <p>For all data protection enquiries, please contact us at: <strong>info@germanexilesrl.co.uk</strong></p>
                 </div>
               </CardContent>
             </Card>
@@ -262,7 +262,7 @@ const PrivacyPolicy = () => {
                 </div>
                 <div className="mt-6 p-4 bg-green-900/20 border border-green-600/30 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">How to Exercise Your Rights:</h4>
-                  <p>Email us at <strong>privacy@germanexilesrl.co.uk</strong> with your request. We will respond within 30 days and may require identity verification for security purposes.</p>
+                  <p>Email us at <strong>info@germanexilesrl.co.uk</strong> with your request. We will respond within 30 days and may require identity verification for security purposes.</p>
                 </div>
               </CardContent>
             </Card>
@@ -394,7 +394,7 @@ const PrivacyPolicy = () => {
                       <Mail className="w-5 h-5 text-blue-400" />
                       Data Protection Enquiries
                     </h4>
-                    <p><strong>Email:</strong> privacy@germanexilesrl.co.uk</p>
+                    <p><strong>Email:</strong> info@germanexilesrl.co.uk</p>
                     <p><strong>Response Time:</strong> Within 30 days</p>
                   </div>
                   <div>
