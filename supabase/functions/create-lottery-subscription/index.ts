@@ -28,7 +28,7 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
     // Get request body
-    const { priceId, quantity, lotteryLines } = await req.json();
+    const { priceId, quantity, lotteryLines, promoCode, originalAmount, discountedAmount } = await req.json();
     
     if (!priceId || !quantity || !lotteryLines) {
       throw new Error("Missing required parameters: priceId, quantity, lotteryLines");
@@ -46,23 +46,48 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
+    // Create line items - use custom pricing if promo code is applied
+    const lineItems = [];
+    
+    if (promoCode && discountedAmount !== undefined) {
+      // Use custom pricing with discount
+      lineItems.push({
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: `Monthly Lottery Entry${quantity > 1 ? ` (${quantity} lines)` : ''}`,
+            description: promoCode ? `Applied promo code: ${promoCode}` : undefined,
+          },
+          unit_amount: Math.round((discountedAmount * 100) / quantity), // Convert to pence and divide by quantity
+          recurring: {
+            interval: "month"
+          }
+        },
+        quantity: quantity,
+      });
+    } else {
+      // Use standard pricing
+      lineItems.push({
+        price: priceId,
+        quantity: quantity,
+      });
+    }
+
     // Create a subscription checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: quantity,
-        },
-      ],
+      line_items: lineItems,
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/lottery/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/lottery?cancelled=true`,
       metadata: {
         user_id: user.id,
         lottery_lines: JSON.stringify(lotteryLines),
-        entry_type: "subscription"
+        entry_type: "subscription",
+        promo_code: promoCode || "",
+        original_amount: originalAmount?.toString() || "",
+        discounted_amount: discountedAmount?.toString() || ""
       }
     });
 
