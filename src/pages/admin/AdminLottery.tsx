@@ -364,9 +364,8 @@ const AdminLottery = () => {
     setNewDraw({ ...newDraw, winning_numbers: newNumbers });
   };
 
-  if (!isAuthenticated && !adminLoading) return null;
-  
   if (adminLoading) {
+    console.log("AdminLottery: admin loading...");
     return (
       <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
@@ -376,6 +375,13 @@ const AdminLottery = () => {
       </div>
     );
   }
+
+  if (!isAuthenticated) {
+    console.log("AdminLottery: not authenticated, isAuthenticated:", isAuthenticated, "adminLoading:", adminLoading);
+    return null;
+  }
+
+  console.log("AdminLottery: rendering main content, loading:", loading);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
