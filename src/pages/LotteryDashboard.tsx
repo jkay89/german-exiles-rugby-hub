@@ -26,6 +26,10 @@ interface LotterySubscription {
   lines_count: number;
   stripe_subscription_id: string;
   next_draw_date: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  stripe_customer_id?: string;
 }
 
 interface SubscriptionDetails {
@@ -198,23 +202,54 @@ const LotteryDashboard = () => {
 
   const updateEntryNumbers = async (entryId: string, newNumbers: number[]) => {
     try {
-      const { error } = await supabase
-        .from('lottery_entries')
-        .update({ numbers: newNumbers })
-        .eq('id', entryId)
-        .eq('user_id', user?.id);
+      const entry = currentEntries.find(e => e.id === entryId);
+      if (!entry) return;
 
-      if (error) throw error;
+      // If this is a subscription entry, create a new entry for the next draw
+      if (entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_')) {
+        // Calculate next draw date (first day of next month)
+        const nextDrawDate = new Date();
+        nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
+        nextDrawDate.setDate(1);
+        
+        // Create new entry for next draw with updated numbers
+        const { error: insertError } = await supabase
+          .from('lottery_entries')
+          .insert({
+            user_id: user?.id,
+            numbers: newNumbers,
+            line_number: entry.line_number,
+            is_active: true,
+            stripe_subscription_id: entry.stripe_subscription_id,
+            draw_date: nextDrawDate.toISOString().split('T')[0]
+          });
 
-      setCurrentEntries(prev => prev.map(entry => 
-        entry.id === entryId ? { ...entry, numbers: newNumbers } : entry
-      ));
+        if (insertError) throw insertError;
 
+        toast({
+          title: "Numbers updated for future draws",
+          description: `Your subscription numbers have been updated and will be used starting from ${nextDrawDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.`
+        });
+      } else {
+        // Regular entry update (shouldn't happen with current logic)
+        const { error } = await supabase
+          .from('lottery_entries')
+          .update({ numbers: newNumbers })
+          .eq('id', entryId)
+          .eq('user_id', user?.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Numbers updated",
+          description: "Your lottery numbers have been updated successfully."
+        });
+      }
+
+      // Refresh the data
+      await loadUserData();
       setEditingEntry(null);
-      toast({
-        title: "Numbers updated",
-        description: "Your lottery numbers have been updated successfully."
-      });
+      
     } catch (error: any) {
       toast({
         title: "Error updating numbers",
@@ -293,7 +328,12 @@ const LotteryDashboard = () => {
   };
 
   const canEditEntry = (entry: LotteryEntry) => {
-    return entry && entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_');
+    // Never allow editing entries for current draw date - only future draws
+    const entryDate = new Date(entry.draw_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return false; // Disable editing in the entries section - only allow in subscription section
   };
 
   if (authLoading) {
@@ -351,10 +391,10 @@ const LotteryDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-700 p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-gray-400 mb-1">Status</h3>
-                    <Badge variant={subscriptionDetails.status === 'active' ? 'default' : 'secondary'} className="text-sm">
-                      {subscriptionDetails.status?.toUpperCase()}
+                    <Badge variant={subscription ? 'default' : 'secondary'} className="text-sm">
+                      {subscription ? 'ACTIVE' : 'INACTIVE'}
                     </Badge>
-                    {subscriptionDetails.cancelAtPeriodEnd && (
+                    {subscriptionDetails?.cancelAtPeriodEnd && (
                       <p className="text-xs text-yellow-400 mt-1">Cancels at period end</p>
                     )}
                   </div>
@@ -369,19 +409,16 @@ const LotteryDashboard = () => {
                     </p>
                   </div>
                   
-                  <div className="bg-gray-700 p-4 rounded-lg">
-                    <h3 className="text-sm font-medium text-gray-400 mb-1">Next Payment</h3>
-                    <p className="text-lg font-semibold text-white">
-                      {subscriptionDetails.nextPaymentDate ? 
-                        new Date(subscriptionDetails.nextPaymentDate).toLocaleDateString('en-GB', { 
-                          day: 'numeric', 
+                    <div className="bg-gray-700 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Next Payment</h3>
+                      <p className="text-lg font-semibold text-white">
+                        1st {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString('en-GB', { 
                           month: 'long',
                           year: 'numeric'
-                        }) : 'N/A'
-                      }
-                    </p>
-                    <p className="text-xs text-gray-400">1st of each month</p>
-                  </div>
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-400">Always 1st of each month</p>
+                    </div>
                 </div>
 
                 {/* Subscription Details */}
@@ -395,7 +432,7 @@ const LotteryDashboard = () => {
                         </p>
                         <p className="text-white">
                           <span className="text-gray-400">Started:</span> {' '}
-                          {new Date(subscriptionDetails.createdAt || '').toLocaleDateString('en-GB')}
+                          {subscription ? new Date(subscription.created_at).toLocaleDateString('en-GB') : 'N/A'}
                         </p>
                         <p className="text-white">
                           <span className="text-gray-400">Next Draw:</span> {formatDrawDate(nextDrawDate)}
@@ -411,9 +448,7 @@ const LotteryDashboard = () => {
                         </p>
                         <p className="text-white">
                           <span className="text-gray-400">Current Period Ends:</span> {' '}
-                          {subscriptionDetails.currentPeriodEnd ? 
-                            new Date(subscriptionDetails.currentPeriodEnd).toLocaleDateString('en-GB') : 'N/A'
-                          }
+                          {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                     </div>
@@ -439,12 +474,48 @@ const LotteryDashboard = () => {
                     <Button 
                       variant="outline"
                       className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                      disabled
                     >
-                      Change Numbers
-                      <span className="text-xs ml-2">(Available in dashboard)</span>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Numbers Below
                     </Button>
                   </div>
+
+                  {/* Subscription Numbers Section */}
+                  {subscription && currentEntries.length > 0 && (
+                    <div className="border-t border-gray-600 pt-6 mt-6">
+                      <div className="mb-4">
+                        <h4 className="text-lg font-medium text-white mb-2">Your Subscription Numbers</h4>
+                        <p className="text-sm text-gray-400 mb-4">
+                          These numbers will be used for all future draws. Changes apply to the next draw after the current one.
+                        </p>
+                      </div>
+                      
+                      {currentEntries.map((entry, index) => (
+                        <div key={entry.id} className="mb-6 p-4 bg-gray-700 rounded-lg">
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="text-white font-medium">Line {entry.line_number}</h5>
+                            {editingEntry !== entry.id && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingEntry(entry.id)}
+                                className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                              >
+                                Edit Numbers
+                              </Button>
+                            )}
+                          </div>
+                          
+                          {renderEntryNumbers(entry, editingEntry === entry.id)}
+                        </div>
+                      ))}
+                      
+                      <div className="text-xs text-gray-400 bg-gray-800 p-3 rounded-lg">
+                        <strong>Note:</strong> Number changes will take effect for draws after the current draw period. 
+                        Current draw numbers cannot be modified once the draw period has started.
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : subscription ? (
