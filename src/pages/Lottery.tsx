@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { Trophy, Calendar, Users, Banknote } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
-import SubscriptionManager from "@/components/lottery/SubscriptionManager";
 import RecentDraw from "@/components/lottery/RecentDraw";
 
 const Lottery = () => {
@@ -250,9 +249,6 @@ const Lottery = () => {
             
           {/* Lottery Entry Component */}
           <LotteryEntry />
-          
-          {/* Subscription Management for logged-in users */}
-          <SubscriptionManager />
           
           {/* Dashboard Link for logged-in users */}
           {user && (
