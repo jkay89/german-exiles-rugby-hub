@@ -27,6 +27,7 @@ const AdminLottery = () => {
   
   const [draws, setDraws] = useState<LotteryDraw[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentJackpot, setCurrentJackpot] = useState(1000);
   const [newDraw, setNewDraw] = useState({
     draw_date: "",
     winning_numbers: [0, 0, 0, 0],
@@ -45,6 +46,7 @@ const AdminLottery = () => {
     if (isAuthenticated) {
       fetchDraws();
       fetchNextDrawDate();
+      fetchCurrentJackpot();
     }
   }, [isAuthenticated]);
 
@@ -74,6 +76,47 @@ const AdminLottery = () => {
     const now = new Date();
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     setNextDrawDate(nextMonth.toISOString().split('T')[0]);
+  };
+
+  const fetchCurrentJackpot = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'current_jackpot')
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setCurrentJackpot(Number(data.setting_value));
+      }
+    } catch (error) {
+      console.error('Error fetching current jackpot:', error);
+    }
+  };
+
+  const updateCurrentJackpot = async (newAmount: number) => {
+    try {
+      const { error } = await supabase
+        .from('lottery_settings')
+        .update({ setting_value: newAmount.toString() })
+        .eq('setting_key', 'current_jackpot');
+
+      if (error) throw error;
+
+      setCurrentJackpot(newAmount);
+      toast({
+        title: "Success",
+        description: "Current jackpot updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating current jackpot:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update current jackpot",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAddDraw = async () => {
@@ -163,6 +206,39 @@ const AdminLottery = () => {
         className="container mx-auto px-6 py-12"
       >
         <h1 className="text-3xl font-bold text-white mb-8">Lottery Management</h1>
+
+        {/* Current Jackpot Management */}
+        <Card className="bg-gray-900 border-gray-800 text-white mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Save className="w-5 h-5 text-yellow-400" />
+              Current Jackpot Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <Label htmlFor="current-jackpot">Current Jackpot Amount (£)</Label>
+                <Input
+                  id="current-jackpot"
+                  type="number"
+                  value={currentJackpot}
+                  onChange={(e) => setCurrentJackpot(Number(e.target.value))}
+                  className="bg-gray-800 border-gray-700 text-white"
+                />
+              </div>
+              <Button 
+                onClick={() => updateCurrentJackpot(currentJackpot)} 
+                className="bg-yellow-600 hover:bg-yellow-700 mt-6"
+              >
+                Update Jackpot
+              </Button>
+            </div>
+            <p className="text-sm text-gray-400 mt-2">
+              This amount will be displayed on the lottery page as the current jackpot prize
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Next Draw Info */}
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">

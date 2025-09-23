@@ -1,14 +1,42 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trophy, Calendar, Users, Banknote } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
 import RecentDraw from "@/components/lottery/RecentDraw";
 
 const Lottery = () => {
   const { user } = useAuth();
+  const [currentJackpot, setCurrentJackpot] = useState(1000);
+
+  useEffect(() => {
+    fetchCurrentJackpot();
+  }, []);
+
+  const fetchCurrentJackpot = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'current_jackpot')
+        .single();
+
+      if (error) {
+        console.error('Error fetching current jackpot:', error);
+        return;
+      }
+      
+      if (data) {
+        setCurrentJackpot(Number(data.setting_value));
+      }
+    } catch (error) {
+      console.error('Error fetching current jackpot:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -135,7 +163,7 @@ const Lottery = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl text-yellow-400 flex items-center gap-2">
                     <Trophy className="w-6 h-6" />
-                    Jackpot Prize
+                    Current Jackpot Prize
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -144,7 +172,7 @@ const Lottery = () => {
                     the jackpot is shared equally.
                   </p>
                   <p className="text-2xl font-bold text-yellow-400 mb-2">
-                    Current Jackpot Prize: £1,000
+                    Current Jackpot Prize: £{currentJackpot.toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-400">
                     Maximum prize: £25,000 (by law)
