@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Folder, Images, Plus, Edit, Calendar, Users, FileText } from "lucide-react";
+import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -139,6 +139,21 @@ const AdminDashboard = () => {
               <p className="text-gray-400 mb-4">Upload and manage club documents and resources.</p>
               <Link to="/admin/documents">
                 <Button className="w-full bg-german-red hover:bg-german-gold">Manage Documents</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="h-5 w-5 text-german-gold" />
+                Lottery Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Manage lottery draws, results, and next draw dates.</p>
+              <Link to="/admin/lottery">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Lottery</Button>
               </Link>
             </CardContent>
           </Card>

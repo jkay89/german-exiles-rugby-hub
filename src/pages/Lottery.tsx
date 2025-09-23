@@ -6,6 +6,7 @@ import { Trophy, Calendar, Users, Banknote } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
 import SubscriptionManager from "@/components/lottery/SubscriptionManager";
+import RecentDraw from "@/components/lottery/RecentDraw";
 
 const Lottery = () => {
   const { user } = useAuth();
@@ -37,6 +38,13 @@ const Lottery = () => {
               </Button>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Recent Draw & Countdown */}
+      <section className="py-8 px-4 bg-gray-950">
+        <div className="max-w-6xl mx-auto">
+          <RecentDraw />
         </div>
       </section>
 

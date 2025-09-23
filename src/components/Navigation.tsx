@@ -2,6 +2,7 @@
 import { Logo } from "./navigation/Logo";
 import { DesktopNavigation } from "./navigation/DesktopNavigation";
 import { MobileNavigation } from "./navigation/MobileNavigation";
+import LotteryNavigation from "./navigation/LotteryNavigation";
 import AuthButton from "./auth/AuthButton";
 import AdminAuthButton from "./auth/AdminAuthButton";
 import { useLocation } from "react-router-dom";
@@ -27,7 +28,7 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           <Logo />
           <div className="flex items-center gap-4">
-            <DesktopNavigation />
+            {isLotteryPage ? <LotteryNavigation /> : <DesktopNavigation />}
             {renderAuthButton()}
           </div>
           <MobileNavigation />

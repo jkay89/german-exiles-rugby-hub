@@ -38,6 +38,7 @@ import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminFixtures from "./pages/admin/AdminFixtures";
 import AdminCommittee from "./pages/admin/AdminCommittee";
 import AdminDocuments from "./pages/admin/AdminDocuments";
+import AdminLottery from "./pages/admin/AdminLottery";
 import { AdminProvider } from "./contexts/AdminContext";
 import { setupSupabase } from "./lib/supabase-setup";
 import { seedInitialContent } from "./utils/seedInitialContent";
@@ -100,9 +101,10 @@ const App = () => (
                 <Route path="/admin/news" element={<AdminNews />} />
                 <Route path="/admin/media" element={<AdminMedia />} />
                 <Route path="/admin/sponsors" element={<AdminSponsors />} />
-                <Route path="/admin/fixtures" element={<AdminFixtures />} />
-                <Route path="/admin/committee" element={<AdminCommittee />} />
-                <Route path="/admin/documents" element={<AdminDocuments />} />
+        <Route path="/admin/fixtures" element={<AdminFixtures />} />
+        <Route path="/admin/committee" element={<AdminCommittee />} />
+        <Route path="/admin/documents" element={<AdminDocuments />} />
+        <Route path="/admin/lottery" element={<AdminLottery />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
