@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar, Mail, ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const LotterySuccess = () => {
   const [searchParams] = useSearchParams();
@@ -11,9 +12,35 @@ const LotterySuccess = () => {
   const [isSubscription, setIsSubscription] = useState(false);
 
   useEffect(() => {
-    // You could call a verification endpoint here to get more details about the payment
-    // For now, we'll just show a success message
+    // Process the lottery purchase when component mounts
+    if (sessionId) {
+      processLotteryPurchase();
+    }
   }, [sessionId]);
+
+  const processLotteryPurchase = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.warn("No active session for lottery processing");
+        return;
+      }
+
+      const { error } = await supabase.functions.invoke('process-lottery-purchase', {
+        body: { sessionId },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      });
+
+      if (error) {
+        console.error('Error processing lottery purchase:', error);
+      }
+    } catch (error) {
+      console.error('Failed to process lottery purchase:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">

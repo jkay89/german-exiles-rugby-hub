@@ -7,9 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, Save, Calendar, Percent, Gift } from "lucide-react";
+import { Trash2, Plus, Save, Calendar, Percent, Gift, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import LotteryEntriesTable from "@/components/admin/LotteryEntriesTable";
+
+interface LotteryEntry {
+  id: string;
+  user_id: string;
+  numbers: number[];
+  line_number: number;
+  is_active: boolean;
+  created_at: string;
+  stripe_subscription_id?: string;
+}
 
 interface LotteryDraw {
   id: string;
@@ -661,6 +672,19 @@ const AdminLottery = () => {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+        
+        {/* Lottery Entries Management */}
+        <Card className="bg-gray-900 border-gray-800 text-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-green-400" />
+              All Lottery Entries
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LotteryEntriesTable />
           </CardContent>
         </Card>
       </motion.div>
