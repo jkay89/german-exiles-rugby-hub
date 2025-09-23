@@ -164,6 +164,8 @@ const LotteryEntry = () => {
       return;
     }
 
+    console.log("Payment processing - Auto Renew:", autoRenew);
+    
     setIsProcessing(true);
 
     try {
@@ -182,6 +184,8 @@ const LotteryEntry = () => {
       const functionName = autoRenew ? 'create-lottery-subscription' : 'create-lottery-payment';
       const priceId = autoRenew ? 'price_1SAW2kBMVhaJwA6CyXZ9WV8U' : 'price_1SAW2TBMVhaJwA6C7bPbdbDs';
       
+      console.log("Calling function:", functionName, "with priceId:", priceId);
+      
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: { 
           priceId,
@@ -193,9 +197,12 @@ const LotteryEntry = () => {
         }
       });
 
+      console.log("Function response:", { data, error });
+
       if (error) throw error;
 
       if (data?.url) {
+        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       }
     } catch (error) {
