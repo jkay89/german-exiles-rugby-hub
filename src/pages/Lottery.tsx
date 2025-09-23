@@ -174,9 +174,6 @@ const Lottery = () => {
                   <p className="text-2xl font-bold text-yellow-400 mb-2">
                     Current Jackpot Prize: £{currentJackpot.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-400">
-                    Maximum prize: £25,000 (by law)
-                  </p>
                 </CardContent>
               </Card>
 
