@@ -105,7 +105,10 @@ const LotteryDashboard = () => {
 
       (allEntries || []).forEach(entry => {
         const entryDrawDate = new Date(entry.draw_date);
-        if (entryDrawDate >= new Date() || isCurrentDrawPeriod(entryDrawDate)) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (entryDrawDate >= today) {
           current.push(entry);
         } else {
           previous.push(entry);
@@ -202,6 +205,8 @@ const LotteryDashboard = () => {
 
   const updateEntryNumbers = async (entryId: string, newNumbers: number[]) => {
     try {
+      console.log('Updating entry:', entryId, 'with numbers:', newNumbers);
+      
       // Simply update the existing entry with new numbers
       const { error } = await supabase
         .from('lottery_entries')
@@ -209,9 +214,14 @@ const LotteryDashboard = () => {
         .eq('id', entryId)
         .eq('user_id', user?.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Update error:', error);
+        throw error;
+      }
 
-      // Update local state
+      console.log('Entry updated successfully');
+
+      // Update local state immediately without reloading all data
       setCurrentEntries(prev => prev.map(entry => 
         entry.id === entryId ? { ...entry, numbers: newNumbers } : entry
       ));
@@ -219,10 +229,11 @@ const LotteryDashboard = () => {
       setEditingEntry(null);
       toast({
         title: "Numbers updated",
-        description: "Your subscription numbers have been updated for future draws."
+        description: "Your subscription numbers have been updated."
       });
       
     } catch (error: any) {
+      console.error('Error updating numbers:', error);
       toast({
         title: "Error updating numbers",
         description: error.message,
