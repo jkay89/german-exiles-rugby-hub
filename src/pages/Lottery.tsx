@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trophy, Calendar, Users, Banknote } from "lucide-react";
+import LotteryEntry from "@/components/lottery/LotteryEntry";
 
 const Lottery = () => {
   return (
@@ -220,21 +221,25 @@ const Lottery = () => {
 
       {/* CTA Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-blue-600/10 to-red-600/10">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
+            className="space-y-8"
           >
-            <h2 className="text-3xl font-bold mb-6">Ready to Play?</h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Entries close at 7:50 PM on the day of the draw. 
-              Late entries are carried forward to the next month.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                Enter the Lottery
-              </Button>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-6">Ready to Play?</h2>
+              <p className="text-xl text-gray-300 mb-8">
+                Entries close at 7:50 PM on the day of the draw. 
+                Late entries are carried forward to the next month.
+              </p>
+            </div>
+            
+            {/* Lottery Entry Component */}
+            <LotteryEntry />
+            
+            <div className="text-center pt-8">
               <Button size="lg" variant="outline" asChild>
                 <Link to="/lottery/terms">Read Full Terms & Conditions</Link>
               </Button>
