@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, RefreshCw } from "lucide-react";
+import { Loader2, User, RefreshCw, Trash2 } from "lucide-react";
 import { formatDrawDate } from "@/utils/drawDateUtils";
 
 interface LotteryEntry {
@@ -28,6 +28,7 @@ const LotteryEntriesTable = () => {
   const [userProfiles, setUserProfiles] = useState<UserProfiles>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingEntry, setDeletingEntry] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -131,6 +132,39 @@ const LotteryEntriesTable = () => {
     }
   };
 
+  const deleteEntry = async (entryId: string, userEmail: string) => {
+    if (!confirm(`Are you sure you want to permanently delete this lottery entry for ${userEmail}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingEntry(entryId);
+      
+      const { error } = await supabase
+        .from('lottery_entries')
+        .delete()
+        .eq('id', entryId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setEntries(prev => prev.filter(entry => entry.id !== entryId));
+
+      toast({
+        title: "Success",
+        description: "Lottery entry deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to delete entry: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingEntry(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -188,8 +222,22 @@ const LotteryEntriesTable = () => {
                     variant="outline"
                     onClick={() => toggleEntryStatus(entry.id, entry.is_active)}
                     className="text-xs"
+                    disabled={deletingEntry === entry.id}
                   >
                     {entry.is_active ? 'Deactivate' : 'Activate'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => deleteEntry(entry.id, userProfiles[entry.user_id]?.email || 'Unknown User')}
+                    disabled={deletingEntry === entry.id}
+                    className="text-xs"
+                  >
+                    {deletingEntry === entry.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3 h-3" />
+                    )}
                   </Button>
                 </div>
               </div>
