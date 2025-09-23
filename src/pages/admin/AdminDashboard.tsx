@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Folder, Images, Plus, Edit, Calendar } from "lucide-react";
+import { Folder, Images, Plus, Edit, Calendar, Users, FileText } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -109,6 +109,36 @@ const AdminDashboard = () => {
               <p className="text-gray-400 mb-4">Manage fixtures and update match results.</p>
               <Link to="/admin/fixtures">
                 <Button className="w-full bg-german-red hover:bg-german-gold">Manage Fixtures</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-german-gold" />
+                Committee Members
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Manage committee member profiles and contact details.</p>
+              <Link to="/admin/committee">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Committee</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-german-gold" />
+                Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Upload and manage club documents and resources.</p>
+              <Link to="/admin/documents">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Documents</Button>
               </Link>
             </CardContent>
           </Card>
