@@ -74,12 +74,17 @@ serve(async (req) => {
     const promoCode = metadata.promo_code || null;
 
     // Save lottery entries to database
+    const nextDrawDate = new Date();
+    nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
+    nextDrawDate.setDate(0); // Last day of next month
+    
     const entries = lotteryLines.map((numbers: number[], index: number) => ({
       user_id: user.id,
       numbers: numbers,
       line_number: index + 1,
       is_active: true,
-      stripe_subscription_id: sessionId
+      stripe_subscription_id: sessionId,
+      draw_date: nextDrawDate.toISOString().split('T')[0] // Format as YYYY-MM-DD
     }));
 
     const { error: entriesError } = await supabaseClient

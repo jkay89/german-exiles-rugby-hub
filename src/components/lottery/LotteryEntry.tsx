@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, CreditCard, RefreshCw, Plus, Trash2, Gift, Percent } from "lucide-react";
 import NumberSelector from "./NumberSelector";
 import { supabase } from "@/integrations/supabase/client";
+import { getNextDrawDate, formatDrawDate } from "@/utils/drawDateUtils";
 import { useToast } from "@/hooks/use-toast";
 
 interface LotteryLine {
@@ -222,9 +223,9 @@ const LotteryEntry = () => {
             <Calendar className="w-5 h-5" />
             Lottery Entry
           </CardTitle>
-          <p className="text-gray-400">
-            Next draw: Last week of {new Date().toLocaleString('default', { month: 'long' })}
-          </p>
+            <p className="text-gray-400">
+              Next draw: {formatDrawDate(getNextDrawDate())}
+            </p>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Lottery Lines */}

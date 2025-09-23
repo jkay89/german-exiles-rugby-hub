@@ -185,6 +185,7 @@ export type Database = {
       lottery_entries: {
         Row: {
           created_at: string
+          draw_date: string
           id: string
           is_active: boolean
           line_number: number
@@ -195,6 +196,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          draw_date: string
           id?: string
           is_active?: boolean
           line_number?: number
@@ -205,6 +207,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          draw_date?: string
           id?: string
           is_active?: boolean
           line_number?: number

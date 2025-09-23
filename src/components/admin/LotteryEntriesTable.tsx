@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, RefreshCw } from "lucide-react";
+import { formatDrawDate } from "@/utils/drawDateUtils";
 
 interface LotteryEntry {
   id: string;
@@ -12,6 +13,7 @@ interface LotteryEntry {
   line_number: number;
   is_active: boolean;
   created_at: string;
+  draw_date: string;
   stripe_subscription_id?: string;
 }
 
@@ -203,13 +205,15 @@ const LotteryEntriesTable = () => {
                 ))}
               </div>
 
-              {entry.stripe_subscription_id && (
-                <div className="mt-2">
-                  <p className="text-xs text-gray-500">
-                    Stripe Reference: {entry.stripe_subscription_id.slice(0, 20)}...
-                  </p>
-                </div>
-              )}
+            {/* Admin Section - Show draw date */}
+            <div className="mt-2">
+              <p className="text-xs text-gray-500">
+                Draw Date: {formatDrawDate(new Date(entry.draw_date))} 
+                {entry.stripe_subscription_id && (
+                  <> • Stripe: {entry.stripe_subscription_id.slice(0, 20)}...</>
+                )}
+              </p>
+            </div>
             </div>
           ))}
         </div>

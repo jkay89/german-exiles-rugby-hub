@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import NumberSelector from "@/components/lottery/NumberSelector";
-import { Loader2, Calendar, Trophy, Settings, CreditCard } from "lucide-react";
+import { Loader2, Calendar, Trophy, Settings, CreditCard, Clock, History } from "lucide-react";
+import { getNextDrawDate, formatDrawDate, isCurrentDrawPeriod, isPastDraw } from "@/utils/drawDateUtils";
 
 interface LotteryEntry {
   id: string;
@@ -16,6 +17,7 @@ interface LotteryEntry {
   line_number: number;
   is_active: boolean;
   stripe_subscription_id: string;
+  draw_date: string;
 }
 
 interface LotterySubscription {
@@ -48,11 +50,15 @@ const LotteryDashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [entries, setEntries] = useState<LotteryEntry[]>([]);
+  const [currentEntries, setCurrentEntries] = useState<LotteryEntry[]>([]);
+  const [previousEntries, setPreviousEntries] = useState<LotteryEntry[]>([]);
   const [subscription, setSubscription] = useState<LotterySubscription | null>(null);
   const [results, setResults] = useState<LotteryResult[]>([]);
   const [latestDraw, setLatestDraw] = useState<LotteryDraw | null>(null);
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
+
+  const nextDrawDate = getNextDrawDate();
+  const nextDrawDateString = nextDrawDate.toISOString().split('T')[0];
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -64,15 +70,30 @@ const LotteryDashboard = () => {
     try {
       setLoading(true);
       
-      // Load user's lottery entries
-      const { data: entriesData, error: entriesError } = await supabase
+      // Load user's lottery entries and separate by draw date
+      const { data: allEntries, error: entriesError } = await supabase
         .from('lottery_entries')
         .select('*')
         .eq('user_id', user?.id)
-        .order('line_number');
+        .order('draw_date', { ascending: false });
 
       if (entriesError) throw entriesError;
-      setEntries(entriesData || []);
+
+      // Separate current and previous entries
+      const current: LotteryEntry[] = [];
+      const previous: LotteryEntry[] = [];
+
+      (allEntries || []).forEach(entry => {
+        const entryDrawDate = new Date(entry.draw_date);
+        if (entryDrawDate >= new Date() || isCurrentDrawPeriod(entryDrawDate)) {
+          current.push(entry);
+        } else {
+          previous.push(entry);
+        }
+      });
+
+      setCurrentEntries(current);
+      setPreviousEntries(previous);
 
       // Load user's subscription
       const { data: subscriptionData, error: subscriptionError } = await supabase
@@ -80,7 +101,7 @@ const LotteryDashboard = () => {
         .select('*')
         .eq('user_id', user?.id)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
       if (subscriptionError && subscriptionError.code !== 'PGRST116') {
         throw subscriptionError;
@@ -93,7 +114,7 @@ const LotteryDashboard = () => {
         .select('*')
         .order('draw_date', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (drawError && drawError.code !== 'PGRST116') {
         throw drawError;
@@ -136,7 +157,7 @@ const LotteryDashboard = () => {
 
       if (error) throw error;
 
-      setEntries(prev => prev.map(entry => 
+      setCurrentEntries(prev => prev.map(entry => 
         entry.id === entryId ? { ...entry, numbers: newNumbers } : entry
       ));
 
@@ -176,6 +197,56 @@ const LotteryDashboard = () => {
     }
   };
 
+  const renderEntryNumbers = (entry: LotteryEntry, isEditing: boolean) => {
+    if (isEditing) {
+      return (
+        <div className="space-y-4">
+          <NumberSelector
+            selectedNumbers={entry.numbers}
+            onNumbersChange={(newNumbers) => {
+              setCurrentEntries(prev => prev.map(e => 
+                e.id === entry.id ? { ...e, numbers: newNumbers } : e
+              ));
+            }}
+            maxNumbers={6}
+            maxValue={49}
+          />
+          <div className="flex gap-2">
+            <Button
+              onClick={() => updateEntryNumbers(entry.id, entry.numbers)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Save Changes
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setEditingEntry(null)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {entry.numbers.map((number, index) => (
+          <div
+            key={index}
+            className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-white"
+          >
+            {number}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const canEditEntry = (entry: LotteryEntry) => {
+    return entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_');
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -188,7 +259,6 @@ const LotteryDashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if username matches the logged-in user's email (simplified approach)
   const userSlug = user.email?.split('@')[0] || '';
   if (username !== userSlug) {
     return <Navigate to={`/lottery/${userSlug}`} replace />;
@@ -229,11 +299,9 @@ const LotteryDashboard = () => {
                   <p className="text-sm text-gray-400 mt-1">
                     {subscription.lines_count} line{subscription.lines_count > 1 ? 's' : ''} active
                   </p>
-                  {subscription.next_draw_date && (
-                    <p className="text-sm text-gray-400">
-                      Next draw: {new Date(subscription.next_draw_date).toLocaleDateString()}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-400">
+                    Next draw: {formatDrawDate(nextDrawDate)}
+                  </p>
                 </div>
                 <Button variant="outline" onClick={cancelSubscription}>
                   <Settings className="w-4 h-4 mr-2" />
@@ -251,108 +319,73 @@ const LotteryDashboard = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="numbers" className="space-y-8">
+        <Tabs defaultValue="current" className="space-y-8">
           <TabsList className="bg-gray-800 border-gray-700">
-            <TabsTrigger value="numbers">My Numbers</TabsTrigger>
+            <TabsTrigger value="current">Current Numbers</TabsTrigger>
+            <TabsTrigger value="previous">Previous Numbers</TabsTrigger>
             <TabsTrigger value="results">Results & Wins</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="numbers" className="space-y-6">
+          {/* Current Numbers Tab */}
+          <TabsContent value="current" className="space-y-6">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Your Lottery Numbers</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Clock className="w-5 h-5" />
+                  {formatDrawDate(nextDrawDate)} Numbers
+                </CardTitle>
                 <CardDescription>
-                  Click "Edit" to change your numbers for future draws
+                  Your lottery numbers for the next draw
+                  {canEditEntry(currentEntries[0]) && " - Click 'Edit' to change subscription numbers"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {entries.length > 0 ? (
+                {currentEntries.length > 0 ? (
                   <div className="space-y-4">
-                    {entries.map((entry) => (
+                    {currentEntries.map((entry) => (
                       <div key={entry.id} className="p-4 bg-gray-700 rounded-lg">
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="font-semibold text-white">
                             Line {entry.line_number}
                           </h3>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={entry.is_active ? 'default' : 'secondary'}>
-                                {entry.is_active ? 'Active' : 'Inactive'}
-                              </Badge>
-                              {/* Only allow editing for subscription entries */}
-                              {entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_') ? (
-                                editingEntry === entry.id ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setEditingEntry(null)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setEditingEntry(entry.id)}
-                                  >
-                                    Edit
-                                  </Button>
-                                )
-                              ) : (
-                                <Badge variant="secondary" className="text-xs">
-                                  One-time Entry (No Edit)
-                                </Badge>
-                              )}
-                            </div>
-                        </div>
-
-                        {editingEntry === entry.id ? (
-                          <div className="space-y-4">
-                            <NumberSelector
-                              selectedNumbers={entry.numbers}
-                              onNumbersChange={(newNumbers) => {
-                                // Update the entry state immediately for UI feedback
-                                setEntries(prev => prev.map(e => 
-                                  e.id === entry.id ? { ...e, numbers: newNumbers } : e
-                                ));
-                              }}
-                              maxNumbers={6}
-                              maxValue={49}
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                onClick={() => updateEntryNumbers(entry.id, entry.numbers)}
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
-                                Save Changes
-                              </Button>
-                              <Button
-                                variant="outline"
-                                onClick={() => setEditingEntry(null)}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                            <div className="flex flex-wrap gap-2">
-                              {entry.numbers.map((number, index) => (
-                                <div
-                                  key={index}
-                                  className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-white"
+                          <div className="flex items-center gap-2">
+                            <Badge variant={entry.is_active ? 'default' : 'secondary'}>
+                              {entry.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                            {canEditEntry(entry) ? (
+                              editingEntry === entry.id ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setEditingEntry(null)}
                                 >
-                                  {number}
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                                  Cancel
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setEditingEntry(entry.id)}
+                                >
+                                  Edit
+                                </Button>
+                              )
+                            ) : (
+                              <Badge variant="secondary" className="text-xs">
+                                One-time Entry
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        {renderEntryNumbers(entry, editingEntry === entry.id)}
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-gray-400 mb-4">No lottery entries found</p>
+                    <p className="text-gray-400 mb-4">No entries for the next draw</p>
                     <Button asChild>
-                      <a href="/lottery">Play Now</a>
+                      <a href="/lottery">Enter Now</a>
                     </Button>
                   </div>
                 )}
@@ -360,6 +393,69 @@ const LotteryDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Previous Numbers Tab */}
+          <TabsContent value="previous" className="space-y-6">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <History className="w-5 h-5" />
+                  Previous Numbers
+                </CardTitle>
+                <CardDescription>
+                  Your lottery numbers from past draws
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {previousEntries.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Group by draw date */}
+                    {Object.entries(
+                      previousEntries.reduce((groups, entry) => {
+                        const drawDate = entry.draw_date;
+                        if (!groups[drawDate]) groups[drawDate] = [];
+                        groups[drawDate].push(entry);
+                        return groups;
+                      }, {} as Record<string, LotteryEntry[]>)
+                    ).map(([drawDate, entries]) => (
+                      <div key={drawDate} className="border border-gray-600 rounded-lg p-4">
+                        <h3 className="text-lg font-semibold text-white mb-3">
+                          {formatDrawDate(new Date(drawDate))} Draw
+                        </h3>
+                        <div className="space-y-3">
+                          {entries.map((entry) => (
+                            <div key={entry.id} className="p-3 bg-gray-700 rounded-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-white">Line {entry.line_number}</span>
+                                <Badge variant={entry.stripe_subscription_id?.startsWith('sub_') ? 'default' : 'secondary'}>
+                                  {entry.stripe_subscription_id?.startsWith('sub_') ? 'Subscription' : 'One-time'}
+                                </Badge>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {entry.numbers.map((number, index) => (
+                                  <div
+                                    key={index}
+                                    className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                                  >
+                                    {number}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No previous entries found</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Results Tab */}
           <TabsContent value="results" className="space-y-6">
             {/* Latest Draw */}
             {latestDraw && (
@@ -375,7 +471,7 @@ const LotteryDashboard = () => {
                     {latestDraw.winning_numbers.map((number, index) => (
                       <div
                         key={index}
-                        className="w-12 h-12 bg-gold-500 rounded-full flex items-center justify-center font-bold text-black"
+                        className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black"
                       >
                         {number}
                       </div>
@@ -384,11 +480,11 @@ const LotteryDashboard = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-400">Jackpot</p>
-                      <p className="font-semibold text-white">€{latestDraw.jackpot_amount}</p>
+                      <p className="font-semibold text-white">£{latestDraw.jackpot_amount}</p>
                     </div>
                     <div>
                       <p className="text-gray-400">Lucky Dip</p>
-                      <p className="font-semibold text-white">€{latestDraw.lucky_dip_amount}</p>
+                      <p className="font-semibold text-white">£{latestDraw.lucky_dip_amount}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -415,7 +511,7 @@ const LotteryDashboard = () => {
                           </p>
                           {result.is_winner && (
                             <Badge className="bg-green-600">
-                              Winner! €{result.prize_amount}
+                              Winner! £{result.prize_amount}
                             </Badge>
                           )}
                         </div>
