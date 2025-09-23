@@ -215,6 +215,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lottery_promo_codes: {
+        Row: {
+          code_name: string
+          created_at: string
+          discount_percentage: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          reason: string
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+        }
+        Insert: {
+          code_name: string
+          created_at?: string
+          discount_percentage: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Update: {
+          code_name?: string
+          created_at?: string
+          discount_percentage?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Relationships: []
+      }
       lottery_results: {
         Row: {
           created_at: string

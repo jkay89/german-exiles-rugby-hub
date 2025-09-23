@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, Save, Calendar } from "lucide-react";
+import { Trash2, Plus, Save, Calendar, Percent, Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,6 +36,14 @@ const AdminLottery = () => {
   const [nextDrawDate, setNextDrawDate] = useState("");
   const [currentJackpot, setCurrentJackpot] = useState(1000);
   const [newJackpotAmount, setNewJackpotAmount] = useState("");
+  const [promoCodes, setPromoCodes] = useState<any[]>([]);
+  const [newPromoCode, setNewPromoCode] = useState({
+    code_name: "",
+    reason: "",
+    discount_percentage: 0,
+    usage_limit: null as number | null,
+    expires_at: ""
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -48,6 +56,7 @@ const AdminLottery = () => {
       fetchDraws();
       fetchNextDrawDate();
       fetchCurrentJackpot();
+      fetchPromoCodes();
     }
   }, [isAuthenticated]);
 
@@ -129,6 +138,132 @@ const AdminLottery = () => {
       toast({
         title: "Error",
         description: "Failed to update jackpot amount",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchPromoCodes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lottery_promo_codes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPromoCodes(data || []);
+    } catch (error) {
+      console.error('Error fetching promo codes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch promo codes",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddPromoCode = async () => {
+    if (!newPromoCode.code_name || !newPromoCode.reason || newPromoCode.discount_percentage <= 0) {
+      toast({
+        title: "Invalid Data",
+        description: "Please fill in all required fields with valid values",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const promoData = {
+        code_name: newPromoCode.code_name.toUpperCase(),
+        reason: newPromoCode.reason,
+        discount_percentage: newPromoCode.discount_percentage,
+        usage_limit: newPromoCode.usage_limit,
+        expires_at: newPromoCode.expires_at || null
+      };
+
+      const { error } = await supabase
+        .from('lottery_promo_codes')
+        .insert([promoData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Promo code created successfully",
+      });
+
+      setNewPromoCode({
+        code_name: "",
+        reason: "",
+        discount_percentage: 0,
+        usage_limit: null,
+        expires_at: ""
+      });
+
+      fetchPromoCodes();
+    } catch (error: any) {
+      console.error('Error creating promo code:', error);
+      if (error.code === '23505') {
+        toast({
+          title: "Error",
+          description: "A promo code with this name already exists",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create promo code",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDeletePromoCode = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('lottery_promo_codes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Promo code deleted successfully",
+      });
+
+      fetchPromoCodes();
+    } catch (error) {
+      console.error('Error deleting promo code:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete promo code",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const togglePromoCodeStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('lottery_promo_codes')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Promo code ${!currentStatus ? 'activated' : 'deactivated'} successfully`,
+      });
+
+      fetchPromoCodes();
+    } catch (error) {
+      console.error('Error updating promo code status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update promo code status",
         variant: "destructive",
       });
     }
@@ -345,6 +480,140 @@ const AdminLottery = () => {
               <Save className="w-4 h-4 mr-2" />
               Add Draw Result
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Promo Code Management */}
+        <Card className="bg-gray-900 border-gray-800 text-white mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-purple-400" />
+              Promo Code Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Add New Promo Code */}
+            <div className="border border-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Create New Promo Code</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="promo-code-name">Code Name</Label>
+                  <Input
+                    id="promo-code-name"
+                    type="text"
+                    placeholder="e.g., SAVE20"
+                    value={newPromoCode.code_name}
+                    onChange={(e) => setNewPromoCode({ ...newPromoCode, code_name: e.target.value.toUpperCase() })}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="promo-reason">Reason/Description</Label>
+                  <Input
+                    id="promo-reason"
+                    type="text"
+                    placeholder="e.g., Holiday Special"
+                    value={newPromoCode.reason}
+                    onChange={(e) => setNewPromoCode({ ...newPromoCode, reason: e.target.value })}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="promo-discount">Discount Percentage (%)</Label>
+                  <Input
+                    id="promo-discount"
+                    type="number"
+                    min="1"
+                    max="100"
+                    placeholder="e.g., 20"
+                    value={newPromoCode.discount_percentage || ''}
+                    onChange={(e) => setNewPromoCode({ ...newPromoCode, discount_percentage: Number(e.target.value) })}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="promo-usage-limit">Usage Limit (Optional)</Label>
+                  <Input
+                    id="promo-usage-limit"
+                    type="number"
+                    min="1"
+                    placeholder="Leave blank for unlimited"
+                    value={newPromoCode.usage_limit || ''}
+                    onChange={(e) => setNewPromoCode({ ...newPromoCode, usage_limit: e.target.value ? Number(e.target.value) : null })}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="promo-expires">Expires At (Optional)</Label>
+                  <Input
+                    id="promo-expires"
+                    type="datetime-local"
+                    value={newPromoCode.expires_at}
+                    onChange={(e) => setNewPromoCode({ ...newPromoCode, expires_at: e.target.value })}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+              </div>
+              <Button 
+                onClick={handleAddPromoCode} 
+                className="bg-purple-600 hover:bg-purple-700 mt-4"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Promo Code
+              </Button>
+            </div>
+
+            {/* Existing Promo Codes */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Existing Promo Codes</h3>
+              {promoCodes.length === 0 ? (
+                <p className="text-gray-400">No promo codes created yet</p>
+              ) : (
+                <div className="space-y-3">
+                  {promoCodes.map((promo) => (
+                    <div key={promo.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono font-bold text-purple-400">{promo.code_name}</span>
+                          <Badge className={`${promo.is_active ? 'bg-green-600' : 'bg-gray-600'}`}>
+                            {promo.is_active ? 'Active' : 'Inactive'}
+                          </Badge>
+                          <span className="text-yellow-400 flex items-center gap-1">
+                            <Percent className="w-4 h-4" />
+                            {promo.discount_percentage}% off
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-400 mt-1">{promo.reason}</p>
+                        <div className="text-xs text-gray-500 mt-1 space-x-4">
+                          {promo.usage_limit && (
+                            <span>Limit: {promo.used_count}/{promo.usage_limit}</span>
+                          )}
+                          {promo.expires_at && (
+                            <span>Expires: {new Date(promo.expires_at).toLocaleDateString('en-GB')}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => togglePromoCodeStatus(promo.id, promo.is_active)}
+                          variant={promo.is_active ? "outline" : "default"}
+                          size="sm"
+                        >
+                          {promo.is_active ? 'Deactivate' : 'Activate'}
+                        </Button>
+                        <Button
+                          onClick={() => handleDeletePromoCode(promo.id)}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 

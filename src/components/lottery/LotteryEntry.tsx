@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, CreditCard, RefreshCw, Plus, Trash2 } from "lucide-react";
+import { Calendar, CreditCard, RefreshCw, Plus, Trash2, Gift, Percent } from "lucide-react";
 import NumberSelector from "./NumberSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -15,12 +16,25 @@ interface LotteryLine {
   numbers: number[];
 }
 
+interface PromoCode {
+  id: string;
+  code_name: string;
+  discount_percentage: number;
+  usage_limit: number | null;
+  used_count: number;
+  expires_at: string | null;
+  is_active: boolean;
+}
+
 const LotteryEntry = () => {
   const [lines, setLines] = useState<LotteryLine[]>([
     { id: "1", numbers: [] }
   ]);
   const [autoRenew, setAutoRenew] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
   const { toast } = useToast();
 
   const addNewLine = () => {
@@ -49,7 +63,92 @@ const LotteryEntry = () => {
 
   const getTotalCost = () => {
     const validLines = getValidLines();
+    const baseCost = validLines.length * 5; // £5 per line
+    
+    if (appliedPromo) {
+      const discount = (baseCost * appliedPromo.discount_percentage) / 100;
+      return Math.max(0, baseCost - discount);
+    }
+    
+    return baseCost;
+  };
+
+  const getOriginalCost = () => {
+    const validLines = getValidLines();
     return validLines.length * 5; // £5 per line
+  };
+
+  const validatePromoCode = async () => {
+    if (!promoCode.trim()) {
+      setAppliedPromo(null);
+      return;
+    }
+
+    setIsValidatingPromo(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('lottery_promo_codes')
+        .select('*')
+        .eq('code_name', promoCode.toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        toast({
+          title: "Invalid promo code",
+          description: "The promo code you entered is not valid or has expired.",
+          variant: "destructive"
+        });
+        setAppliedPromo(null);
+        return;
+      }
+
+      // Check if expired
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        toast({
+          title: "Promo code expired",
+          description: "This promo code has expired.",
+          variant: "destructive"
+        });
+        setAppliedPromo(null);
+        return;
+      }
+
+      // Check usage limit
+      if (data.usage_limit && data.used_count >= data.usage_limit) {
+        toast({
+          title: "Promo code limit reached",
+          description: "This promo code has reached its usage limit.",
+          variant: "destructive"
+        });
+        setAppliedPromo(null);
+        return;
+      }
+
+      setAppliedPromo(data);
+      toast({
+        title: "Promo code applied!",
+        description: `${data.discount_percentage}% discount applied - ${data.reason}`,
+      });
+    } catch (error) {
+      console.error('Error validating promo code:', error);
+      toast({
+        title: "Error",
+        description: "Failed to validate promo code. Please try again.",
+        variant: "destructive"
+      });
+      setAppliedPromo(null);
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
+
+  const removePromoCode = () => {
+    setPromoCode("");
+    setAppliedPromo(null);
   };
 
   const handlePayment = async () => {
@@ -86,7 +185,10 @@ const LotteryEntry = () => {
         body: { 
           priceId,
           quantity: validLines.length,
-          lotteryLines: validLines.map(line => line.numbers)
+          lotteryLines: validLines.map(line => line.numbers),
+          promoCode: appliedPromo?.code_name || null,
+          originalAmount: getOriginalCost(),
+          discountedAmount: totalCost
         }
       });
 
@@ -113,6 +215,8 @@ const LotteryEntry = () => {
 
   const validLines = getValidLines();
   const totalCost = getTotalCost();
+  const originalCost = getOriginalCost();
+  const hasDiscount = appliedPromo && totalCost < originalCost;
 
   return (
     <div className="space-y-6">
@@ -192,9 +296,28 @@ const LotteryEntry = () => {
                     {validLines.length}
                   </Badge>
                 </div>
+                
+                {hasDiscount && (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white">Original Cost:</span>
+                      <span className="text-lg text-gray-400 line-through">£{originalCost}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-green-400 flex items-center gap-2">
+                        <Percent className="w-4 h-4" />
+                        {appliedPromo?.code_name} (-{appliedPromo?.discount_percentage}%)
+                      </span>
+                      <span className="text-sm text-green-400">-£{(originalCost - totalCost).toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+                
                 <div className="flex justify-between items-center">
-                  <span className="text-white">Total Cost:</span>
-                  <span className="text-2xl font-bold text-green-400">£{totalCost}</span>
+                  <span className="text-white font-semibold">Total Cost:</span>
+                  <span className={`text-2xl font-bold ${hasDiscount ? 'text-green-400' : 'text-green-400'}`}>
+                    £{totalCost.toFixed(2)}
+                  </span>
                 </div>
                 {autoRenew && (
                   <div className="flex justify-between items-center">
@@ -203,6 +326,59 @@ const LotteryEntry = () => {
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Promo Code Section */}
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2 text-lg">
+                <Gift className="w-5 h-5 text-purple-400" />
+                Promo Code
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {appliedPromo ? (
+                <div className="flex items-center justify-between p-3 bg-green-900/20 border border-green-600/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Percent className="w-4 h-4 text-green-400" />
+                    <span className="font-mono font-bold text-green-400">{appliedPromo.code_name}</span>
+                    <Badge className="bg-green-600">{appliedPromo.discount_percentage}% off</Badge>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={removePromoCode}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter promo code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    className="bg-gray-700 border-gray-600 text-white"
+                    onKeyPress={(e) => e.key === 'Enter' && validatePromoCode()}
+                  />
+                  <Button
+                    onClick={validatePromoCode}
+                    disabled={!promoCode.trim() || isValidatingPromo}
+                    variant="outline"
+                  >
+                    {isValidatingPromo ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Apply"
+                    )}
+                  </Button>
+                </div>
+              )}
+              <p className="text-xs text-gray-400">
+                Have a promo code? Enter it above to get a discount on your lottery entry.
+              </p>
             </CardContent>
           </Card>
 
@@ -218,7 +394,7 @@ const LotteryEntry = () => {
             ) : (
               <CreditCard className="w-4 h-4 mr-2" />
             )}
-            {autoRenew ? 'Subscribe' : 'Pay'} £{totalCost}
+            {autoRenew ? 'Subscribe' : 'Pay'} £{totalCost.toFixed(2)}
           </Button>
 
           {validLines.length === 0 && (
