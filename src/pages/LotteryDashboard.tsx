@@ -112,12 +112,15 @@ const LotteryDashboard = () => {
       setPreviousEntries(previous);
 
       // Load user's subscription
+      console.log('Loading subscription for user:', user?.id);
       const { data: subscriptionData, error: subscriptionError } = await supabase
         .from('lottery_subscriptions')
         .select('*')
         .eq('user_id', user?.id)
         .eq('status', 'active')
         .maybeSingle();
+
+      console.log('Subscription query result:', { subscriptionData, subscriptionError });
 
       if (subscriptionError && subscriptionError.code !== 'PGRST116') {
         throw subscriptionError;
@@ -126,6 +129,7 @@ const LotteryDashboard = () => {
 
       // Load detailed subscription information from Stripe
       if (subscriptionData) {
+        console.log('Found subscription, loading details from Stripe...');
         try {
           const { data: detailsData, error: detailsError } = await supabase.functions.invoke('get-subscription-details', {
             headers: {
@@ -133,14 +137,24 @@ const LotteryDashboard = () => {
             }
           });
 
+          console.log('Subscription details response:', { detailsData, detailsError });
+
           if (detailsError) {
             console.error('Error loading subscription details:', detailsError);
+            // Set empty subscription details to stop the loading spinner
+            setSubscriptionDetails({ hasSubscription: false });
           } else {
             setSubscriptionDetails(detailsData);
           }
         } catch (error) {
           console.error('Failed to load subscription details:', error);
+          // Set empty subscription details to stop the loading spinner
+          setSubscriptionDetails({ hasSubscription: false });
         }
+      } else {
+        console.log('No subscription found');
+        // No subscription, so set details to indicate no subscription
+        setSubscriptionDetails({ hasSubscription: false });
       }
 
       // Load latest draw
