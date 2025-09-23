@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, User, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
+import { Mail, Lock, User, ArrowLeft, AlertCircle, CheckCircle, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,11 +17,24 @@ const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Reset form state when switching tabs
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setDateOfBirth("");
+    setTermsAccepted(false);
+    setError("");
+    setSuccessMessage("");
+  };
 
   useEffect(() => {
     // Check if user is already logged in
@@ -75,6 +89,19 @@ const AuthPage = () => {
     }
   };
 
+  const calculateAge = (birthDate: string): number => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -89,6 +116,25 @@ const AuthPage = () => {
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!dateOfBirth) {
+      setError("Please enter your date of birth.");
+      setIsLoading(false);
+      return;
+    }
+
+    const age = calculateAge(dateOfBirth);
+    if (age < 18) {
+      setError("You must be 18 or over to register for the lottery.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError("Please read and accept the Terms & Conditions to continue.");
       setIsLoading(false);
       return;
     }
@@ -150,7 +196,7 @@ const AuthPage = () => {
                 <p className="text-gray-400">Sign in or create an account to play</p>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="signin" className="space-y-6">
+                <Tabs defaultValue="signin" className="space-y-6" onValueChange={resetForm}>
                   <TabsList className="grid w-full grid-cols-2 bg-gray-800">
                     <TabsTrigger value="signin" className="data-[state=active]:bg-blue-600">
                       Sign In
@@ -268,24 +314,107 @@ const AuthPage = () => {
                         </div>
                       </div>
 
+                       <div className="space-y-2">
+                         <Label htmlFor="confirm-password" className="text-white">
+                           Confirm Password
+                         </Label>
+                         <div className="relative">
+                           <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                           <Input
+                             id="confirm-password"
+                             type="password"
+                             placeholder="Confirm your password"
+                             value={confirmPassword}
+                             onChange={(e) => setConfirmPassword(e.target.value)}
+                             className="pl-10 bg-gray-800 border-gray-700 text-white"
+                             required
+                           />
+                         </div>
+                       </div>
+
+                       <div className="space-y-2">
+                         <Label htmlFor="signup-dob" className="text-white">
+                           Date of Birth
+                         </Label>
+                         <div className="relative">
+                           <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                           <Input
+                             id="signup-dob"
+                             type="date"
+                             value={dateOfBirth}
+                             onChange={(e) => setDateOfBirth(e.target.value)}
+                             className="pl-10 bg-gray-800 border-gray-700 text-white"
+                             required
+                           />
+                         </div>
+                         <p className="text-xs text-gray-400">You must be 18 or over to participate</p>
+                       </div>
+
+                       <div className="space-y-2">
+                         <div className="flex items-start space-x-2">
+                           <Checkbox
+                             id="terms"
+                             checked={termsAccepted}
+                             onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                             className="border-gray-600 data-[state=checked]:bg-blue-600"
+                           />
+                           <Label 
+                             htmlFor="terms" 
+                             className="text-sm text-gray-300 leading-5 cursor-pointer"
+                           >
+                             I have read and agree to the{" "}
+                             <Link 
+                               to="/lottery/terms" 
+                               className="text-blue-400 hover:text-blue-300 underline"
+                               target="_blank"
+                             >
+                               Terms and Conditions
+                             </Link>
+                           </Label>
+                         </div>
+                       </div>
+
                       <div className="space-y-2">
-                        <Label htmlFor="confirm-password" className="text-white">
-                          Confirm Password
+                        <Label htmlFor="signup-dob" className="text-white">
+                          Date of Birth
                         </Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <Input
-                            id="confirm-password"
-                            type="password"
-                            placeholder="Confirm your password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            id="signup-dob"
+                            type="date"
+                            value={dateOfBirth}
+                            onChange={(e) => setDateOfBirth(e.target.value)}
                             className="pl-10 bg-gray-800 border-gray-700 text-white"
                             required
                           />
                         </div>
+                        <p className="text-xs text-gray-400">You must be 18 or over to participate</p>
                       </div>
 
+                      <div className="space-y-2">
+                        <div className="flex items-start space-x-2">
+                          <Checkbox
+                            id="terms"
+                            checked={termsAccepted}
+                            onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                            className="border-gray-600 data-[state=checked]:bg-blue-600"
+                          />
+                          <Label 
+                            htmlFor="terms" 
+                            className="text-sm text-gray-300 leading-5 cursor-pointer"
+                          >
+                            I have read and agree to the{" "}
+                            <Link 
+                              to="/lottery/terms" 
+                              className="text-blue-400 hover:text-blue-300 underline"
+                              target="_blank"
+                            >
+                              Terms and Conditions
+                            </Link>
+                          </Label>
+                        </div>
+                      </div>
                       <Button
                         type="submit"
                         className="w-full bg-green-600 hover:bg-green-700"
