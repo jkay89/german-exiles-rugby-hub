@@ -96,6 +96,7 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    console.log("AdminContext login called with email:", email);
     try {
       setLoading(true);
       
@@ -103,31 +104,40 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
         email,
         password,
       });
+      console.log("Supabase auth response:", { data: !!data, error });
 
       if (error) {
+        console.log("Auth error:", error);
         return { success: false, error: error.message };
       }
 
       if (data.user) {
+        console.log("User authenticated, checking admin role for user:", data.user.id);
         // Check if user has admin role
         const { data: isAdminResult, error: roleError } = await supabase
           .rpc('is_admin', { _user_id: data.user.id });
         
+        console.log("Admin role check result:", { isAdminResult, roleError });
+        
         if (roleError) {
+          console.log("Role check error, signing out:", roleError);
           await supabase.auth.signOut(); // Sign out if role check fails
           return { success: false, error: 'Failed to verify admin permissions' };
         }
 
         if (!isAdminResult) {
+          console.log("User is not admin, signing out");
           await supabase.auth.signOut(); // Sign out if not admin
           return { success: false, error: 'You do not have admin permissions' };
         }
 
+        console.log("Login successful!");
         return { success: true };
       }
 
       return { success: false, error: 'Authentication failed' };
     } catch (error) {
+      console.log("Login exception:", error);
       return { success: false, error: 'An unexpected error occurred' };
     } finally {
       setLoading(false);
