@@ -4,6 +4,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Link,
   Preview,
   Text,
@@ -35,6 +36,16 @@ export const SubscriptionConfirmationEmail = ({
     <Preview>Your lottery subscription is active!</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Section style={logoSection}>
+          <Img
+            src="https://hmjwfnsygwzijjgrygia.supabase.co/storage/v1/object/public/media/d5497b13-60f3-4490-9abb-bc42b3027140.png"
+            alt="German Exiles RL Logo"
+            width="80"
+            height="80"
+            style={logoStyle}
+          />
+          <Text style={brandText}>German Exiles RL</Text>
+        </Section>
         <Heading style={h1}>🎯 Lottery Subscription Confirmed!</Heading>
         
         <Text style={text}>
@@ -192,6 +203,24 @@ const numberBall = {
   fontSize: '16px',
   fontWeight: 'bold',
   textAlign: 'center' as const,
+}
+
+const logoSection = {
+  textAlign: 'center' as const,
+  margin: '20px 0 30px',
+}
+
+const logoStyle = {
+  margin: '0 auto',
+  display: 'block',
+}
+
+const brandText = {
+  color: '#d4af37',
+  fontSize: '18px',
+  fontWeight: 'bold',
+  textAlign: 'center' as const,
+  margin: '10px 0 0',
 }
 
 const footer = {
