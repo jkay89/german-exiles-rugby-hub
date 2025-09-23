@@ -717,6 +717,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_promo_usage: {
+        Args: { promo_name: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: { _user_id?: string }
         Returns: boolean
