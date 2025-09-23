@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trophy, Calendar, Users, Banknote } from "lucide-react";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
+import SubscriptionManager from "@/components/lottery/SubscriptionManager";
 
 const Lottery = () => {
   return (
@@ -236,8 +237,11 @@ const Lottery = () => {
               </p>
             </div>
             
-            {/* Lottery Entry Component */}
-            <LotteryEntry />
+          {/* Lottery Entry Component */}
+          <LotteryEntry />
+          
+          {/* Subscription Management for logged-in users */}
+          <SubscriptionManager />
             
             <div className="text-center pt-8">
               <Button size="lg" variant="outline" asChild>

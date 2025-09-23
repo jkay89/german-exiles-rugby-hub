@@ -1,115 +1,320 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Mail, Lock, User, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAuth = async (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    checkUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+    setSuccessMessage("");
 
     try {
-      const { error } = isSignUp 
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
-        toast({
-          title: "Authentication error",
-          description: error.message,
-          variant: "destructive",
-        });
+        if (error.message.includes("Invalid login credentials")) {
+          setError("Invalid email or password. Please check your credentials and try again.");
+        } else if (error.message.includes("Email not confirmed")) {
+          setError("Please check your email and click the confirmation link before signing in.");
+        } else {
+          setError(error.message);
+        }
       } else {
         toast({
-          title: isSignUp ? "Account created" : "Login successful",
-          description: isSignUp ? "Please check your email to verify your account" : "Welcome back!",
+          title: "Welcome back!",
+          description: "You've successfully signed in.",
         });
-        if (!isSignUp) {
-          navigate("/admin/dashboard");
-        }
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccessMessage("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
       });
+
+      if (error) {
+        if (error.message.includes("User already registered")) {
+          setError("An account with this email already exists. Please sign in instead.");
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setSuccessMessage("Please check your email for a confirmation link to complete your registration.");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="container mx-auto px-6 py-12"
-      >
-        <div className="max-w-md mx-auto bg-gray-900 p-8 rounded-lg border border-gray-800">
-          <h1 className="text-2xl font-bold text-white mb-6 text-center">
-            {isSignUp ? "Create Account" : "Admin Login"}
-          </h1>
-          
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="text-sm text-gray-400 block mb-1">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-gray-800 border-gray-700 text-white"
-                required
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="text-sm text-gray-400 block mb-1">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-gray-800 border-gray-700 text-white"
-                required
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-german-red hover:bg-german-gold text-white"
-              disabled={isLoading}
-            >
-              {isLoading ? "Processing..." : isSignUp ? "Sign Up" : "Login"}
-            </Button>
-
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="w-full text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
-            </button>
-          </form>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <section className="py-12 px-4 border-b border-gray-800">
+        <div className="max-w-md mx-auto">
+          <Button variant="outline" asChild className="mb-6">
+            <Link to="/" className="inline-flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
+          </Button>
         </div>
-      </motion.div>
+      </section>
+
+      {/* Auth Forms */}
+      <section className="py-12 px-4">
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl text-white">
+                  German Exiles Lottery
+                </CardTitle>
+                <p className="text-gray-400">Sign in or create an account to play</p>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="signin" className="space-y-6">
+                  <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+                    <TabsTrigger value="signin" className="data-[state=active]:bg-blue-600">
+                      Sign In
+                    </TabsTrigger>
+                    <TabsTrigger value="signup" className="data-[state=active]:bg-blue-600">
+                      Sign Up
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Error/Success Messages */}
+                  {error && (
+                    <Alert className="border-red-600/50 bg-red-600/10">
+                      <AlertCircle className="h-4 w-4 text-red-400" />
+                      <AlertDescription className="text-red-400">
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {successMessage && (
+                    <Alert className="border-green-600/50 bg-green-600/10">
+                      <CheckCircle className="h-4 w-4 text-green-400" />
+                      <AlertDescription className="text-green-400">
+                        {successMessage}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Sign In Form */}
+                  <TabsContent value="signin">
+                    <form onSubmit={handleSignIn} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-email" className="text-white">
+                          Email
+                        </Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="signin-email"
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-10 bg-gray-800 border-gray-700 text-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-password" className="text-white">
+                          Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="signin-password"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-10 bg-gray-800 border-gray-700 text-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Signing In..." : "Sign In"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+
+                  {/* Sign Up Form */}
+                  <TabsContent value="signup">
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="text-white">
+                          Email
+                        </Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="signup-email"
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-10 bg-gray-800 border-gray-700 text-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="text-white">
+                          Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="signup-password"
+                            type="password"
+                            placeholder="Choose a password (min 6 characters)"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-10 bg-gray-800 border-gray-700 text-white"
+                            minLength={6}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password" className="text-white">
+                          Confirm Password
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="confirm-password"
+                            type="password"
+                            placeholder="Confirm your password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="pl-10 bg-gray-800 border-gray-700 text-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Creating Account..." : "Create Account"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+
+                <Separator className="my-6 bg-gray-700" />
+
+                <div className="text-center text-sm text-gray-400">
+                  <p>
+                    By creating an account, you agree to our{" "}
+                    <Link to="/lottery/terms" className="text-blue-400 hover:text-blue-300">
+                      Terms & Conditions
+                    </Link>
+                  </p>
+                  <p className="mt-2">
+                    Must be 18+ to participate in the lottery
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 };

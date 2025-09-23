@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { useEffect } from "react";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
@@ -26,6 +27,7 @@ import MediaFolder from "./pages/MediaFolder";
 import Lottery from "./pages/Lottery";
 import LotteryTerms from "./pages/LotteryTerms";
 import LotterySuccess from "./pages/LotterySuccess";
+import AuthPage from "./pages/auth/AuthPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPlayers from "./pages/admin/AdminPlayers";
@@ -65,40 +67,43 @@ const App = () => (
       <Sonner />
       <AdminProvider>
         <LanguageProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <Navigation />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/heritage-team" element={<HeritageTeam />} />
-              <Route path="/community-team" element={<CommunityTeam />} />
-              <Route path="/exiles-9s" element={<Exiles9s />} />
-              <Route path="/coaching-team" element={<CoachingTeam />} />
-              <Route path="/committee-members" element={<CommitteeMembers />} />
-              <Route path="/documents" element={<Documents />} />
-              <Route path="/fixtures" element={<Fixtures />} />
-              <Route path="/nrld" element={<NRLD />} />
-              <Route path="/sponsors" element={<Sponsors />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/news/:id" element={<NewsArticle />} />
-              <Route path="/media" element={<Media />} />
-              <Route path="/media/:id" element={<MediaFolder />} />
-              <Route path="/lottery" element={<Lottery />} />
-              <Route path="/lottery/terms" element={<LotteryTerms />} />
-              <Route path="/lottery/success" element={<LotterySuccess />} />
-              <Route path="/admin" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/players" element={<AdminPlayers />} />
-              <Route path="/admin/news" element={<AdminNews />} />
-              <Route path="/admin/media" element={<AdminMedia />} />
-              <Route path="/admin/sponsors" element={<AdminSponsors />} />
-              <Route path="/admin/fixtures" element={<AdminFixtures />} />
-              <Route path="/admin/committee" element={<AdminCommittee />} />
-              <Route path="/admin/documents" element={<AdminDocuments />} />
-            </Routes>
-          </BrowserRouter>
+          <AuthProvider>
+            <BrowserRouter>
+              <ScrollToTop />
+              <Navigation />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/heritage-team" element={<HeritageTeam />} />
+                <Route path="/community-team" element={<CommunityTeam />} />
+                <Route path="/exiles-9s" element={<Exiles9s />} />
+                <Route path="/coaching-team" element={<CoachingTeam />} />
+                <Route path="/committee-members" element={<CommitteeMembers />} />
+                <Route path="/documents" element={<Documents />} />
+                <Route path="/fixtures" element={<Fixtures />} />
+                <Route path="/nrld" element={<NRLD />} />
+                <Route path="/sponsors" element={<Sponsors />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:id" element={<NewsArticle />} />
+                <Route path="/media" element={<Media />} />
+                <Route path="/media/:id" element={<MediaFolder />} />
+                <Route path="/lottery" element={<Lottery />} />
+                <Route path="/lottery/terms" element={<LotteryTerms />} />
+                <Route path="/lottery/success" element={<LotterySuccess />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/admin" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/players" element={<AdminPlayers />} />
+                <Route path="/admin/news" element={<AdminNews />} />
+                <Route path="/admin/media" element={<AdminMedia />} />
+                <Route path="/admin/sponsors" element={<AdminSponsors />} />
+                <Route path="/admin/fixtures" element={<AdminFixtures />} />
+                <Route path="/admin/committee" element={<AdminCommittee />} />
+                <Route path="/admin/documents" element={<AdminDocuments />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
         </LanguageProvider>
       </AdminProvider>
     </TooltipProvider>
