@@ -1,1 +1,13 @@
 project_id = "hmjwfnsygwzijjgrygia"
+
+[functions.create-lottery-payment]
+verify_jwt = false
+
+[functions.create-lottery-subscription]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.notify-lottery-winners]
+verify_jwt = false
