@@ -155,6 +155,150 @@ export type Database = {
         }
         Relationships: []
       }
+      lottery_draws: {
+        Row: {
+          created_at: string
+          draw_date: string
+          id: string
+          jackpot_amount: number | null
+          lucky_dip_amount: number | null
+          winning_numbers: number[]
+        }
+        Insert: {
+          created_at?: string
+          draw_date: string
+          id?: string
+          jackpot_amount?: number | null
+          lucky_dip_amount?: number | null
+          winning_numbers: number[]
+        }
+        Update: {
+          created_at?: string
+          draw_date?: string
+          id?: string
+          jackpot_amount?: number | null
+          lucky_dip_amount?: number | null
+          winning_numbers?: number[]
+        }
+        Relationships: []
+      }
+      lottery_entries: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          line_number: number
+          numbers: number[]
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          line_number?: number
+          numbers: number[]
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          line_number?: number
+          numbers?: number[]
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lottery_results: {
+        Row: {
+          created_at: string
+          draw_id: string
+          entry_id: string
+          id: string
+          is_winner: boolean
+          matches: number
+          prize_amount: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          draw_id: string
+          entry_id: string
+          id?: string
+          is_winner?: boolean
+          matches?: number
+          prize_amount?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          draw_id?: string
+          entry_id?: string
+          id?: string
+          is_winner?: boolean
+          matches?: number
+          prize_amount?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lottery_results_draw_id_fkey"
+            columns: ["draw_id"]
+            isOneToOne: false
+            referencedRelation: "lottery_draws"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lottery_results_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "lottery_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lottery_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          lines_count: number
+          next_draw_date: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lines_count?: number
+          next_draw_date?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lines_count?: number
+          next_draw_date?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       media_folders: {
         Row: {
           created_at: string
