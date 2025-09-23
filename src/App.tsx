@@ -23,6 +23,8 @@ import News from "./pages/News";
 import NewsArticle from "./pages/NewsArticle";
 import Media from "./pages/Media";
 import MediaFolder from "./pages/MediaFolder";
+import Lottery from "./pages/Lottery";
+import LotteryTerms from "./pages/LotteryTerms";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPlayers from "./pages/admin/AdminPlayers";
@@ -82,6 +84,8 @@ const App = () => (
               <Route path="/news/:id" element={<NewsArticle />} />
               <Route path="/media" element={<Media />} />
               <Route path="/media/:id" element={<MediaFolder />} />
+              <Route path="/lottery" element={<Lottery />} />
+              <Route path="/lottery/terms" element={<LotteryTerms />} />
               <Route path="/admin" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/players" element={<AdminPlayers />} />
