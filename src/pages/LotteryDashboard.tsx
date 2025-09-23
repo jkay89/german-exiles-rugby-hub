@@ -28,6 +28,20 @@ interface LotterySubscription {
   next_draw_date: string;
 }
 
+interface SubscriptionDetails {
+  hasSubscription: boolean;
+  status?: string;
+  linesCount?: number;
+  pricePerLine?: number;
+  totalAmount?: number;
+  currency?: string;
+  nextPaymentDate?: string;
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+  stripeSubscriptionId?: string;
+  createdAt?: string;
+}
+
 interface LotteryDraw {
   id: string;
   draw_date: string;
@@ -53,6 +67,7 @@ const LotteryDashboard = () => {
   const [currentEntries, setCurrentEntries] = useState<LotteryEntry[]>([]);
   const [previousEntries, setPreviousEntries] = useState<LotteryEntry[]>([]);
   const [subscription, setSubscription] = useState<LotterySubscription | null>(null);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
   const [results, setResults] = useState<LotteryResult[]>([]);
   const [latestDraw, setLatestDraw] = useState<LotteryDraw | null>(null);
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
@@ -107,6 +122,25 @@ const LotteryDashboard = () => {
         throw subscriptionError;
       }
       setSubscription(subscriptionData);
+
+      // Load detailed subscription information from Stripe
+      if (subscriptionData) {
+        try {
+          const { data: detailsData, error: detailsError } = await supabase.functions.invoke('get-subscription-details', {
+            headers: {
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            }
+          });
+
+          if (detailsError) {
+            console.error('Error loading subscription details:', detailsError);
+          } else {
+            setSubscriptionDetails(detailsData);
+          }
+        } catch (error) {
+          console.error('Failed to load subscription details:', error);
+        }
+      }
 
       // Load latest draw
       const { data: drawData, error: drawError } = await supabase
@@ -290,30 +324,131 @@ const LotteryDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {subscription ? (
-              <div className="flex items-center justify-between">
-                <div>
-                  <Badge variant={subscription.status === 'active' ? 'default' : 'secondary'}>
-                    {subscription.status.toUpperCase()}
-                  </Badge>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {subscription.lines_count} line{subscription.lines_count > 1 ? 's' : ''} active
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Next draw: {formatDrawDate(nextDrawDate)}
-                  </p>
+            {subscription && subscriptionDetails ? (
+              <div className="space-y-6">
+                {/* Status Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">Status</h3>
+                    <Badge variant={subscriptionDetails.status === 'active' ? 'default' : 'secondary'} className="text-sm">
+                      {subscriptionDetails.status?.toUpperCase()}
+                    </Badge>
+                    {subscriptionDetails.cancelAtPeriodEnd && (
+                      <p className="text-xs text-yellow-400 mt-1">Cancels at period end</p>
+                    )}
+                  </div>
+                  
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">Monthly Cost</h3>
+                    <p className="text-xl font-bold text-white">
+                      £{subscriptionDetails.totalAmount?.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      £{subscriptionDetails.pricePerLine?.toFixed(2)} per line × {subscriptionDetails.linesCount} lines
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">Next Payment</h3>
+                    <p className="text-lg font-semibold text-white">
+                      {subscriptionDetails.nextPaymentDate ? 
+                        new Date(subscriptionDetails.nextPaymentDate).toLocaleDateString('en-GB', { 
+                          day: 'numeric', 
+                          month: 'long',
+                          year: 'numeric'
+                        }) : 'N/A'
+                      }
+                    </p>
+                    <p className="text-xs text-gray-400">1st of each month</p>
+                  </div>
                 </div>
-                <Button variant="outline" onClick={cancelSubscription}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage Subscription
-                </Button>
+
+                {/* Subscription Details */}
+                <div className="border-t border-gray-600 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 mb-2">Subscription Details</h4>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-white">
+                          <span className="text-gray-400">Lines:</span> {subscriptionDetails.linesCount}
+                        </p>
+                        <p className="text-white">
+                          <span className="text-gray-400">Started:</span> {' '}
+                          {new Date(subscriptionDetails.createdAt || '').toLocaleDateString('en-GB')}
+                        </p>
+                        <p className="text-white">
+                          <span className="text-gray-400">Next Draw:</span> {formatDrawDate(nextDrawDate)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 mb-2">Payment Info</h4>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-white">
+                          <span className="text-gray-400">Billing Cycle:</span> Monthly
+                        </p>
+                        <p className="text-white">
+                          <span className="text-gray-400">Current Period Ends:</span> {' '}
+                          {subscriptionDetails.currentPeriodEnd ? 
+                            new Date(subscriptionDetails.currentPeriodEnd).toLocaleDateString('en-GB') : 'N/A'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Management Actions */}
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" onClick={cancelSubscription}>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Manage Subscription
+                    </Button>
+                    
+                    {!subscriptionDetails.cancelAtPeriodEnd && (
+                      <Button 
+                        variant="outline" 
+                        className="border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black"
+                        onClick={cancelSubscription}
+                      >
+                        Pause Subscription
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline"
+                      className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
+                      disabled
+                    >
+                      Change Numbers
+                      <span className="text-xs ml-2">(Available in dashboard)</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : subscription ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-white mr-2" />
+                <span>Loading subscription details...</span>
               </div>
             ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-400 mb-4">No active subscription found</p>
-                <Button asChild>
-                  <a href="/lottery">Start Playing</a>
-                </Button>
+              <div className="text-center py-6">
+                <div className="bg-gray-700 rounded-lg p-6">
+                  <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">No Active Subscription</h3>
+                  <p className="text-gray-400 mb-4">
+                    Start a monthly subscription to automatically enter every draw with your chosen numbers.
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-400 mb-4">
+                    <p>✓ Never miss a draw</p>
+                    <p>✓ Same numbers every month</p>
+                    <p>✓ Cancel anytime</p>
+                    <p>✓ Manage your subscription online</p>
+                  </div>
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <a href="/lottery">Start Subscription</a>
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>
