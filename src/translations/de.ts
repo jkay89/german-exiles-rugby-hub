@@ -3,7 +3,11 @@ export default {
   about: "Über Uns",
   heritage_team: "Heritage Team",
   community_team: "Community Team",
+  committee_members: "Vorstandsmitglieder",
+  coaching_team: "Trainer & Unterstützungsteam",
+  documents: "Dokumente",
   staff: "Mitarbeiter",
+  the_club: "Der Verein",
   fixtures: "Spielplan",
   latest_news: "Aktuelle Nachrichten",
   news: "Nachrichten",
@@ -68,6 +72,19 @@ export default {
   staff_title: "Trainer & Unterstützungspersonal",
   staff_description: "Lernen Sie die engagierten Personen kennen, die hinter den Kulissen arbeiten, um unsere Spieler zu entwickeln und das Wachstum des Rugby League in Deutschland zu fördern.",
   
+  // Committee Members translations
+  committee_members_title: "Vorstandsmitglieder",
+  committee_members_description: "Lernen Sie die engagierten Vorstandsmitglieder kennen, die German Exiles Rugby League leiten und führen.",
+  
+  // Documents translations
+  documents_title: "Dokumente",
+  documents_description: "Zugang zu wichtigen Vereinsdokumenten einschließlich unserer Satzung, Verhaltenskodex und Sitzungsprotokollen.",
+  constitution: "Satzung",
+  code_of_conduct: "Verhaltenskodex", 
+  meeting_minutes: "Sitzungsprotokolle",
+  agm_minutes: "Jahreshauptversammlung Protokolle",
+  download_document: "Herunterladen",
+  
   // Fixtures page translations
   fixtures_results: "Spielplan & Ergebnisse",
   fixtures_description: "Sehen Sie sich kommende Spiele, vergangene Ergebnisse und Spielerstatistiken für die German Exiles Teams an.",
@@ -112,6 +129,11 @@ export default {
   platinum_sponsor: "Platin Sponsor",
   gold_sponsor: "Gold Sponsor",
   silver_sponsors: "Silber Sponsoren",
+  media_partner: "Medienpartner",
   affiliate_sponsors: "Partner Sponsoren",
   visit_website: "Webseite Besuchen",
+  
+  // Additional fixture and result related terms
+  back_to_media: "Zurück zu Medien",
+  no_media_items: "Keine Medieninhalte verfügbar",
 };
