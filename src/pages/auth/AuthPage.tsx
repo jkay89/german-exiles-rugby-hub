@@ -372,49 +372,8 @@ const AuthPage = () => {
                              </Link>
                            </Label>
                          </div>
-                       </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-dob" className="text-white">
-                          Date of Birth
-                        </Label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="signup-dob"
-                            type="date"
-                            value={dateOfBirth}
-                            onChange={(e) => setDateOfBirth(e.target.value)}
-                            className="pl-10 bg-gray-800 border-gray-700 text-white"
-                            required
-                          />
                         </div>
-                        <p className="text-xs text-gray-400">You must be 18 or over to participate</p>
-                      </div>
 
-                      <div className="space-y-2">
-                        <div className="flex items-start space-x-2">
-                          <Checkbox
-                            id="terms"
-                            checked={termsAccepted}
-                            onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                            className="border-gray-600 data-[state=checked]:bg-blue-600"
-                          />
-                          <Label 
-                            htmlFor="terms" 
-                            className="text-sm text-gray-300 leading-5 cursor-pointer"
-                          >
-                            I have read and agree to the{" "}
-                            <Link 
-                              to="/lottery/terms" 
-                              className="text-blue-400 hover:text-blue-300 underline"
-                              target="_blank"
-                            >
-                              Terms and Conditions
-                            </Link>
-                          </Label>
-                        </div>
-                      </div>
                       <Button
                         type="submit"
                         className="w-full bg-green-600 hover:bg-green-700"
