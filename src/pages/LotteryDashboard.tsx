@@ -16,7 +16,7 @@ interface LotteryEntry {
   numbers: number[];
   line_number: number;
   is_active: boolean;
-  stripe_subscription_id: string;
+  stripe_subscription_id?: string;
   draw_date: string;
 }
 
@@ -279,7 +279,7 @@ const LotteryDashboard = () => {
   };
 
   const canEditEntry = (entry: LotteryEntry) => {
-    return entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_');
+    return entry && entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_');
   };
 
   if (authLoading) {
@@ -478,7 +478,7 @@ const LotteryDashboard = () => {
                 </CardTitle>
                 <CardDescription>
                   Your lottery numbers for the next draw
-                  {canEditEntry(currentEntries[0]) && " - Click 'Edit' to change subscription numbers"}
+                  {currentEntries.length > 0 && currentEntries[0] && canEditEntry(currentEntries[0]) && " - Click 'Edit' to change subscription numbers"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
