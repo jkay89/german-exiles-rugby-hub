@@ -28,9 +28,8 @@ serve(async (req: Request) => {
     // Sample data for test emails
     const testData = {
       customerName: "John Doe",
-      numbers: [7, 14, 21, 28, 35, 42],
+      numbers: [7, 14, 21, 28],
       drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Next week
-      jackpotAmount: 50000,
       lineNumber: 12345,
       paymentAmount: 5
     };
@@ -42,7 +41,6 @@ serve(async (req: Request) => {
         userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
-        jackpotAmount: testData.jackpotAmount,
         lineNumber: testData.lineNumber
       }
     });
@@ -54,7 +52,6 @@ serve(async (req: Request) => {
         userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
-        jackpotAmount: testData.jackpotAmount,
         lineNumber: testData.lineNumber,
         paymentAmount: testData.paymentAmount,
         emailType: 'confirmation',
@@ -69,7 +66,6 @@ serve(async (req: Request) => {
         userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
-        jackpotAmount: testData.jackpotAmount,
         lineNumber: testData.lineNumber,
         paymentAmount: testData.paymentAmount,
         emailType: 'monthly'
