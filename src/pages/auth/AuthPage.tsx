@@ -27,7 +27,7 @@ const AuthPage = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/");
+        navigate("/lottery");
       }
     };
     checkUser();
@@ -35,7 +35,7 @@ const AuthPage = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/");
+        navigate("/lottery");
       }
     });
 
@@ -94,7 +94,7 @@ const AuthPage = () => {
     }
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/lottery`;
       
       const { error } = await supabase.auth.signUp({
         email,
