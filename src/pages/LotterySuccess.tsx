@@ -68,9 +68,9 @@ const LotterySuccess = () => {
                     <Link to="/lottery">Enter Another Draw</Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild>
-                    <Link to="/" className="inline-flex items-center gap-2">
+                    <Link to="/lottery" className="inline-flex items-center gap-2">
                       <ArrowLeft className="w-4 h-4" />
-                      Back to Home
+                      Back to Lottery
                     </Link>
                   </Button>
                 </div>
