@@ -11,6 +11,7 @@ import { Trash2, Plus, Save, Calendar, Percent, Gift, Users } from "lucide-react
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LotteryEntriesTable from "@/components/admin/LotteryEntriesTable";
+import { TestEmailSender } from "@/components/admin/TestEmailSender";
 
 interface LotteryEntry {
   id: string;
@@ -674,6 +675,11 @@ const AdminLottery = () => {
             )}
           </CardContent>
         </Card>
+        
+        {/* Test Email Sender */}
+        <div className="mb-8">
+          <TestEmailSender />
+        </div>
         
         {/* Lottery Entries Management */}
         <Card className="bg-gray-900 border-gray-800 text-white">
