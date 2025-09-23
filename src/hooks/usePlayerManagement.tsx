@@ -47,25 +47,30 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     const formData = new FormData(e.currentTarget);
     
     try {
-      // Handle file upload if there's a photo
-      const photoFile = formData.get('photo') as File;
       let photoUrl = null;
       
-      if (photoFile && photoFile.name) {
-        const fileExt = photoFile.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+      // Handle file upload if there's a selected file
+      const hasSelectedFile = formData.get('selectedFile') === 'true';
+      if (hasSelectedFile) {
+        const photoInput = e.currentTarget.querySelector('input[name="photo"]') as HTMLInputElement;
+        const file = photoInput?.files?.[0];
         
-        const { error: uploadError } = await supabase.storage
-          .from('players')
-          .upload(fileName, photoFile);
+        if (file) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
           
-        if (uploadError) throw uploadError;
-        
-        const { data } = supabase.storage
-          .from('players')
-          .getPublicUrl(fileName);
+          const { error: uploadError } = await supabase.storage
+            .from('players')
+            .upload(fileName, file);
+            
+          if (uploadError) throw uploadError;
           
-        photoUrl = data.publicUrl;
+          const { data } = supabase.storage
+            .from('players')
+            .getPublicUrl(fileName);
+            
+          photoUrl = data.publicUrl;
+        }
       }
       
       // Create the player object
@@ -112,25 +117,30 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     const formData = new FormData(e.currentTarget);
     
     try {
-      // Handle file upload if there's a photo
-      const photoFile = formData.get('photo') as File;
       let photoUrl = editingPlayer.photo_url;
       
-      if (photoFile && photoFile.name) {
-        const fileExt = photoFile.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+      // Handle file upload if there's a selected file
+      const hasSelectedFile = formData.get('selectedFile') === 'true';
+      if (hasSelectedFile) {
+        const photoInput = e.currentTarget.querySelector('input[name="photo"]') as HTMLInputElement;
+        const file = photoInput?.files?.[0];
         
-        const { error: uploadError } = await supabase.storage
-          .from('players')
-          .upload(fileName, photoFile);
+        if (file) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
           
-        if (uploadError) throw uploadError;
-        
-        const { data } = supabase.storage
-          .from('players')
-          .getPublicUrl(fileName);
+          const { error: uploadError } = await supabase.storage
+            .from('players')
+            .upload(fileName, file);
+            
+          if (uploadError) throw uploadError;
           
-        photoUrl = data.publicUrl;
+          const { data } = supabase.storage
+            .from('players')
+            .getPublicUrl(fileName);
+            
+          photoUrl = data.publicUrl;
+        }
       }
       
       // Update the player object

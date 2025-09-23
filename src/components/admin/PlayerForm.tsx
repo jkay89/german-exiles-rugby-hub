@@ -211,6 +211,9 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
         playerName={playerName}
       />
 
+      {/* Hidden input to track if we have a selected file */}
+      <input type="hidden" name="selectedFile" value={selectedFile ? "true" : "false"} />
+
       <div className="flex justify-end gap-2">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel}>
