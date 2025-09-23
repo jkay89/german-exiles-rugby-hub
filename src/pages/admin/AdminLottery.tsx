@@ -64,25 +64,25 @@ const AdminLottery = () => {
   }, [isAuthenticated, adminLoading, navigate]);
 
   useEffect(() => {
-    console.log("AdminLottery useEffect - isAuthenticated:", isAuthenticated, "adminLoading:", adminLoading);
     if (isAuthenticated) {
-      console.log("Fetching lottery data...");
-      fetchDraws();
+      Promise.all([
+        fetchDraws(),
+        fetchCurrentJackpot(),
+        fetchPromoCodes()
+      ]).finally(() => {
+        setLoading(false);
+      });
       fetchNextDrawDate();
-      fetchCurrentJackpot();
-      fetchPromoCodes();
     }
   }, [isAuthenticated]);
 
   const fetchDraws = async () => {
-    console.log("fetchDraws called");
     try {
       const { data, error } = await supabase
         .from('lottery_draws')
         .select('*')
         .order('draw_date', { ascending: false });
 
-      console.log("Draws fetch result:", { data, error });
       if (error) throw error;
       setDraws(data || []);
     } catch (error) {
@@ -92,23 +92,18 @@ const AdminLottery = () => {
         description: "Failed to fetch lottery draws",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchNextDrawDate = () => {
-    console.log("fetchNextDrawDate called");
-    // Calculate next draw date (last day of current month)
+    // Calculate next draw date (last day of next month)
     const now = new Date();
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const formattedDate = lastDayOfMonth.toISOString().split('T')[0];
-    console.log("Next draw date calculated:", formattedDate);
+    const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    const formattedDate = lastDayOfNextMonth.toISOString().split('T')[0];
     setNextDrawDate(formattedDate);
   };
 
   const fetchCurrentJackpot = async () => {
-    console.log("fetchCurrentJackpot called");
     try {
       const { data, error } = await supabase
         .from('lottery_settings')
@@ -116,7 +111,6 @@ const AdminLottery = () => {
         .eq('setting_key', 'current_jackpot')
         .maybeSingle();
 
-      console.log("Current jackpot fetch result:", { data, error });
       if (error) throw error;
       if (data) {
         setCurrentJackpot(Number(data.setting_value));
@@ -128,7 +122,6 @@ const AdminLottery = () => {
   };
 
   const updateCurrentJackpot = async () => {
-    console.log("updateCurrentJackpot called with amount:", newJackpotAmount);
     if (!newJackpotAmount || Number(newJackpotAmount) <= 0) {
       toast({
         title: "Invalid Amount",
@@ -148,7 +141,6 @@ const AdminLottery = () => {
           onConflict: 'setting_key'
         });
 
-      console.log("Update jackpot result:", { error });
       if (error) throw error;
 
       setCurrentJackpot(Number(newJackpotAmount));
@@ -441,7 +433,7 @@ const AdminLottery = () => {
           </CardHeader>
           <CardContent>
             <p className="text-gray-400">
-              Next scheduled draw: <span className="text-white">{new Date(nextDrawDate).toLocaleDateString('en-GB')}</span>
+              Next scheduled draw: <span className="text-white">{nextDrawDate ? new Date(nextDrawDate).toLocaleDateString('en-GB') : 'Calculating...'}</span>
             </p>
             <p className="text-sm text-gray-500 mt-2">
               This is automatically calculated as the last day of next month
