@@ -72,7 +72,7 @@ serve(async (req) => {
 
     // Send the email
     const { data, error } = await resend.emails.send({
-      from: 'Lottery <noreply@resend.dev>',
+      from: 'German Exiles Lottery <noreply@germanexilesrl.co.uk>',
       to: [userEmail],
       subject: subject,
       html: html,
