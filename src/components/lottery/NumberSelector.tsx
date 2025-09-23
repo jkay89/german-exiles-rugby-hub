@@ -140,4 +140,6 @@ const NumberSelector = ({
   );
 };
 
+// Explicitly export as both default and named export to handle module resolution issues
 export default NumberSelector;
+export { NumberSelector };
