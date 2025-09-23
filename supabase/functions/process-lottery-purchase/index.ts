@@ -87,11 +87,44 @@ serve(async (req) => {
       draw_date: nextDrawDate.toISOString().split('T')[0] // Format as YYYY-MM-DD
     }));
 
-    const { error: entriesError } = await supabaseClient
+    const { data: entryData, error: entriesError } = await supabaseClient
       .from('lottery_entries')
-      .insert(entries);
+      .insert(entries)
+      .select();
 
     if (entriesError) throw entriesError;
+
+    // Get current jackpot amount for email
+    const { data: jackpotData } = await supabaseClient
+      .from('lottery_settings')
+      .select('setting_value')
+      .eq('setting_key', 'current_jackpot')
+      .maybeSingle();
+    
+    const currentJackpot = jackpotData ? Number(jackpotData.setting_value) : 1000;
+
+    // Send confirmation email
+    try {
+      const { data: { users } } = await supabaseClient.auth.admin.listUsers();
+      const userRecord = users?.find(u => u.id === user.id);
+      
+      if (userRecord?.email) {
+        await supabaseClient.functions.invoke('send-lottery-purchase-email', {
+          body: {
+            userEmail: userRecord.email,
+            userName: userRecord.user_metadata?.full_name || userRecord.email?.split('@')[0],
+            numbers: entries[0].numbers,
+            drawDate: entries[0].draw_date,
+            jackpotAmount: currentJackpot,
+            lineNumber: entries[0].line_number
+          }
+        });
+        console.log('Purchase confirmation email sent');
+      }
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the purchase if email fails
+    }
 
     // If it's a subscription, also create/update subscription record
     if (entryType === 'subscription') {
@@ -108,6 +141,36 @@ serve(async (req) => {
         });
 
       if (subscriptionError) throw subscriptionError;
+
+      // Send subscription confirmation email
+      try {
+        const { data: { users } } = await supabaseClient.auth.admin.listUsers();
+        const userRecord = users?.find(u => u.id === user.id);
+        
+        if (userRecord?.email) {
+          // Calculate next payment date (1st of next month)
+          const nextPaymentDate = new Date();
+          nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+          nextPaymentDate.setDate(1);
+
+          await supabaseClient.functions.invoke('send-lottery-subscription-email', {
+            body: {
+              userEmail: userRecord.email,
+              userName: userRecord.user_metadata?.full_name || userRecord.email?.split('@')[0],
+              numbers: entries[0].numbers,
+              drawDate: entries[0].draw_date,
+              jackpotAmount: currentJackpot,
+              lineNumber: entries[0].line_number,
+              nextPaymentDate: nextPaymentDate.toISOString().split('T')[0],
+              emailType: 'confirmation'
+            }
+          });
+          console.log('Subscription confirmation email sent');
+        }
+      } catch (emailError) {
+        console.error('Failed to send subscription confirmation email:', emailError);
+        // Don't fail the subscription if email fails
+      }
     }
 
     // If promo code was used, increment usage count

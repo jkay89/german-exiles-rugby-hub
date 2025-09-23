@@ -63,6 +63,48 @@ serve(async (req) => {
         if (insertError) throw insertError;
 
         console.log(`Created ${newEntries.length} new entries for next draw`);
+
+        // Send monthly reminder emails for renewed subscriptions
+        try {
+          // Get current jackpot for email
+          const { data: jackpotData } = await supabaseClient
+            .from('lottery_settings')
+            .select('setting_value')
+            .eq('setting_key', 'current_jackpot')
+            .maybeSingle();
+          
+          const currentJackpot = jackpotData ? Number(jackpotData.setting_value) : 1000;
+
+          // Get all unique user IDs from the renewed entries
+          const userIds = [...new Set(newEntries.map(entry => entry.user_id))];
+          
+          // Get user emails
+          const { data: { users } } = await supabaseClient.auth.admin.listUsers();
+          
+          for (const userId of userIds) {
+            const user = users?.find(u => u.id === userId);
+            const userEntries = newEntries.filter(entry => entry.user_id === userId);
+            
+            if (user?.email && userEntries.length > 0) {
+              await supabaseClient.functions.invoke('send-lottery-subscription-email', {
+                body: {
+                  userEmail: user.email,
+                  userName: user.user_metadata?.full_name || user.email?.split('@')[0],
+                  numbers: userEntries[0].numbers,
+                  drawDate: userEntries[0].draw_date,
+                  jackpotAmount: currentJackpot,
+                  lineNumber: userEntries[0].line_number,
+                  emailType: 'monthly',
+                  paymentAmount: 5 // Standard lottery price per line
+                }
+              });
+              console.log(`Monthly reminder email sent to ${user.email}`);
+            }
+          }
+        } catch (emailError) {
+          console.error('Failed to send monthly emails:', emailError);
+          // Don't fail the process if email fails
+        }
       }
     }
 

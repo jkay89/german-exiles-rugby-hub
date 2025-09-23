@@ -1,0 +1,103 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "npm:resend@4.0.0";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
+import React from 'npm:react@18.3.1';
+import { SubscriptionConfirmationEmail } from './_templates/subscription-confirmation.tsx';
+import { MonthlyReminderEmail } from './_templates/monthly-reminder.tsx';
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  // Create Supabase client
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+  );
+
+  try {
+    const { 
+      userEmail, 
+      userName, 
+      numbers, 
+      drawDate, 
+      jackpotAmount, 
+      lineNumber,
+      nextPaymentDate,
+      emailType = 'confirmation', // 'confirmation' or 'monthly'
+      paymentAmount = 5 // Default lottery price
+    } = await req.json();
+
+    console.log(`Sending ${emailType} email to:`, userEmail);
+
+    let html;
+    let subject;
+
+    if (emailType === 'monthly') {
+      // Monthly reminder email
+      html = await renderAsync(
+        React.createElement(MonthlyReminderEmail, {
+          customerName: userName,
+          numbers: numbers,
+          drawDate: drawDate,
+          jackpotAmount: jackpotAmount,
+          lineNumber: lineNumber,
+          paymentAmount: paymentAmount,
+        })
+      );
+      subject = '📅 Monthly Lottery Entry Confirmed';
+    } else {
+      // Initial subscription confirmation
+      html = await renderAsync(
+        React.createElement(SubscriptionConfirmationEmail, {
+          customerName: userName,
+          numbers: numbers,
+          drawDate: drawDate,
+          jackpotAmount: jackpotAmount,
+          lineNumber: lineNumber,
+          nextPaymentDate: nextPaymentDate,
+        })
+      );
+      subject = '🎯 Lottery Subscription Confirmed!';
+    }
+
+    // Send the email
+    const { data, error } = await resend.emails.send({
+      from: 'Lottery <noreply@resend.dev>',
+      to: [userEmail],
+      subject: subject,
+      html: html,
+    });
+
+    if (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
+
+    console.log(`${emailType} email sent successfully:`, data);
+
+    return new Response(JSON.stringify({ success: true, emailId: data?.id }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+
+  } catch (error) {
+    console.error('Error in send-lottery-subscription-email function:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      details: 'Failed to send subscription email'
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});
