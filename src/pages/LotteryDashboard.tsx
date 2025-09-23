@@ -202,53 +202,25 @@ const LotteryDashboard = () => {
 
   const updateEntryNumbers = async (entryId: string, newNumbers: number[]) => {
     try {
-      const entry = currentEntries.find(e => e.id === entryId);
-      if (!entry) return;
+      // Simply update the existing entry with new numbers
+      const { error } = await supabase
+        .from('lottery_entries')
+        .update({ numbers: newNumbers })
+        .eq('id', entryId)
+        .eq('user_id', user?.id);
 
-      // If this is a subscription entry, create a new entry for the next draw
-      if (entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_')) {
-        // Calculate next draw date (first day of next month)
-        const nextDrawDate = new Date();
-        nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
-        nextDrawDate.setDate(1);
-        
-        // Create new entry for next draw with updated numbers
-        const { error: insertError } = await supabase
-          .from('lottery_entries')
-          .insert({
-            user_id: user?.id,
-            numbers: newNumbers,
-            line_number: entry.line_number,
-            is_active: true,
-            stripe_subscription_id: entry.stripe_subscription_id,
-            draw_date: nextDrawDate.toISOString().split('T')[0]
-          });
+      if (error) throw error;
 
-        if (insertError) throw insertError;
+      // Update local state
+      setCurrentEntries(prev => prev.map(entry => 
+        entry.id === entryId ? { ...entry, numbers: newNumbers } : entry
+      ));
 
-        toast({
-          title: "Numbers updated for future draws",
-          description: `Your subscription numbers have been updated and will be used starting from ${nextDrawDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.`
-        });
-      } else {
-        // Regular entry update (shouldn't happen with current logic)
-        const { error } = await supabase
-          .from('lottery_entries')
-          .update({ numbers: newNumbers })
-          .eq('id', entryId)
-          .eq('user_id', user?.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "Numbers updated",
-          description: "Your lottery numbers have been updated successfully."
-        });
-      }
-
-      // Refresh the data
-      await loadUserData();
       setEditingEntry(null);
+      toast({
+        title: "Numbers updated",
+        description: "Your subscription numbers have been updated for future draws."
+      });
       
     } catch (error: any) {
       toast({
@@ -511,8 +483,8 @@ const LotteryDashboard = () => {
                       ))}
                       
                       <div className="text-xs text-gray-400 bg-gray-800 p-3 rounded-lg">
-                        <strong>Note:</strong> Number changes will take effect for draws after the current draw period. 
-                        Current draw numbers cannot be modified once the draw period has started.
+                        <strong>Note:</strong> Your updated numbers will be used for all future draws. 
+                        The system automatically manages draw entries each month.
                       </div>
                     </div>
                   )}
