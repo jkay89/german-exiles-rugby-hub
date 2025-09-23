@@ -279,10 +279,15 @@ const Lottery = () => {
             </div>
           )}
             
-            <div className="text-center pt-8">
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/lottery/terms">Read Full Terms & Conditions</Link>
-              </Button>
+            <div className="text-center pt-8 space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/lottery/terms">Read Full Terms & Conditions</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/lottery/privacy">Privacy Policy & GDPR</Link>
+                </Button>
+              </div>
             </div>
           </motion.div>
         </div>

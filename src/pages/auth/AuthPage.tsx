@@ -434,6 +434,10 @@ const AuthPage = () => {
                     <Link to="/lottery/terms" className="text-blue-400 hover:text-blue-300">
                       Terms & Conditions
                     </Link>
+                    {" "}and{" "}
+                    <Link to="/lottery/privacy" className="text-blue-400 hover:text-blue-300">
+                      Privacy Policy
+                    </Link>
                   </p>
                   <p className="mt-2">
                     Must be 18+ to participate in the lottery
