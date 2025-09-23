@@ -108,11 +108,7 @@ serve(async (req) => {
     // If promo code was used, increment usage count
     if (promoCode) {
       const { error: promoError } = await supabaseClient
-        .from('lottery_promo_codes')
-        .update({ 
-          used_count: supabaseClient.raw('used_count + 1') 
-        })
-        .eq('code_name', promoCode);
+        .rpc('increment_promo_usage', { promo_name: promoCode });
 
       if (promoError) {
         console.error('Error updating promo code usage:', promoError);
