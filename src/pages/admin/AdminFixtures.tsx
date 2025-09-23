@@ -414,6 +414,7 @@ const AdminFixtures = () => {
                         <SelectItem value="Heritage Team">Heritage Team</SelectItem>
                         <SelectItem value="Community Team">Community Team</SelectItem>
                         <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
+                        <SelectItem value="National Team">National Team</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -604,6 +605,7 @@ const AdminFixtures = () => {
                         <SelectItem value="Heritage Team">Heritage Team</SelectItem>
                         <SelectItem value="Community Team">Community Team</SelectItem>
                         <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
+                        <SelectItem value="National Team">National Team</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
