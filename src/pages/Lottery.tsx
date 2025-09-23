@@ -144,7 +144,7 @@ const Lottery = () => {
                     the jackpot is shared equally.
                   </p>
                   <p className="text-2xl font-bold text-yellow-400 mb-2">
-                    £1,000 Jackpot
+                    Current Jackpot Prize: £1,000
                   </p>
                   <p className="text-sm text-gray-400">
                     Maximum prize: £25,000 (by law)
