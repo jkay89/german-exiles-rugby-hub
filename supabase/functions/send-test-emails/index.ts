@@ -38,8 +38,8 @@ serve(async (req: Request) => {
     // Send purchase confirmation email
     const purchaseEmailResponse = await supabase.functions.invoke('send-lottery-purchase-email', {
       body: {
-        customerEmail: emailAddress,
-        customerName: testData.customerName,
+        userEmail: emailAddress,
+        userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
         jackpotAmount: testData.jackpotAmount,
@@ -50,14 +50,14 @@ serve(async (req: Request) => {
     // Send subscription confirmation email
     const subscriptionEmailResponse = await supabase.functions.invoke('send-lottery-subscription-email', {
       body: {
-        customerEmail: emailAddress,
-        customerName: testData.customerName,
+        userEmail: emailAddress,
+        userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
         jackpotAmount: testData.jackpotAmount,
         lineNumber: testData.lineNumber,
         paymentAmount: testData.paymentAmount,
-        emailType: 'subscription_confirmation',
+        emailType: 'confirmation',
         nextPaymentDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // Next month
       }
     });
@@ -65,14 +65,14 @@ serve(async (req: Request) => {
     // Send monthly reminder email
     const reminderEmailResponse = await supabase.functions.invoke('send-lottery-subscription-email', {
       body: {
-        customerEmail: emailAddress,
-        customerName: testData.customerName,
+        userEmail: emailAddress,
+        userName: testData.customerName,
         numbers: testData.numbers,
         drawDate: testData.drawDate,
         jackpotAmount: testData.jackpotAmount,
         lineNumber: testData.lineNumber,
         paymentAmount: testData.paymentAmount,
-        emailType: 'monthly_reminder'
+        emailType: 'monthly'
       }
     });
 
