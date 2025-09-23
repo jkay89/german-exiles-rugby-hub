@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, RefreshCw, Trash2 } from "lucide-react";
+import { Loader2, User, RefreshCw, Trash2, Filter, Calendar, CreditCard } from "lucide-react";
 import { formatDrawDate } from "@/utils/drawDateUtils";
 
 interface LotteryEntry {
@@ -25,15 +28,26 @@ interface UserProfiles {
 
 const LotteryEntriesTable = () => {
   const [entries, setEntries] = useState<LotteryEntry[]>([]);
+  const [filteredEntries, setFilteredEntries] = useState<LotteryEntry[]>([]);
   const [userProfiles, setUserProfiles] = useState<UserProfiles>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [deletingEntry, setDeletingEntry] = useState<string | null>(null);
+  
+  // Filter states
+  const [drawDateFilter, setDrawDateFilter] = useState<string>('');
+  const [entryTypeFilter, setEntryTypeFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  
   const { toast } = useToast();
 
   useEffect(() => {
     fetchEntries();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [entries, drawDateFilter, entryTypeFilter, statusFilter]);
 
   const fetchEntries = async () => {
     try {
@@ -89,6 +103,49 @@ const LotteryEntriesTable = () => {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...entries];
+
+    // Filter by draw date
+    if (drawDateFilter) {
+      filtered = filtered.filter(entry => entry.draw_date === drawDateFilter);
+    }
+
+    // Filter by entry type
+    if (entryTypeFilter !== 'all') {
+      filtered = filtered.filter(entry => {
+        const isSubscription = entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_');
+        return entryTypeFilter === 'subscription' ? isSubscription : !isSubscription;
+      });
+    }
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(entry => {
+        return statusFilter === 'active' ? entry.is_active : !entry.is_active;
+      });
+    }
+
+    setFilteredEntries(filtered);
+  };
+
+  const clearFilters = () => {
+    setDrawDateFilter('');
+    setEntryTypeFilter('all');
+    setStatusFilter('all');
+  };
+
+  const getEntryType = (entry: LotteryEntry) => {
+    return entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_') 
+      ? 'subscription' 
+      : 'one-time';
+  };
+
+  const getUniqueDrawDates = () => {
+    const dates = [...new Set(entries.map(entry => entry.draw_date))];
+    return dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
   };
 
   const handleRefresh = async () => {
@@ -179,7 +236,12 @@ const LotteryEntriesTable = () => {
         <div className="flex items-center gap-2">
           <User className="w-5 h-5 text-green-400" />
           <span className="text-lg font-semibold text-white">
-            Total Entries: {entries.length}
+            Total Entries: {entries.length} 
+            {filteredEntries.length !== entries.length && (
+              <span className="text-sm text-gray-400 ml-2">
+                (Showing: {filteredEntries.length})
+              </span>
+            )}
           </span>
         </div>
         <Button
@@ -194,20 +256,98 @@ const LotteryEntriesTable = () => {
         </Button>
       </div>
 
-      {entries.length === 0 ? (
+      {/* Filters */}
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-4 h-4 text-blue-400" />
+          <span className="text-sm font-medium text-white">Filters</span>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <Label htmlFor="draw-date-filter" className="text-sm text-gray-300">Draw Date</Label>
+            <Select value={drawDateFilter} onValueChange={setDrawDateFilter}>
+              <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectValue placeholder="All dates" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-700 border-gray-600">
+                <SelectItem value="">All dates</SelectItem>
+                {getUniqueDrawDates().map((date) => (
+                  <SelectItem key={date} value={date}>
+                    {formatDrawDate(new Date(date))}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="entry-type-filter" className="text-sm text-gray-300">Entry Type</Label>
+            <Select value={entryTypeFilter} onValueChange={setEntryTypeFilter}>
+              <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-700 border-gray-600">
+                <SelectItem value="all">All types</SelectItem>
+                <SelectItem value="subscription">Subscription</SelectItem>
+                <SelectItem value="one-time">One-time</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="status-filter" className="text-sm text-gray-300">Status</Label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-700 border-gray-600">
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={clearFilters}
+              className="w-full"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {filteredEntries.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
-          No lottery entries found
+          {entries.length === 0 ? 'No lottery entries found' : 'No entries match the current filters'}
         </div>
       ) : (
         <div className="space-y-3">
-          {entries.map((entry) => (
+          {filteredEntries.map((entry) => (
             <div key={entry.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="text-white font-medium">
-                      {userProfiles[entry.user_id]?.email || `User ID: ${entry.user_id.slice(0, 8)}...`}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white font-medium">
+                        {userProfiles[entry.user_id]?.email || `User ID: ${entry.user_id.slice(0, 8)}...`}
+                      </p>
+                      <Badge 
+                        variant={getEntryType(entry) === 'subscription' ? 'default' : 'secondary'}
+                        className={getEntryType(entry) === 'subscription' ? 'bg-green-600' : 'bg-gray-600'}
+                      >
+                        {getEntryType(entry) === 'subscription' ? (
+                          <><CreditCard className="w-3 h-3 mr-1" />Subscription</>
+                        ) : (
+                          <>One-time</>
+                        )}
+                      </Badge>
+                    </div>
                     <p className="text-xs text-gray-400">
                       Line {entry.line_number} • {formatDate(entry.created_at)}
                     </p>
@@ -253,15 +393,20 @@ const LotteryEntriesTable = () => {
                 ))}
               </div>
 
-            {/* Admin Section - Show draw date */}
-            <div className="mt-2">
-              <p className="text-xs text-gray-500">
-                Draw Date: {formatDrawDate(new Date(entry.draw_date))} 
-                {entry.stripe_subscription_id && (
-                  <> • Stripe: {entry.stripe_subscription_id.slice(0, 20)}...</>
-                )}
-              </p>
-            </div>
+              {/* Admin Section - Show draw date and additional info */}
+              <div className="mt-2 pt-2 border-t border-gray-600">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-400">
+                    <Calendar className="w-3 h-3 inline mr-1" />
+                    Draw Date: {formatDrawDate(new Date(entry.draw_date))}
+                  </p>
+                  {entry.stripe_subscription_id && (
+                    <p className="text-xs text-gray-500">
+                      Stripe: {entry.stripe_subscription_id.slice(0, 20)}...
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>
