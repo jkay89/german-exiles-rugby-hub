@@ -274,28 +274,35 @@ const LotteryDashboard = () => {
                           <h3 className="font-semibold text-white">
                             Line {entry.line_number}
                           </h3>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={entry.is_active ? 'default' : 'secondary'}>
-                              {entry.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                            {editingEntry === entry.id ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setEditingEntry(null)}
-                              >
-                                Cancel
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setEditingEntry(entry.id)}
-                              >
-                                Edit
-                              </Button>
-                            )}
-                          </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={entry.is_active ? 'default' : 'secondary'}>
+                                {entry.is_active ? 'Active' : 'Inactive'}
+                              </Badge>
+                              {/* Only allow editing for subscription entries */}
+                              {entry.stripe_subscription_id && entry.stripe_subscription_id.startsWith('sub_') ? (
+                                editingEntry === entry.id ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setEditingEntry(null)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setEditingEntry(entry.id)}
+                                  >
+                                    Edit
+                                  </Button>
+                                )
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">
+                                  One-time Entry (No Edit)
+                                </Badge>
+                              )}
+                            </div>
                         </div>
 
                         {editingEntry === entry.id ? (

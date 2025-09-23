@@ -35,6 +35,7 @@ const LotteryEntriesTable = () => {
   const fetchEntries = async () => {
     try {
       setLoading(true);
+      console.log('Fetching lottery entries...');
       
       // Fetch all lottery entries
       const { data: entriesData, error: entriesError } = await supabase
@@ -42,27 +43,36 @@ const LotteryEntriesTable = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log('Entries data:', entriesData);
+      console.log('Entries error:', entriesError);
+
       if (entriesError) throw entriesError;
 
       setEntries(entriesData || []);
 
-      // Fetch user profiles for the unique user IDs
+      // Since we can't access auth.users from client, we'll create a simpler user display
+      console.log('Entries loaded:', entriesData?.length || 0);
+
+      // Fetch user emails using edge function
       const userIds = [...new Set((entriesData || []).map(entry => entry.user_id))];
       
       if (userIds.length > 0) {
-        // Use auth.users to get user emails
-        const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
-        
-        if (usersError) {
-          console.error('Error fetching users:', usersError);
-        } else {
-          const profilesMap: UserProfiles = {};
-          users?.forEach((user: any) => {
-            if (user && user.id && userIds.includes(user.id)) {
-              profilesMap[user.id] = { email: user.email };
-            }
+        try {
+          const { data: emailData, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+            body: { userIds }
           });
-          setUserProfiles(profilesMap);
+          
+          if (emailError) {
+            console.error('Error fetching user emails:', emailError);
+          } else {
+            const profilesMap: UserProfiles = {};
+            Object.entries(emailData.userEmails || {}).forEach(([userId, email]) => {
+              profilesMap[userId] = { email: email as string };
+            });
+            setUserProfiles(profilesMap);
+          }
+        } catch (error) {
+          console.error('Failed to fetch user emails:', error);
         }
       }
 
