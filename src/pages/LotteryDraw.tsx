@@ -140,11 +140,36 @@ const LotteryDraw = () => {
   };
 
   const conductDraw = async () => {
+    // Extra protection: check if draw already completed today
+    if (drawCompleted) {
+      console.log('Draw already completed, skipping...');
+      return;
+    }
+
     setDrawInProgress(true);
     setDrawNumbers([]);
     setShowingNumbers(false);
     
     try {
+      // Check if a draw has already been conducted today
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingDraw } = await supabase
+        .from('lottery_draws')
+        .select('id')
+        .eq('draw_date', today)
+        .eq('is_test_draw', false)
+        .maybeSingle();
+
+      if (existingDraw) {
+        console.log('Draw already exists for today, skipping...');
+        setDrawCompleted(true);
+        toast({
+          title: "Draw Already Complete",
+          description: "Today's draw has already been conducted.",
+        });
+        return;
+      }
+
       // Call the edge function to conduct the draw using RANDOM.ORG
       const { data, error } = await supabase.functions.invoke('conduct-lottery-draw', {
         body: {
@@ -154,6 +179,9 @@ const LotteryDraw = () => {
       });
 
       if (error) throw error;
+
+      // Mark as completed immediately to prevent duplicate calls
+      setDrawCompleted(true);
 
       // Show animated number reveal
       if (data.drawResult && data.drawResult.winningNumbers) {
@@ -170,7 +198,7 @@ const LotteryDraw = () => {
         setTimeout(() => {
           toast({
             title: "Draw Complete!",
-            description: "The winning numbers have been drawn and results updated.",
+            description: `Winners: ${data.drawResult.jackpotWinners} jackpot, ${data.drawResult.luckyDipWinners} lucky dip. Notifications sent!`,
           });
         }, 1000);
       }
@@ -181,6 +209,7 @@ const LotteryDraw = () => {
       
     } catch (error) {
       console.error('Error conducting draw:', error);
+      setDrawCompleted(false); // Reset on error so they can try again
       toast({
         title: "Draw Error",
         description: "There was an error conducting the draw. Please try again.",
