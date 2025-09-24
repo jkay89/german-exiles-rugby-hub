@@ -229,21 +229,117 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       try {
-        // Render the React Email template for lucky dip winners
-        const luckyDipEmailHtml = await renderAsync(
-          React.createElement(LuckyDipWinnerEmail, {
-            winnerName: userEmail.email.split('@')[0] || 'Lucky Winner',
-            prizeAmount: winner.prizeAmount,
-            drawDate: draw.draw_date,
-            winningNumbers: draw.winning_numbers,
-          })
-        );
+        // Use simplified HTML email instead of React template to avoid rendering issues
+        const simpleEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Lucky Dip Winner!</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);">
+                
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center;">
+                  <div style="font-size: 24px; margin-bottom: 10px;">🎊 🎉 🏆 💰 🎊</div>
+                  <h1 style="margin: 20px 0 10px 0; font-size: 32px; font-weight: bold;">LUCKY DIP WINNER!</h1>
+                  <div style="background: #10b981; color: white; padding: 15px 30px; border-radius: 50px; font-size: 20px; font-weight: bold; margin: 20px auto; display: inline-block;">
+                    YOU'VE WON £${winner.prizeAmount}!
+                  </div>
+                  <div style="font-size: 28px; margin: 20px 0;">🎉 🏉 🎉</div>
+                </div>
+
+                <!-- Prize Section -->
+                <div style="text-align: center; padding: 30px 20px; background: #ffecd2;">
+                  <div style="font-size: 48px; font-weight: bold; color: #b91c1c; margin: 0;">£${winner.prizeAmount}</div>
+                  <div style="font-size: 18px; color: #059669; font-weight: bold; margin: 10px 0;">🍀 LUCKY DIP PRIZE 🍀</div>
+                  <div style="font-size: 14px; color: #6b7280; font-style: italic;">✨ Randomly selected from all entries! ✨</div>
+                </div>
+
+                <!-- Congratulations -->
+                <div style="padding: 30px 20px; text-align: center;">
+                  <h2 style="font-size: 24px; font-weight: bold; color: #1f2937; margin: 0 0 20px 0;">🏆 CONGRATULATIONS ${userEmail.email.split('@')[0].toUpperCase()}! 🏆</h2>
+                  <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0;">
+                    The lottery gods have smiled upon you! You've been randomly selected as a Lucky Dip winner 
+                    in the German Exiles Rugby League Lottery. No number matching needed - just pure luck! 🍀
+                  </p>
+                </div>
+
+                <!-- Draw Details -->
+                <div style="background: #f3f4f6; padding: 25px; margin: 20px 0;">
+                  <h3 style="font-size: 20px; color: #1f2937; margin: 0 0 15px 0; text-align: center;">🎯 Draw Details</h3>
+                  <div style="text-align: center;">
+                    <p style="font-size: 16px; color: #374151; margin: 10px 0;">
+                      <strong>📅 Draw Date:</strong> ${new Date(draw.draw_date).toLocaleDateString('en-GB', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </p>
+                    <p style="font-size: 16px; color: #374151; margin: 10px 0;">
+                      <strong>🎱 Winning Numbers:</strong>
+                    </p>
+                    <div style="text-align: center; margin: 20px 0;">
+                      ${draw.winning_numbers.map(num => `<span style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-block; text-align: center; line-height: 40px; font-weight: bold; margin: 0 5px;">${num}</span>`).join('')}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Claim Instructions -->
+                <div style="background: #fef3c7; padding: 30px; margin: 20px 0;">
+                  <h3 style="font-size: 22px; color: #92400e; margin: 0 0 15px 0; text-align: center;">💎 How to Claim Your Prize</h3>
+                  <p style="font-size: 16px; color: #78350f; text-align: center; margin: 0 0 20px 0;">
+                    Ready to get your hands on that cash? Here's what you need to do:
+                  </p>
+                  
+                  <div style="margin: 20px 0;">
+                    <div style="background: white; padding: 15px 20px; margin: 10px 0; border-radius: 8px;">
+                      <span style="font-size: 20px; margin-right: 15px;">📷</span>
+                      A clear photo of your government-issued ID (passport or driving licence)
+                    </div>
+                    <div style="background: white; padding: 15px 20px; margin: 10px 0; border-radius: 8px;">
+                      <span style="font-size: 20px; margin-right: 15px;">🏦</span>
+                      Your bank account details for the prize transfer
+                    </div>
+                    <div style="background: white; padding: 15px 20px; margin: 10px 0; border-radius: 8px;">
+                      <span style="font-size: 20px; margin-right: 15px;">📧</span>
+                      A copy of this winning notification email
+                    </div>
+                  </div>
+                  
+                  <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; margin: 20px 0;">
+                    <p style="font-size: 16px; color: #374151; margin: 0 0 10px 0; font-weight: 600;">📬 Send everything to:</p>
+                    <a href="mailto:jay@germanexilesrl.co.uk" style="color: #1e40af; font-size: 20px; font-weight: bold; text-decoration: none; display: block; margin: 10px 0;">
+                      jay@germanexilesrl.co.uk
+                    </a>
+                    <p style="color: #059669; font-size: 16px; font-weight: bold; margin: 15px 0 0 0;">
+                      ⚡ Prize processed within 5-7 working days ⚡
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="background: #1f2937; color: #9ca3af; text-align: center; padding: 30px 20px;">
+                  <p style="color: white; font-size: 18px; font-weight: bold; margin: 0 0 10px 0;">German Exiles Rugby League</p>
+                  <p style="font-size: 14px; margin: 5px 0;">Supporting rugby league in Germany 🏉</p>
+                  <p style="font-size: 12px; margin: 15px 0 0 0; opacity: 0.8;">
+                    Keep this email as proof of your prize win. Good luck and well done! 🍀
+                  </p>
+                </div>
+                
+              </div>
+            </body>
+          </html>
+        `;
 
         await resend.emails.send({
           from: "German Exiles RL <noreply@germanexilesrl.co.uk>",
           to: [userEmail.email],
           subject: `🎉 LUCKY DIP WINNER! £${winner.prizeAmount} Prize! 🍀 German Exiles RL`,
-          html: luckyDipEmailHtml,
+          html: simpleEmailHtml,
         });
 
         console.log(`Exciting lucky dip email sent to ${userEmail.email}`);
