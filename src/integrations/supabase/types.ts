@@ -162,6 +162,7 @@ export type Database = {
           id: string
           jackpot_amount: number | null
           lucky_dip_amount: number | null
+          random_org_signature: string | null
           winning_numbers: number[]
         }
         Insert: {
@@ -170,6 +171,7 @@ export type Database = {
           id?: string
           jackpot_amount?: number | null
           lucky_dip_amount?: number | null
+          random_org_signature?: string | null
           winning_numbers: number[]
         }
         Update: {
@@ -178,6 +180,7 @@ export type Database = {
           id?: string
           jackpot_amount?: number | null
           lucky_dip_amount?: number | null
+          random_org_signature?: string | null
           winning_numbers?: number[]
         }
         Relationships: []
