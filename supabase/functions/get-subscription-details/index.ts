@@ -69,11 +69,24 @@ serve(async (req) => {
       items: stripeSubscription.items.data.length
     });
     
-    // Calculate next payment date (1st of next month)
-    const nextPaymentDate = new Date();
-    nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1); 
-    nextPaymentDate.setDate(1);
-    nextPaymentDate.setHours(0, 0, 0, 0);
+    // Calculate next payment date only for active subscriptions
+    let nextPaymentDate = null;
+    let currentPeriodEnd = null;
+    
+    if (stripeSubscription.status === 'active') {
+      // Calculate next payment date (1st of next month) only for active subscriptions
+      const nextPayment = new Date();
+      nextPayment.setMonth(nextPayment.getMonth() + 1); 
+      nextPayment.setDate(1);
+      nextPayment.setHours(0, 0, 0, 0);
+      nextPaymentDate = nextPayment.toISOString().split('T')[0];
+      
+      // Current period end from Stripe
+      currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0];
+    } else if (stripeSubscription.current_period_end) {
+      // For canceled/inactive subscriptions, just show the current period end if available
+      currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0];
+    }
 
     // Get the price per line (from subscription items)
     const pricePerLine = stripeSubscription.items.data[0]?.price?.unit_amount || 500; // Default 500 pence = £5
@@ -86,11 +99,12 @@ serve(async (req) => {
       pricePerLine: pricePerLine / 100, // Convert to pounds
       totalAmount: totalAmount,
       currency: stripeSubscription.items.data[0]?.price?.currency || 'gbp',
-      nextPaymentDate: nextPaymentDate.toISOString().split('T')[0],
-      currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0],
+      nextPaymentDate: nextPaymentDate,
+      currentPeriodEnd: currentPeriodEnd,
       cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
       stripeSubscriptionId: subscriptionData.stripe_subscription_id,
-      createdAt: subscriptionData.created_at
+      createdAt: subscriptionData.created_at,
+      canceledAt: stripeSubscription.canceled_at ? new Date(stripeSubscription.canceled_at * 1000).toISOString().split('T')[0] : null
     };
 
     console.log('Subscription details retrieved:', subscriptionDetails);

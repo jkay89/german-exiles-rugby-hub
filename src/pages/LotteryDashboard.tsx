@@ -39,11 +39,12 @@ interface SubscriptionDetails {
   pricePerLine?: number;
   totalAmount?: number;
   currency?: string;
-  nextPaymentDate?: string;
-  currentPeriodEnd?: string;
+  nextPaymentDate?: string | null;
+  currentPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean;
   stripeSubscriptionId?: string;
   createdAt?: string;
+  canceledAt?: string | null;
 }
 
 interface LotteryDraw {
@@ -384,34 +385,67 @@ const LotteryDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-700 p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-gray-400 mb-1">Status</h3>
-                    <Badge variant={subscription ? 'default' : 'secondary'} className="text-sm">
-                      {subscription ? 'ACTIVE' : 'INACTIVE'}
+                    <Badge 
+                      variant={
+                        subscriptionDetails.status === 'active' ? 'default' : 
+                        subscriptionDetails.status === 'canceled' ? 'destructive' : 'secondary'
+                      } 
+                      className="text-sm"
+                    >
+                      {subscriptionDetails.status?.toUpperCase() || 'UNKNOWN'}
                     </Badge>
-                    {subscriptionDetails?.cancelAtPeriodEnd && (
+                    {subscriptionDetails.status === 'canceled' && subscriptionDetails.canceledAt && (
+                      <p className="text-xs text-red-400 mt-1">
+                        Canceled on {new Date(subscriptionDetails.canceledAt).toLocaleDateString('en-GB')}
+                      </p>
+                    )}
+                    {subscriptionDetails?.cancelAtPeriodEnd && subscriptionDetails.status === 'active' && (
                       <p className="text-xs text-yellow-400 mt-1">Cancels at period end</p>
                     )}
                   </div>
                   
                   <div className="bg-gray-700 p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-gray-400 mb-1">Monthly Cost</h3>
-                    <p className="text-xl font-bold text-white">
-                      £{subscriptionDetails.totalAmount?.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      £{subscriptionDetails.pricePerLine?.toFixed(2)} per line × {subscriptionDetails.linesCount} lines
-                    </p>
+                    {subscriptionDetails.status === 'active' ? (
+                      <>
+                        <p className="text-xl font-bold text-white">
+                          £{subscriptionDetails.totalAmount?.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          £{subscriptionDetails.pricePerLine?.toFixed(2)} per line × {subscriptionDetails.linesCount} lines
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xl font-bold text-gray-400">
+                        No active billing
+                      </p>
+                    )}
                   </div>
                   
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Next Payment</h3>
-                      <p className="text-lg font-semibold text-white">
-                        1st {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString('en-GB', { 
-                          month: 'long',
-                          year: 'numeric'
-                        })}
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">
+                      {subscriptionDetails.status === 'active' ? 'Next Payment' : 'Period End'}
+                    </h3>
+                    {subscriptionDetails.status === 'active' && subscriptionDetails.nextPaymentDate ? (
+                      <>
+                        <p className="text-lg font-semibold text-white">
+                          1st {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString('en-GB', { 
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                        <p className="text-xs text-gray-400">Always 1st of each month</p>
+                      </>
+                    ) : subscriptionDetails.currentPeriodEnd ? (
+                      <p className="text-lg font-semibold text-gray-400">
+                        {new Date(subscriptionDetails.currentPeriodEnd).toLocaleDateString('en-GB')}
                       </p>
-                      <p className="text-xs text-gray-400">Always 1st of each month</p>
-                    </div>
+                    ) : (
+                      <p className="text-lg font-semibold text-gray-400">
+                        No longer active
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Subscription Details */}
@@ -437,12 +471,14 @@ const LotteryDashboard = () => {
                       <h4 className="text-sm font-medium text-gray-400 mb-2">Payment Info</h4>
                       <div className="space-y-1 text-sm">
                         <p className="text-white">
-                          <span className="text-gray-400">Billing Cycle:</span> Monthly
+                          <span className="text-gray-400">Billing Cycle:</span> {subscriptionDetails.status === 'active' ? 'Monthly' : 'Inactive'}
                         </p>
-                        <p className="text-white">
-                          <span className="text-gray-400">Current Period Ends:</span> {' '}
-                          {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('en-GB')}
-                        </p>
+                        {subscriptionDetails.currentPeriodEnd && (
+                          <p className="text-white">
+                            <span className="text-gray-400">Current Period Ends:</span> {' '}
+                            {new Date(subscriptionDetails.currentPeriodEnd).toLocaleDateString('en-GB')}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -454,7 +490,7 @@ const LotteryDashboard = () => {
                       Manage Subscription
                     </Button>
                     
-                    {!subscriptionDetails.cancelAtPeriodEnd && (
+                    {subscriptionDetails.status === 'active' && !subscriptionDetails.cancelAtPeriodEnd && (
                       <Button 
                         variant="outline" 
                         className="border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black"
@@ -464,17 +500,19 @@ const LotteryDashboard = () => {
                       </Button>
                     )}
                     
-                    <Button 
-                      variant="outline"
-                      className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                    >
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Numbers Below
-                    </Button>
+                    {subscriptionDetails.status === 'active' && (
+                      <Button 
+                        variant="outline"
+                        className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Numbers Below
+                      </Button>
+                    )}
                   </div>
 
-                  {/* Subscription Numbers Section */}
-                  {subscription && currentEntries.length > 0 && (
+                  {/* Subscription Numbers Section - Only show for active subscriptions */}
+                  {subscriptionDetails.status === 'active' && subscription && currentEntries.length > 0 && (
                     <div className="border-t border-gray-600 pt-6 mt-6">
                       <div className="mb-4">
                         <h4 className="text-lg font-medium text-white mb-2">Your Subscription Numbers</h4>
