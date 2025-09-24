@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       await resend.emails.send({
-        from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
+        from: "German Exiles RL <noreply@germanexilesrl.co.uk>",
         to: ["jay@germanexilesrl.co.uk"],
         subject: `🎯 Lottery Draw Results - ${draw.draw_date} - ${winners.length} Winners`,
         html: summaryEmailHtml,
@@ -198,7 +198,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         await resend.emails.send({
-          from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
+          from: "German Exiles RL <noreply@germanexilesrl.co.uk>",
           to: [userEmail.email],
           subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} - German Exiles RL`,
           html: jackpotEmailHtml,
@@ -240,7 +240,7 @@ const handler = async (req: Request): Promise<Response> => {
         );
 
         await resend.emails.send({
-          from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
+          from: "German Exiles RL <noreply@germanexilesrl.co.uk>",
           to: [userEmail.email],
           subject: `🎉 LUCKY DIP WINNER! £${winner.prizeAmount} Prize! 🍀 German Exiles RL`,
           html: luckyDipEmailHtml,

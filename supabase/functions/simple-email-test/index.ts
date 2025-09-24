@@ -23,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Send very simple email
     const emailResult = await resend.emails.send({
-      from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
+      from: "German Exiles RL <noreply@germanexilesrl.co.uk>",
       to: [testEmail],
       subject: "Simple Test - Resend API Working",
       html: `
