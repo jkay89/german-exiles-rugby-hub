@@ -364,20 +364,6 @@ serve(async (req) => {
         console.error('Error invoking draw completion function:', completionError);
       }
     }
-          body: { 
-            drawDate: drawDate
-          }
-        });
-
-        if (completionError) {
-          console.error('Error processing draw completion:', completionError);
-        } else {
-          console.log('Draw completion processed successfully');
-        }
-      } catch (completionError) {
-        console.error('Error invoking draw completion function:', completionError);
-      }
-    }
 
     return new Response(
       JSON.stringify({
