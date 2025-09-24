@@ -88,6 +88,11 @@ const LotteryDraw = () => {
     } else {
       setTimeUntilDraw("Draw in progress...");
       setIsDrawActive(true);
+      
+      // Automatically conduct draw when timer hits zero
+      if (!drawInProgress && difference <= 0) {
+        conductDraw();
+      }
     }
   };
 
@@ -273,14 +278,13 @@ const LotteryDraw = () => {
                 </div>
 
                 {isDrawActive && !drawInProgress && (
-                  <Button 
-                    onClick={conductDraw}
-                    size="lg"
-                    className="bg-purple-600 hover:bg-purple-700 text-xl px-8 py-4"
-                  >
-                    <Play className="w-6 h-6 mr-2" />
-                    Conduct Official Draw
-                  </Button>
+                  <div className="text-center">
+                    <div className="animate-pulse">
+                      <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
+                    </div>
+                    <p className="text-xl text-purple-400">Preparing for automatic draw...</p>
+                    <p className="text-gray-400">Draw will commence automatically when timer reaches zero</p>
+                  </div>
                 )}
 
                 {drawInProgress && (
@@ -333,7 +337,7 @@ const LotteryDraw = () => {
                 {!isDrawActive && (
                   <div className="text-gray-400">
                     <Calendar className="w-8 h-8 mx-auto mb-2" />
-                    <p>Live draw will be available 5 minutes before draw time</p>
+                    <p>Automatic draw will commence when the countdown reaches zero</p>
                   </div>
                 )}
               </div>
