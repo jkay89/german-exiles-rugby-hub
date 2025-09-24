@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, RefreshCw, Mail, Calendar, User } from "lucide-react";
+import { Trash2, RefreshCw, Mail, Calendar, User, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -61,6 +61,31 @@ export const RegisteredUsersTable = () => {
       toast({
         title: "Error", 
         description: "Failed to delete user",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePromoteToAdmin = async (userEmail: string) => {
+    try {
+      const { error } = await supabase.rpc('promote_to_admin', {
+        _user_email: userEmail
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User ${userEmail} has been promoted to admin`,
+      });
+
+      // Refresh the users list
+      fetchUsers();
+    } catch (error) {
+      console.error('Error promoting user:', error);
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to promote user to admin",
         variant: "destructive",
       });
     }
@@ -154,17 +179,51 @@ export const RegisteredUsersTable = () => {
                 </div>
               </div>
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="ml-4"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
+              <div className="flex items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
+                    >
+                      <Shield className="h-4 w-4 mr-1" />
+                      Promote to Admin
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-gray-900 border-gray-700">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-white">Promote User to Admin</AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-400">
+                        Are you sure you want to promote <strong>{user.email}</strong> to admin?
+                        <br /><br />
+                        This will give them full access to the admin dashboard and all management features.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handlePromoteToAdmin(user.email)}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Promote to Admin
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
                 <AlertDialogContent className="bg-gray-900 border-gray-700">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-white">Delete User Account</AlertDialogTitle>
@@ -193,8 +252,9 @@ export const RegisteredUsersTable = () => {
                       Delete User
                     </AlertDialogAction>
                   </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           ))}
         </div>
