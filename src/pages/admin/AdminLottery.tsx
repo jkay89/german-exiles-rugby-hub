@@ -97,12 +97,29 @@ const AdminLottery = () => {
     }
   };
 
-  const fetchNextDrawDate = () => {
-    // Calculate next draw date (last day of next month)
-    const now = new Date();
-    const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-    const formattedDate = lastDayOfNextMonth.toISOString().split('T')[0];
-    setNextDrawDate(formattedDate);
+  const fetchNextDrawDate = async () => {
+    try {
+      // Fetch next draw date from lottery_settings
+      const { data: dateData, error: dateError } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'next_draw_date')
+        .maybeSingle();
+      
+      if (dateError) throw dateError;
+      
+      if (dateData) {
+        setNextDrawDate(dateData.setting_value);
+      } else {
+        // Fallback to calculating next month if settings not found
+        const now = new Date();
+        const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+        const formattedDate = lastDayOfNextMonth.toISOString().split('T')[0];
+        setNextDrawDate(formattedDate);
+      }
+    } catch (error) {
+      console.error('Error fetching next draw date:', error);
+    }
   };
 
   const fetchCurrentJackpot = async () => {

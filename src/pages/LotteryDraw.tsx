@@ -7,6 +7,7 @@ import { Calendar, Clock, Trophy, Users, ExternalLink, Play, CheckCircle } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
+import { getNextDrawDateFromSettings } from "@/utils/drawDateUtils";
 
 interface DrawResult {
   id: string;
@@ -44,23 +45,27 @@ const LotteryDraw = () => {
     return () => clearInterval(timer);
   }, [nextDrawDate]);
 
-  const calculateNextDrawDate = () => {
-    const now = new Date();
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const drawTime = new Date(lastDayOfMonth);
-    
-    // Set draw time to 8 PM on the last day of the month
-    drawTime.setHours(20, 0, 0, 0);
-    
-    // If we've passed this month's draw, move to next month
-    if (now > drawTime) {
-      const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-      drawTime.setFullYear(lastDayOfNextMonth.getFullYear());
-      drawTime.setMonth(lastDayOfNextMonth.getMonth());
-      drawTime.setDate(lastDayOfNextMonth.getDate());
+  const calculateNextDrawDate = async () => {
+    try {
+      const drawDate = await getNextDrawDateFromSettings();
+      setNextDrawDate(drawDate);
+    } catch (error) {
+      console.error('Error fetching next draw date:', error);
+      // Fallback to default calculation
+      const now = new Date();
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const drawTime = new Date(lastDayOfMonth);
+      drawTime.setHours(20, 0, 0, 0);
+      
+      if (now > drawTime) {
+        const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+        drawTime.setFullYear(lastDayOfNextMonth.getFullYear());
+        drawTime.setMonth(lastDayOfNextMonth.getMonth());
+        drawTime.setDate(lastDayOfNextMonth.getDate());
+      }
+      
+      setNextDrawDate(drawTime);
     }
-    
-    setNextDrawDate(drawTime);
   };
 
   const updateCountdown = () => {

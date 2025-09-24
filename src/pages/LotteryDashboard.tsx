@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import NumberSelector from "@/components/lottery/NumberSelector";
 import { Loader2, Calendar, Trophy, Settings, CreditCard, Clock, History } from "lucide-react";
-import { getNextDrawDate, formatDrawDate, isCurrentDrawPeriod, isPastDraw } from "@/utils/drawDateUtils";
+import { getNextDrawDate, formatDrawDate, isCurrentDrawPeriod, isPastDraw, getNextDrawDateFromSettings } from "@/utils/drawDateUtils";
 
 interface LotteryEntry {
   id: string;
@@ -75,16 +75,26 @@ const LotteryDashboard = () => {
   const [results, setResults] = useState<LotteryResult[]>([]);
   const [latestDraw, setLatestDraw] = useState<LotteryDraw | null>(null);
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
+  const [nextDrawDate, setNextDrawDate] = useState<Date>(getNextDrawDate());
 
-  const nextDrawDate = getNextDrawDate();
   const nextDrawDateString = nextDrawDate.toISOString().split('T')[0];
 
   useEffect(() => {
     console.log("LotteryDashboard useEffect - authLoading:", authLoading, "user:", !!user);
     if (!authLoading && user) {
       loadUserData();
+      loadNextDrawDate();
     }
   }, [user, authLoading]);
+
+  const loadNextDrawDate = async () => {
+    try {
+      const drawDate = await getNextDrawDateFromSettings();
+      setNextDrawDate(drawDate);
+    } catch (error) {
+      console.error('Error loading next draw date:', error);
+    }
+  };
 
   const loadUserData = async () => {
     try {

@@ -53,32 +53,56 @@ const RecentDraw = () => {
 
   const fetchNextDrawDate = async () => {
     try {
-      // For now, we'll calculate the next draw date as the last day of next month
-      // This can be made configurable via admin panel later
-      const now = new Date();
-      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      setNextDrawDate(nextMonth.toISOString().split('T')[0]);
+      // Fetch next draw date from lottery_settings
+      const { data: dateData, error: dateError } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'next_draw_date')
+        .maybeSingle();
+      
+      if (dateError) throw dateError;
+      
+      if (dateData) {
+        setNextDrawDate(dateData.setting_value);
+      } else {
+        // Fallback to calculating next month if settings not found
+        const now = new Date();
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        setNextDrawDate(nextMonth.toISOString().split('T')[0]);
+      }
     } catch (error) {
-      console.error('Error calculating next draw date:', error);
+      console.error('Error fetching next draw date:', error);
     }
   };
 
-  const updateCountdown = () => {
+  const updateCountdown = async () => {
     if (!nextDrawDate) return;
 
-    const now = new Date().getTime();
-    const drawTime = new Date(nextDrawDate + " 19:50:00").getTime();
-    const difference = drawTime - now;
+    try {
+      // Fetch draw time from settings
+      const { data: timeData } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'draw_time')
+        .maybeSingle();
+      
+      const drawTimeStr = timeData?.setting_value || "19:50";
+      const now = new Date().getTime();
+      const drawTime = new Date(nextDrawDate + " " + drawTimeStr + ":00").getTime();
+      const difference = drawTime - now;
 
-    if (difference > 0) {
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-      setTimeRemaining(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-    } else {
-      setTimeRemaining("Draw in progress or complete");
+        setTimeRemaining(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+      } else {
+        setTimeRemaining("Draw in progress or complete");
+      }
+    } catch (error) {
+      console.error('Error updating countdown:', error);
     }
   };
 
