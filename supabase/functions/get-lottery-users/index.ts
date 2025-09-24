@@ -18,79 +18,51 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get all unique user IDs from lottery entries and subscriptions
-    const { data: lotteryUsers, error: lotteryError } = await supabaseClient
-      .from('lottery_entries')
-      .select('user_id')
-      .eq('is_active', true);
-
-    const { data: subscriptionUsers, error: subscriptionError } = await supabaseClient
-      .from('lottery_subscriptions')  
-      .select('user_id')
-      .eq('status', 'active');
-
-    if (lotteryError) {
-      console.error('Error fetching lottery users:', lotteryError);
-      throw lotteryError;
+    // Get ALL registered users for admin dashboard
+    const { data: { users: allUsers }, error: allUsersError } = await supabaseClient.auth.admin.listUsers();
+    
+    if (allUsersError) {
+      console.error('Error fetching all users:', allUsersError);
+      throw allUsersError;
     }
 
-    if (subscriptionError) {
-      console.error('Error fetching subscription users:', subscriptionError);
-      throw subscriptionError;
-    }
+    console.log(`Found ${allUsers?.length || 0} total registered users`);
 
-    // Combine and get unique user IDs
-    const allUserIds = new Set([
-      ...(lotteryUsers?.map(u => u.user_id) || []),
-      ...(subscriptionUsers?.map(u => u.user_id) || [])
-    ]);
-
-    console.log(`Found ${allUserIds.size} unique lottery users`);
-
-    // Get user details from auth.users for each unique user ID
+    // Get user details with lottery participation data
     const users = [];
-    for (const userId of allUserIds) {
+    for (const authUser of allUsers || []) {
       try {
-        const { data: user, error: userError } = await supabaseClient.auth.admin.getUserById(userId);
-        
-        if (userError) {
-          console.error(`Error fetching user ${userId}:`, userError);
-          continue;
-        }
+        // Get user's lottery entries count
+        const { data: entriesData } = await supabaseClient
+          .from('lottery_entries')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .eq('is_active', true);
 
-        if (user?.user) {
-          // Get user's lottery entries count
-          const { data: entriesData } = await supabaseClient
-            .from('lottery_entries')
-            .select('id')
-            .eq('user_id', userId)
-            .eq('is_active', true);
+        // Get user's subscription status
+        const { data: subscriptionData } = await supabaseClient
+          .from('lottery_subscriptions')
+          .select('status, created_at')
+          .eq('user_id', authUser.id)
+          .eq('status', 'active')
+          .maybeSingle();
 
-          // Get user's subscription status
-          const { data: subscriptionData } = await supabaseClient
-            .from('lottery_subscriptions')
-            .select('status, created_at')
-            .eq('user_id', userId)
-            .eq('status', 'active')
-            .single();
-
-          users.push({
-            id: user.user.id,
-            email: user.user.email,
-            created_at: user.user.created_at,
-            last_sign_in_at: user.user.last_sign_in_at,
-            entries_count: entriesData?.length || 0,
-            has_subscription: !!subscriptionData,
-            subscription_since: subscriptionData?.created_at || null
-          });
-        }
+        users.push({
+          id: authUser.id,
+          email: authUser.email,
+          created_at: authUser.created_at,
+          last_sign_in_at: authUser.last_sign_in_at,
+          entries_count: entriesData?.length || 0,
+          has_subscription: !!subscriptionData,
+          subscription_since: subscriptionData?.created_at || null
+        });
       } catch (error) {
-        console.error(`Failed to fetch user ${userId}:`, error);
+        console.error(`Failed to process user ${authUser.id}:`, error);
         continue;
       }
     }
 
-    console.log(`Successfully fetched ${users.length} user details`);
+    console.log(`Successfully processed ${users.length} user details`);
 
     return new Response(
       JSON.stringify({ users }),
