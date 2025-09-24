@@ -294,6 +294,23 @@ serve(async (req) => {
       }
     }
 
+    // Trigger draw completion processing for subscriptions (only for real draws)
+    if (!isTestDraw) {
+      try {
+        const { error: completionError } = await supabaseClient.functions.invoke('process-draw-completion', {
+          body: { drawDate: drawDate }
+        });
+
+        if (completionError) {
+          console.error('Error processing draw completion:', completionError);
+        } else {
+          console.log('Draw completion processing triggered successfully');
+        }
+      } catch (completionError) {
+        console.error('Error invoking draw completion function:', completionError);
+      }
+    }
+
     // Process draw completion for subscription renewals (only for real draws)
     if (!isTestDraw) {
       try {
