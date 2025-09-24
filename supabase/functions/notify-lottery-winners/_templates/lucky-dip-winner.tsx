@@ -42,9 +42,6 @@ export const LuckyDipWinnerEmail = ({
           <div style={winnerBadge}>
             YOU'VE WON £{prizeAmount}!
           </div>
-          <div style={{...testNotice, background: 'rgba(255,255,255,0.2)', padding: '10px', borderRadius: '5px', margin: '15px 0', fontSize: '14px'}}>
-            📧 TEST EMAIL - Sent to Jay for verification
-          </div>
           <div style={celebration}>🎉 🏉 🎉</div>
         </Section>
 
