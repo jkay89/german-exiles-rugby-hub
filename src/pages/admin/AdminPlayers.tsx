@@ -315,7 +315,27 @@ const AdminPlayers = () => {
                   <TabsTrigger value="exiles9s" className="data-[state=active]:bg-german-red">Exiles 9s</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value={activeTeam}>
+                <TabsContent value="heritage">
+                  <PlayersList 
+                    players={players}
+                    activeTeam={activeTeam}
+                    onEdit={setEditingPlayer}
+                    onPlayersChanged={loadPlayers}
+                    loading={loading}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="community">
+                  <PlayersList 
+                    players={players}
+                    activeTeam={activeTeam}
+                    onEdit={setEditingPlayer}
+                    onPlayersChanged={loadPlayers}
+                    loading={loading}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="exiles9s">
                   <PlayersList 
                     players={players}
                     activeTeam={activeTeam}
