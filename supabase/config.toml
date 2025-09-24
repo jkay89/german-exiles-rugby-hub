@@ -3,6 +3,12 @@ project_id = "hmjwfnsygwzijjgrygia"
 [functions.notify-lottery-winners]
 verify_jwt = false
 
+[functions.simple-email-test]
+verify_jwt = false
+
+[functions.test-email]
+verify_jwt = false
+
 [functions.create-lottery-payment]
 verify_jwt = false
 
@@ -16,9 +22,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.delete-lottery-user]
-verify_jwt = false
-
-[functions.test-email]
 verify_jwt = false
 
 [functions.conduct-lottery-draw]

@@ -74,19 +74,32 @@ const handler = async (req: Request): Promise<Response> => {
     const luckyDipWinners = winners.filter(w => w.type === 'lucky_dip');
 
     console.log(`Processing ${jackpotWinners.length} jackpot winners and ${luckyDipWinners.length} lucky dip winners`);
+    console.log("All winners data:", JSON.stringify(winners, null, 2));
 
     // Get user emails for all winners
     const allWinnerEmails = [];
     
+    console.log(`Starting to fetch emails for ${winners.length} winners...`);
+    
     for (const winner of winners) {
+      console.log(`Fetching email for user: ${winner.userId}`);
       const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(winner.userId);
-      if (authUser?.user?.email) {
+      
+      if (userError) {
+        console.error(`Error fetching user ${winner.userId}:`, userError);
+      } else if (authUser?.user?.email) {
+        console.log(`Found email for ${winner.userId}: ${authUser.user.email}`);
         allWinnerEmails.push({
           ...winner,
           email: authUser.user.email
         });
+      } else {
+        console.log(`No email found for user ${winner.userId}`);
       }
     }
+
+    console.log(`Total emails collected: ${allWinnerEmails.length}`);
+    console.log("Winner emails with types:", JSON.stringify(allWinnerEmails.map(w => ({ type: w.type, email: w.email })), null, 2));
 
     // Send summary email to Jay
     if (allWinnerEmails.length > 0) {
@@ -172,7 +185,13 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Send emails to lucky dip winners
-    for (const winner of allWinnerEmails.filter(w => w.type === 'lucky_dip')) {
+    console.log("=== STARTING LUCKY DIP EMAIL SECTION ===");
+    const luckyDipEmailWinners = allWinnerEmails.filter(w => w.type === 'lucky_dip');
+    console.log(`Found ${luckyDipEmailWinners.length} lucky dip winners to email`);
+    console.log("Lucky dip winners:", JSON.stringify(luckyDipEmailWinners.map(w => ({ email: w.email, prizeAmount: w.prizeAmount })), null, 2));
+    
+    for (const winner of luckyDipEmailWinners) {
+      console.log(`=== PROCESSING LUCKY DIP EMAIL FOR ${winner.email} ===`);
       const luckyDipEmailHtml = `
         <!DOCTYPE html>
         <html lang="en">
@@ -407,15 +426,22 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `;
 
-      await resend.emails.send({
-        from: "German Exiles RL <onboarding@resend.dev>",
-        to: [winner.email],
-        subject: `🎉 Lucky Dip Winner! £${winner.prizeAmount} - German Exiles RL Lottery`,
-        html: luckyDipEmailHtml,
-      });
+      try {
+        console.log(`Attempting to send email to ${winner.email}...`);
+        const emailResult = await resend.emails.send({
+          from: "German Exiles RL <onboarding@resend.dev>",
+          to: [winner.email],
+          subject: `🎉 Lucky Dip Winner! £${winner.prizeAmount} - German Exiles RL Lottery`,
+          html: luckyDipEmailHtml,
+        });
 
-      console.log(`Lucky dip winner notification sent to ${winner.email}`);
+        console.log(`Email sent successfully to ${winner.email}:`, emailResult);
+      } catch (emailError) {
+        console.error(`Failed to send email to ${winner.email}:`, emailError);
+      }
     }
+    
+    console.log("=== FINISHED LUCKY DIP EMAIL SECTION ===");
 
     return new Response(
       JSON.stringify({ 
