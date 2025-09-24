@@ -1,21 +1,61 @@
 
+import { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlayerProfile {
+  id: string;
   teamNumber: string;
   name: string;
   position: string;
   countryHeritage: "DE" | "GB";
   nationalTeamNumber?: string;
   image?: string;
+  club?: string;
+  bio?: string;
 }
 
 const CommunityTeam = () => {
   const { t } = useLanguage();
-  const players: PlayerProfile[] = [];
+  const [players, setPlayers] = useState<PlayerProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCommunityPlayers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('players')
+          .select('*')
+          .eq('team', 'community')
+          .order('number', { ascending: true });
+
+        if (error) throw error;
+
+        const transformedPlayers: PlayerProfile[] = (data || []).map(player => ({
+          id: player.id,
+          teamNumber: player.number?.toString() || '',
+          name: player.name,
+          position: player.position || '',
+          countryHeritage: player.heritage === 'DE' ? 'DE' : 'GB',
+          nationalTeamNumber: player.national_number || undefined,
+          image: player.photo_url || undefined,
+          club: player.club || undefined,
+          bio: player.bio || undefined,
+        }));
+
+        setPlayers(transformedPlayers);
+      } catch (error) {
+        console.error('Error loading community team players:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCommunityPlayers();
+  }, []);
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -45,7 +85,7 @@ const CommunityTeam = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {players.map((player, index) => (
               <motion.div
-                key={index}
+                key={player.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}

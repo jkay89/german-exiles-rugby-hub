@@ -23,9 +23,10 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         
       if (error) throw error;
       
-      console.log(`Found ${data?.length || 0} players for team ${activeTeam}:`, data);
+      console.log(`Found ${data?.length || 0} players for team ${activeTeam}:`, data?.map(p => ({ name: p.name, team: p.team })));
       setPlayers(data || []);
     } catch (error: any) {
+      console.error(`Error loading players for team ${activeTeam}:`, error);
       toast({
         title: "Error fetching players",
         description: error.message,

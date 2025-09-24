@@ -106,18 +106,14 @@ const AdminPlayers = () => {
   };
 
   const handleTeamChange = (value: string) => {
-    // First update the active team state
+    console.log(`Team tab changing from ${activeTeam} to ${value}`);
+    
+    // Update the active team state
     setActiveTeam(value);
     
     // Reset form states to avoid showing stale data
     setShowAddForm(false);
     setEditingPlayer(null);
-    
-    // Load players for the new team after the state has been updated
-    // We're explicitly passing the new team value to ensure we're loading the correct data
-    setTimeout(() => {
-      loadPlayers();
-    }, 50);
   };
 
   const handleImport = async () => {
