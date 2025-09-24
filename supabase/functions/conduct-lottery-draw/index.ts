@@ -96,6 +96,14 @@ serve(async (req) => {
     console.log('Winning numbers:', winningNumbers);
 
     // Store the draw result in the database
+    console.log('About to insert draw result with data:', {
+      draw_date: drawDate,
+      winning_numbers: winningNumbers,
+      jackpot_amount: jackpotAmount,
+      lucky_dip_amount: 10,
+      random_org_signature: randomOrgData.result.signature?.substring(0, 50) + '...'
+    });
+
     const { data: drawResult, error: drawError } = await supabaseClient
       .from('lottery_draws')
       .insert({
@@ -110,6 +118,7 @@ serve(async (req) => {
 
     if (drawError) {
       console.error('Error storing draw result:', drawError);
+      console.error('Full error object:', JSON.stringify(drawError, null, 2));
       throw drawError;
     }
 
