@@ -65,3 +65,9 @@ verify_jwt = false
 
 [functions.trigger-live-draw]
 verify_jwt = false
+
+[functions.get-admin-users]
+verify_jwt = false
+
+[functions.invite-admin-user]
+verify_jwt = false
