@@ -40,6 +40,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
 
   // Initial load of players when the component mounts or activeTeam changes
   useEffect(() => {
+    console.log(`useEffect triggered for activeTeam: ${activeTeam}`);
     loadPlayers();
   }, [loadPlayers]);
 

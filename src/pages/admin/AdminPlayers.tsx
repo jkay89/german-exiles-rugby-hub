@@ -116,6 +116,12 @@ const AdminPlayers = () => {
     // Reset form states to avoid showing stale data
     setShowAddForm(false);
     setEditingPlayer(null);
+    
+    // Force reload players immediately for the new team
+    setTimeout(() => {
+      console.log(`Force reloading players for team: ${value}`);
+      loadPlayers();
+    }, 100);
   };
 
   const handleImport = async () => {
@@ -314,33 +320,39 @@ const AdminPlayers = () => {
                 </TabsList>
                 
                 <TabsContent value="heritage">
-                  <PlayersList 
-                    players={players}
-                    activeTeam={activeTeam}
-                    onEdit={setEditingPlayer}
-                    onPlayersChanged={loadPlayers}
-                    loading={loading}
-                  />
+                  {activeTeam === 'heritage' && (
+                    <PlayersList 
+                      players={players}
+                      activeTeam={activeTeam}
+                      onEdit={setEditingPlayer}
+                      onPlayersChanged={loadPlayers}
+                      loading={loading}
+                    />
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="community">
-                  <PlayersList 
-                    players={players}
-                    activeTeam={activeTeam}
-                    onEdit={setEditingPlayer}
-                    onPlayersChanged={loadPlayers}
-                    loading={loading}
-                  />
+                  {activeTeam === 'community' && (
+                    <PlayersList 
+                      players={players}
+                      activeTeam={activeTeam}
+                      onEdit={setEditingPlayer}
+                      onPlayersChanged={loadPlayers}
+                      loading={loading}
+                    />
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="exiles9s">
-                  <PlayersList 
-                    players={players}
-                    activeTeam={activeTeam}
-                    onEdit={setEditingPlayer}
-                    onPlayersChanged={loadPlayers}
-                    loading={loading}
-                  />
+                  {activeTeam === 'exiles9s' && (
+                    <PlayersList 
+                      players={players}
+                      activeTeam={activeTeam}
+                      onEdit={setEditingPlayer}
+                      onPlayersChanged={loadPlayers}
+                      loading={loading}
+                    />
+                  )}
                 </TabsContent>
               </Tabs>
             </div>
