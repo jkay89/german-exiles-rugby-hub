@@ -26,6 +26,8 @@ const LotteryDraw = () => {
   const [latestResult, setLatestResult] = useState<DrawResult | null>(null);
   const [isDrawActive, setIsDrawActive] = useState(false);
   const [drawInProgress, setDrawInProgress] = useState(false);
+  const [drawNumbers, setDrawNumbers] = useState<number[]>([]);
+  const [showingNumbers, setShowingNumbers] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -121,6 +123,8 @@ const LotteryDraw = () => {
 
   const conductDraw = async () => {
     setDrawInProgress(true);
+    setDrawNumbers([]);
+    setShowingNumbers(false);
     
     try {
       // Call the edge function to conduct the draw using RANDOM.ORG
@@ -133,10 +137,25 @@ const LotteryDraw = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Draw Complete!",
-        description: "The winning numbers have been drawn and results updated.",
-      });
+      // Show animated number reveal
+      if (data.drawResult && data.drawResult.winningNumbers) {
+        setShowingNumbers(true);
+        const numbers = data.drawResult.winningNumbers;
+        
+        // Animate numbers appearing one by one
+        for (let i = 0; i < numbers.length; i++) {
+          await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between numbers
+          setDrawNumbers(prev => [...prev, numbers[i]]);
+        }
+        
+        // Show completion message after all numbers are revealed
+        setTimeout(() => {
+          toast({
+            title: "Draw Complete!",
+            description: "The winning numbers have been drawn and results updated.",
+          });
+        }, 1000);
+      }
 
       // Refresh the latest result
       fetchLatestResult();
@@ -152,7 +171,11 @@ const LotteryDraw = () => {
         variant: "destructive",
       });
     } finally {
-      setDrawInProgress(false);
+      setTimeout(() => {
+        setDrawInProgress(false);
+        setShowingNumbers(false);
+        setDrawNumbers([]);
+      }, 3000); // Reset after 3 seconds
     }
   };
 
@@ -255,10 +278,49 @@ const LotteryDraw = () => {
                 )}
 
                 {drawInProgress && (
-                  <div className="text-center">
-                    <div className="animate-spin w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-xl text-purple-400">Drawing numbers...</p>
-                    <p className="text-gray-400">Please wait while we generate certified random numbers</p>
+                  <div className="text-center space-y-6">
+                    {showingNumbers ? (
+                      <div>
+                        <h3 className="text-2xl font-bold text-purple-400 mb-6">Drawing Numbers...</h3>
+                        <div className="flex justify-center gap-4 mb-6">
+                          {[1, 2, 3, 4].map((position, index) => (
+                            <div 
+                              key={position}
+                              className="w-20 h-20 rounded-full border-4 border-purple-600 flex items-center justify-center relative overflow-hidden"
+                            >
+                              {drawNumbers[index] !== undefined ? (
+                                <motion.div
+                                  initial={{ scale: 0, rotate: 180 }}
+                                  animate={{ scale: 1, rotate: 0 }}
+                                  transition={{ 
+                                    type: "spring", 
+                                    stiffness: 200, 
+                                    damping: 10,
+                                    duration: 0.8 
+                                  }}
+                                  className="text-3xl font-bold text-white bg-gradient-to-br from-purple-600 to-blue-600 w-full h-full rounded-full flex items-center justify-center"
+                                >
+                                  {drawNumbers[index]}
+                                </motion.div>
+                              ) : (
+                                <div className="animate-pulse">
+                                  <div className="w-16 h-16 bg-purple-600/30 rounded-full animate-spin border-t-2 border-purple-400"></div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-lg text-gray-300">
+                          Drawing number {drawNumbers.length + 1} of 4...
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="animate-spin w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p className="text-xl text-purple-400">Connecting to RANDOM.ORG...</p>
+                        <p className="text-gray-400">Generating certified random numbers</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
