@@ -144,6 +144,46 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log("Email sent successfully:", emailResponse);
 
+      // Send individual winner notifications
+      for (const winner of winners) {
+        if (winner.userEmail) {
+          const prizeAmount = winner.matches === 4 ? draw.jackpot_amount : 
+                            winner.matches === 3 ? 100 :
+                            winner.matches === 2 ? 10 : 0;
+          
+          const winnerEmailHtml = `
+            <h1>🎉 Congratulations! You're a Winner!</h1>
+            <p>Great news! Your lottery numbers have won in the German Exiles Rugby League Lottery!</p>
+            
+            <h2>Draw Details</h2>
+            <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
+            <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
+            
+            <h2>Your Winning Entry</h2>
+            <p><strong>Your Numbers:</strong> ${winner.entry.numbers.join(', ')}</p>
+            <p><strong>Matches:</strong> ${winner.matches} out of 4</p>
+            <p><strong>Prize Amount:</strong> £${prizeAmount}</p>
+            <p><strong>Line Number:</strong> ${winner.entry.line_number}</p>
+            
+            <hr>
+            <h3>Next Steps</h3>
+            <p>Your prize will be paid via bank transfer within 2-3 working days.</p>
+            <p>If you have any questions, please contact us at lottery@germanexilesrl.co.uk</p>
+            
+            <p><em>Congratulations again from the German Exiles Rugby League team!</em></p>
+          `;
+
+          await resend.emails.send({
+            from: "German Exiles RL <lottery@germanexilesrl.co.uk>",
+            to: [winner.userEmail],
+            subject: `🎉 You Won! £${prizeAmount} Prize from German Exiles RL Lottery`,
+            html: winnerEmailHtml,
+          });
+
+          console.log(`Winner notification sent to ${winner.userEmail}`);
+        }
+      }
+
       // Store lottery results in database
       for (const winner of winners) {
         const prizeAmount = winner.matches === 4 ? draw.jackpot_amount : 
