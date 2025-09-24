@@ -34,6 +34,7 @@ const RecentDraw = () => {
       const { data, error } = await supabase
         .from('lottery_draws')
         .select('*')
+        .eq('is_test_draw', false) // Only fetch real draws, not test draws
         .order('draw_date', { ascending: false })
         .limit(1);
 

@@ -160,6 +160,7 @@ export type Database = {
           created_at: string
           draw_date: string
           id: string
+          is_test_draw: boolean
           jackpot_amount: number | null
           lucky_dip_amount: number | null
           random_org_signature: string | null
@@ -169,6 +170,7 @@ export type Database = {
           created_at?: string
           draw_date: string
           id?: string
+          is_test_draw?: boolean
           jackpot_amount?: number | null
           lucky_dip_amount?: number | null
           random_org_signature?: string | null
@@ -178,6 +180,7 @@ export type Database = {
           created_at?: string
           draw_date?: string
           id?: string
+          is_test_draw?: boolean
           jackpot_amount?: number | null
           lucky_dip_amount?: number | null
           random_org_signature?: string | null

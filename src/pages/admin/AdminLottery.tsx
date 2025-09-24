@@ -31,6 +31,7 @@ interface LotteryDraw {
   jackpot_amount: number;
   lucky_dip_amount: number;
   created_at: string;
+  is_test_draw?: boolean;
 }
 
 const AdminLottery = () => {
@@ -668,7 +669,14 @@ const AdminLottery = () => {
                   <div key={draw.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div>
-                        <p className="font-medium">{new Date(draw.draw_date).toLocaleDateString('en-GB')}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{new Date(draw.draw_date).toLocaleDateString('en-GB')}</p>
+                          {draw.is_test_draw && (
+                            <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                              TEST
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex gap-2 mt-2">
                           {draw.winning_numbers.map((number, index) => (
                             <Badge 

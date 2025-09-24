@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const { drawDate, jackpotAmount } = await req.json();
+    const { drawDate, jackpotAmount, isTestDraw = false } = await req.json();
 
     if (!drawDate || !jackpotAmount) {
       return new Response(
@@ -111,7 +111,8 @@ serve(async (req) => {
         winning_numbers: winningNumbers,
         jackpot_amount: jackpotAmount,
         lucky_dip_amount: 10,
-        random_org_signature: randomOrgData.result.signature
+        random_org_signature: randomOrgData.result.signature,
+        is_test_draw: isTestDraw
       })
       .select()
       .single();

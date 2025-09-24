@@ -13,6 +13,9 @@ interface DrawResult {
   jackpot_amount: number;
   lucky_dip_amount: number;
   created_at: string;
+  certificate_url?: string;
+  random_org_signature?: string;
+  is_test_draw?: boolean;
 }
 
 const TestDraw = () => {
@@ -75,7 +78,8 @@ const TestDraw = () => {
       const { data, error } = await supabase.functions.invoke('conduct-lottery-draw', {
         body: {
           drawDate: testDrawDate,
-          jackpotAmount: currentJackpot
+          jackpotAmount: currentJackpot,
+          isTestDraw: true // Mark this as a test draw
         }
       });
 
