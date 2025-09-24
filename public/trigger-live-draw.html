@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigger Live Draw</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        button { 
+            background: #dc2626; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer; 
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover { background: #b91c1c; }
+        button:disabled { background: #6b7280; cursor: not-allowed; }
+        .result { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border-radius: 8px; 
+            background: rgba(0,0,0,0.3);
+        }
+        .success { border-left: 4px solid #10b981; }
+        .error { border-left: 4px solid #ef4444; }
+        .warning { 
+            background: rgba(251, 191, 36, 0.2); 
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        pre { 
+            background: rgba(0,0,0,0.5); 
+            padding: 10px; 
+            border-radius: 5px; 
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 German Exiles RL - Live Lottery Draw</h1>
+        
+        <div class="warning">
+            <strong>⚠️ WARNING:</strong> This will trigger a LIVE lottery draw with:
+            <ul>
+                <li>Real winning numbers from RANDOM.ORG</li>
+                <li>Winner determination from current 5 entries</li>
+                <li>Email notifications sent to all winners</li>
+                <li>Admin summary email to jay@germanexilesrl.co.uk</li>
+            </ul>
+        </div>
+
+        <button id="triggerBtn" onclick="triggerLiveDraw()">
+            🎯 TRIGGER LIVE DRAW NOW
+        </button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://hmjwfnsygwzijjgrygia.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtandmbnN5Z3d6aWpqZ3J5Z2lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1Njc4NzQsImV4cCI6MjA2MTE0Mzg3NH0.2Dq0R0-LZ4mjT0Wi5oueCIGOh__GDwoY7fJx4-YPEPo'
+        );
+
+        async function triggerLiveDraw() {
+            const btn = document.getElementById('triggerBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = '🔄 TRIGGERING LIVE DRAW...';
+            
+            result.innerHTML = `
+                <div class="result">
+                    <h3>🎰 Initiating Live Draw...</h3>
+                    <p>⏳ Calling RANDOM.ORG for winning numbers...</p>
+                    <p>📊 Checking 5 lottery entries for winners...</p>
+                    <p>📧 Preparing winner notification emails...</p>
+                </div>
+            `;
+            
+            try {
+                console.log('Triggering live draw...');
+                
+                const { data, error } = await supabase.functions.invoke('trigger-live-draw');
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('Draw result:', data);
+                
+                result.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ LIVE DRAW COMPLETED SUCCESSFULLY!</h3>
+                        <div>
+                            <h4>📊 Draw Results:</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Draw error:', error);
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Error Triggering Live Draw</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <pre>${JSON.stringify(error, null, 2)}</pre>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🎯 TRIGGER LIVE DRAW NOW';
+            }
+        }
+    </script>
+</body>
+</html>
