@@ -41,7 +41,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Draw details:", JSON.stringify(draw, null, 2));
 
     // Filter lucky dip winners
-    const luckyDipWinners = winners?.filter(w => w.type === 'lucky_dip') || [];
+    const luckyDipWinners = winners?.filter((w: any) => w.type === 'lucky_dip') || [];
     console.log(`Found ${luckyDipWinners.length} lucky dip winners`);
 
     // Get emails for lucky dip winners

@@ -79,7 +79,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Failed to fetch admin users',
-        details: error.message 
+        details: (error as Error).message 
       }),
       { 
         status: 500, 

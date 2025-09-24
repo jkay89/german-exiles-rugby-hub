@@ -26,7 +26,7 @@ export const LuckyDipWinnerEmail = ({
 }: LuckyDipWinnerEmailProps) => (
   <Html>
     <Head />
-    <Preview>🎉 You're a Lucky Dip Winner! £{prizeAmount} is yours!</Preview>
+    <Preview>🎉 You're a Lucky Dip Winner! £{prizeAmount.toString()} is yours!</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Celebration Header */}
@@ -48,7 +48,7 @@ export const LuckyDipWinnerEmail = ({
         {/* Prize Announcement */}
         <Section style={prizeSection}>
           <div style={prizeContainer}>
-            <div style={prizeAmount}>£{prizeAmount}</div>
+            <div style={prizeAmountStyle}>£{prizeAmount}</div>
             <div style={prizeLabel}>🍀 LUCKY DIP PRIZE 🍀</div>
             <div style={randomSelection}>
               ✨ Randomly selected from all entries! ✨
@@ -166,7 +166,7 @@ const celebrationHeader = {
   backgroundColor: '#667eea',
   color: 'white',
   padding: '40px 20px',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   borderRadius: '12px 12px 0 0',
 }
 
@@ -202,7 +202,7 @@ const celebration = {
 }
 
 const prizeSection = {
-  textAlign: 'center',
+  textAlign: 'center' as const,
   padding: '30px 20px',
   backgroundColor: '#ffecd2',
   borderRadius: '12px',
@@ -213,7 +213,7 @@ const prizeContainer = {
   padding: '20px',
 }
 
-const prizeAmount = {
+const prizeAmountStyle = {
   fontSize: '48px',
   fontWeight: 'bold',
   color: '#b91c1c',
@@ -237,7 +237,7 @@ const randomSelection = {
 
 const messageSection = {
   padding: '30px 20px',
-  textAlign: 'center',
+  textAlign: 'center' as const,
 }
 
 const congratsText = {
@@ -265,11 +265,11 @@ const sectionHeading = {
   fontSize: '20px',
   color: '#1f2937',
   margin: '0 0 15px 0',
-  textAlign: 'center',
+  textAlign: 'center' as const,
 }
 
 const drawInfo = {
-  textAlign: 'center',
+  textAlign: 'center' as const,
 }
 
 const drawText = {
@@ -279,7 +279,7 @@ const drawText = {
 }
 
 const numbersContainer = {
-  textAlign: 'center',
+  textAlign: 'center' as const,
   margin: '20px 0',
 }
 
@@ -290,7 +290,7 @@ const numberBall = {
   height: '45px',
   borderRadius: '50%',
   display: 'inline-block',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   lineHeight: '45px',
   fontWeight: 'bold',
   fontSize: '18px',
@@ -308,13 +308,13 @@ const claimHeading = {
   fontSize: '22px',
   color: '#92400e',
   margin: '0 0 15px 0',
-  textAlign: 'center',
+  textAlign: 'center' as const,
 }
 
 const claimIntro = {
   fontSize: '16px',
   color: '#78350f',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   margin: '0 0 20px 0',
   fontWeight: '500',
 }
@@ -339,7 +339,7 @@ const contactBox = {
   backgroundColor: 'white',
   padding: '25px',
   borderRadius: '12px',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   margin: '20px 0',
 }
 
@@ -367,7 +367,7 @@ const timeline = {
 }
 
 const excitementSection = {
-  textAlign: 'center',
+  textAlign: 'center' as const,
   padding: '30px 20px',
   backgroundColor: '#e0f2fe',
   borderRadius: '12px',
@@ -390,7 +390,7 @@ const partyEmojis = {
 const footer = {
   backgroundColor: '#1f2937',
   color: '#9ca3af',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   padding: '30px 20px',
   borderRadius: '0 0 12px 12px',
 }

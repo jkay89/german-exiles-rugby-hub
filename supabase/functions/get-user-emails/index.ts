@@ -45,7 +45,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error fetching user emails:", error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: (error as Error).message,
       userEmails: {} 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

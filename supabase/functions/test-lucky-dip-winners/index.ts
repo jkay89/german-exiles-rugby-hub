@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
           userId: winner.user_id,
           email: userEmail,
           success: false,
-          error: emailError.message
+          error: (emailError as Error).message
         });
       }
     }

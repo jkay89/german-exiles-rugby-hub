@@ -84,7 +84,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || 'Failed to invite admin user'
+        error: (error as Error).message || 'Failed to invite admin user'
       }),
       { 
         status: 500, 

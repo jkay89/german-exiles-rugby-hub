@@ -123,7 +123,7 @@ serve(async (req) => {
           body: {
             userEmail: userRecord.email,
             userName: userRecord.user_metadata?.full_name || userRecord.email?.split('@')[0],
-            lotteryLines: entries.map(entry => ({
+            lotteryLines: entries.map((entry: any) => ({
               numbers: entry.numbers,
               lineNumber: entry.line_number
             })),
@@ -209,7 +209,7 @@ serve(async (req) => {
     console.error("Error processing lottery purchase:", error);
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message 
+      error: (error as Error).message 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

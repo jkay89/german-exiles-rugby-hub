@@ -116,17 +116,17 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Detailed error in get-subscription-details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      type: error.type || 'unknown',
-      code: error.code || 'unknown'
+      message: (error as any).message,
+      stack: (error as any).stack,
+      name: (error as any).name,
+      type: (error as any).type || 'unknown',
+      code: (error as any).code || 'unknown'
     });
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: (error as Error).message,
       hasSubscription: false,
-      errorType: error.type || 'unknown',
-      errorCode: error.code || 'unknown'
+      errorType: (error as any).type || 'unknown',
+      errorCode: (error as any).code || 'unknown'
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

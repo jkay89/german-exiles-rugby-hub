@@ -105,7 +105,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in send-lottery-subscription-email function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: (error as Error).message,
       details: 'Failed to send subscription email'
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
