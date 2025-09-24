@@ -174,29 +174,237 @@ const handler = async (req: Request): Promise<Response> => {
     // Send emails to lucky dip winners
     for (const winner of allWinnerEmails.filter(w => w.type === 'lucky_dip')) {
       const luckyDipEmailHtml = `
-        <h1>🎉 Lucky Dip Winner! Congratulations!</h1>
-        <p>Great news! You've been selected as a Lucky Dip winner in the German Exiles Rugby League Lottery!</p>
-        
-        <h2>Draw Details</h2>
-        <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
-        <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
-        
-        <h2>Your Lucky Dip Win</h2>
-        <p><strong>Prize Amount:</strong> £${winner.prizeAmount}</p>
-        <p><strong>Type:</strong> Lucky Dip Winner (Randomly selected from all entries)</p>
-        
-        <hr>
-        <h3>Next Steps</h3>
-        <p><strong>To claim your prize, please email jay@germanexilesrl.co.uk with:</strong></p>
-        <ul>
-          <li>A copy of your photo ID (passport or driving licence)</li>
-          <li>Your bank details for payment transfer</li>
-          <li>This winning notification email</li>
-        </ul>
-        
-        <p>Your prize will be processed and paid within 5-7 working days after verification.</p>
-        
-        <p><em>Well done and congratulations from the German Exiles Rugby League team!</em></p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Lucky Dip Winner - German Exiles RL</title>
+          <style>
+            body {
+              font-family: 'Arial', sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              background-color: #f8f9fa;
+              padding: 20px;
+            }
+            .email-container {
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+              overflow: hidden;
+            }
+            .header {
+              background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+              color: white;
+              padding: 40px 30px;
+              text-align: center;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+              font-weight: bold;
+            }
+            .winner-badge {
+              background: #fbbf24;
+              color: #92400e;
+              padding: 8px 16px;
+              border-radius: 20px;
+              font-weight: bold;
+              font-size: 14px;
+              margin-top: 15px;
+              display: inline-block;
+            }
+            .content {
+              padding: 40px 30px;
+            }
+            .congratulations {
+              text-align: center;
+              margin-bottom: 30px;
+            }
+            .congratulations h2 {
+              color: #1e40af;
+              font-size: 24px;
+              margin-bottom: 10px;
+            }
+            .prize-box {
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+              color: white;
+              padding: 25px;
+              border-radius: 10px;
+              text-align: center;
+              margin: 25px 0;
+            }
+            .prize-amount {
+              font-size: 36px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .prize-label {
+              font-size: 16px;
+              opacity: 0.9;
+              margin-top: 5px;
+            }
+            .draw-details {
+              background: #f1f5f9;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 25px 0;
+            }
+            .draw-details h3 {
+              color: #1e40af;
+              margin-top: 0;
+              margin-bottom: 15px;
+            }
+            .winning-numbers {
+              display: flex;
+              gap: 10px;
+              justify-content: center;
+              margin: 15px 0;
+            }
+            .number-ball {
+              background: #3b82f6;
+              color: white;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: bold;
+              font-size: 16px;
+            }
+            .next-steps {
+              background: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              padding: 20px;
+              margin: 25px 0;
+              border-radius: 0 8px 8px 0;
+            }
+            .next-steps h3 {
+              color: #92400e;
+              margin-top: 0;
+            }
+            .requirements {
+              list-style: none;
+              padding: 0;
+            }
+            .requirements li {
+              background: white;
+              padding: 12px 15px;
+              margin: 8px 0;
+              border-radius: 6px;
+              border-left: 3px solid #f59e0b;
+            }
+            .requirements li:before {
+              content: "✓";
+              color: #10b981;
+              font-weight: bold;
+              margin-right: 10px;
+            }
+            .contact-info {
+              background: #e0f2fe;
+              padding: 20px;
+              border-radius: 8px;
+              text-align: center;
+              margin: 25px 0;
+            }
+            .contact-email {
+              color: #1e40af;
+              font-weight: bold;
+              font-size: 18px;
+              text-decoration: none;
+            }
+            .footer {
+              background: #1f2937;
+              color: #9ca3af;
+              text-align: center;
+              padding: 30px;
+              font-size: 14px;
+            }
+            .footer .logo {
+              color: white;
+              font-weight: bold;
+              font-size: 18px;
+              margin-bottom: 10px;
+            }
+            .timeline {
+              color: #10b981;
+              font-weight: bold;
+              font-size: 16px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="header">
+              <h1>🎉 Lucky Dip Winner!</h1>
+              <div class="winner-badge">YOU'VE WON £${winner.prizeAmount}!</div>
+            </div>
+            
+            <div class="content">
+              <div class="congratulations">
+                <h2>Congratulations!</h2>
+                <p>You've been randomly selected as a Lucky Dip winner in the German Exiles Rugby League Lottery!</p>
+              </div>
+              
+              <div class="prize-box">
+                <div class="prize-amount">£${winner.prizeAmount}</div>
+                <div class="prize-label">Lucky Dip Prize</div>
+              </div>
+              
+              <div class="draw-details">
+                <h3>📅 Draw Details</h3>
+                <p><strong>Draw Date:</strong> ${new Date(draw.draw_date).toLocaleDateString('en-GB', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</p>
+                <p><strong>Winning Numbers:</strong></p>
+                <div class="winning-numbers">
+                  ${draw.winning_numbers.map(num => `<div class="number-ball">${num}</div>`).join('')}
+                </div>
+                <p style="text-align: center; margin-top: 15px;"><em>You were randomly selected from all entries - no number matching required!</em></p>
+              </div>
+              
+              <div class="next-steps">
+                <h3>🏆 How to Claim Your Prize</h3>
+                <p>To receive your prize, please send the following to our lottery coordinator:</p>
+                <ul class="requirements">
+                  <li>A clear photo of your government-issued ID (passport or driving licence)</li>
+                  <li>Your bank account details for the prize transfer</li>
+                  <li>A copy of this winning notification email</li>
+                </ul>
+              </div>
+              
+              <div class="contact-info">
+                <p><strong>Send your claim details to:</strong></p>
+                <a href="mailto:jay@germanexilesrl.co.uk" class="contact-email">jay@germanexilesrl.co.uk</a>
+                <p style="margin-top: 15px;">
+                  <span class="timeline">⏱️ Prize will be processed within 5-7 working days</span>
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; font-style: italic;">
+                  "Well done and congratulations from everyone at German Exiles Rugby League! 🏉"
+                </p>
+              </div>
+            </div>
+            
+            <div class="footer">
+              <div class="logo">German Exiles Rugby League</div>
+              <p>Supporting rugby league in Germany</p>
+              <p style="font-size: 12px; margin-top: 15px;">
+                This email was sent to confirm your lottery win. Please keep this email as proof of your prize.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
       `;
 
       await resend.emails.send({
