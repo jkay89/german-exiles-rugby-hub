@@ -244,8 +244,11 @@ serve(async (req) => {
       } else {
         winnerResults.push({
           type: 'jackpot',
+          entryId: winner.id,
           userId: winner.user_id,
-          prizeAmount: prizeAmount
+          prizeAmount: prizeAmount,
+          matches: 4,
+          isJackpot: true
         });
       }
     }
@@ -268,8 +271,11 @@ serve(async (req) => {
       } else {
         winnerResults.push({
           type: 'lucky_dip',
+          entryId: winner.id,
           userId: winner.user_id,
-          prizeAmount: 10
+          prizeAmount: 10,
+          matches: 0,
+          isJackpot: false
         });
       }
     }
