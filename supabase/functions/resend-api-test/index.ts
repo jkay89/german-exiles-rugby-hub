@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send test email
     console.log("Attempting to send test email...");
     const result = await resend.emails.send({
-      from: "German Exiles RL <onboarding@resend.dev>",
+      from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
       to: ["jay@germanexilesrl.co.uk"],
       subject: "🔧 Resend API Test",
       html: `

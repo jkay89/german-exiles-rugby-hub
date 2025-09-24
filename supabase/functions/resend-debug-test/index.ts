@@ -31,7 +31,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Attempting to send email to: ${testEmail}`);
     
     const emailPayload = {
-      from: "onboarding@resend.dev",
+      from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
       to: [testEmail],
       subject: "DEBUG: Resend API Test",
       html: `

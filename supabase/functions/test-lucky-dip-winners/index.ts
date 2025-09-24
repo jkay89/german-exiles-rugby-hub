@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Sending lucky dip winner email to ${userEmail}...`);
         
         const emailResult = await resend.emails.send({
-          from: "German Exiles RL <onboarding@resend.dev>",
+          from: "German Exiles RL <noreply@mail.germanexilesrl.co.uk>",
           to: [userEmail],
           subject: `🎉 Lucky Dip Winner! £${winner.prize_amount} - German Exiles RL`,
           html: `
