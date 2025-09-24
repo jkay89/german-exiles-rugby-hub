@@ -31,8 +31,10 @@ const LotteryDraw = () => {
   const [showingNumbers, setShowingNumbers] = useState(false);
   const [drawCompleted, setDrawCompleted] = useState(false);
   const [drawExists, setDrawExists] = useState(false);
+  const [animationInProgress, setAnimationInProgress] = useState(false);
   const drawInProgressRef = useRef(false);
   const drawTriggeredRef = useRef(false);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,7 +48,13 @@ const LotteryDraw = () => {
       updateCountdown();
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      // Clean up animation timeout on unmount
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
   }, [nextDrawDate]);
 
   // Reset draw state when nextDrawDate changes (new draw scheduled)
@@ -167,13 +175,19 @@ const LotteryDraw = () => {
 
   const conductDraw = async () => {
     // Extra protection: check if draw already completed today or in progress
-    if (drawCompleted || drawInProgress || drawExists) {
-      console.log('Draw already completed, in progress, or exists - skipping...');
+    if (drawCompleted || drawInProgress || drawExists || animationInProgress) {
+      console.log('Draw already completed, in progress, exists, or animating - skipping...');
       return;
+    }
+
+    // Clear any existing animation timeout
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
     }
 
     // Set both state and ref to prevent race conditions
     setDrawInProgress(true);
+    setAnimationInProgress(true);
     drawInProgressRef.current = true;
     setDrawNumbers([]);
     setShowingNumbers(false);
@@ -198,19 +212,29 @@ const LotteryDraw = () => {
         setShowingNumbers(true);
         const numbers = data.drawResult.winningNumbers;
         
-        // Animate numbers appearing one by one
+        // Animate numbers appearing one by one with proper timing
         for (let i = 0; i < numbers.length; i++) {
-          await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between numbers
+          await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay between numbers
           setDrawNumbers(prev => [...prev, numbers[i]]);
         }
         
+        // Wait for final animation to complete before showing toast
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         // Show completion message after all numbers are revealed
-        setTimeout(() => {
-          toast({
-            title: "Draw Complete!",
-            description: `Winners: ${data.drawResult.jackpotWinners} jackpot, ${data.drawResult.luckyDipWinners} lucky dip. Notifications sent!`,
-          });
-        }, 1000);
+        toast({
+          title: "Draw Complete!",
+          description: `Winners: ${data.drawResult.jackpotWinners} jackpot, ${data.drawResult.luckyDipWinners} lucky dip. Notifications sent!`,
+        });
+
+        // Schedule cleanup after animation completes
+        animationTimeoutRef.current = setTimeout(() => {
+          setDrawInProgress(false);
+          setShowingNumbers(false);
+          setDrawNumbers([]);
+          setAnimationInProgress(false);
+          drawInProgressRef.current = false;
+        }, 5000); // Keep animation visible for 5 seconds after completion
       }
 
       // Refresh the latest result and recalculate next draw date
@@ -222,17 +246,16 @@ const LotteryDraw = () => {
       setDrawCompleted(false); // Reset on error so they can try again
       drawTriggeredRef.current = false; // Reset trigger ref on error
       drawInProgressRef.current = false; // Reset ref on error
+      setAnimationInProgress(false);
+      setDrawInProgress(false);
+      setShowingNumbers(false);
+      setDrawNumbers([]);
+      
       toast({
         title: "Draw Error",
         description: "There was an error conducting the draw. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setTimeout(() => {
-        setDrawInProgress(false);
-        setShowingNumbers(false);
-        setDrawNumbers([]);
-      }, 3000); // Reset UI after 3 seconds
     }
   };
 
@@ -356,15 +379,16 @@ const LotteryDraw = () => {
                             >
                               {drawNumbers[index] !== undefined ? (
                                 <motion.div
-                                  initial={{ scale: 0, rotate: 180 }}
-                                  animate={{ scale: 1, rotate: 0 }}
+                                  key={`number-${drawNumbers[index]}`}
+                                  initial={{ scale: 0, rotate: 180, opacity: 0 }}
+                                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
                                   transition={{ 
                                     type: "spring", 
-                                    stiffness: 200, 
-                                    damping: 10,
-                                    duration: 0.8 
+                                    stiffness: 150, 
+                                    damping: 12,
+                                    duration: 0.6
                                   }}
-                                  className="text-3xl font-bold text-white bg-gradient-to-br from-purple-600 to-blue-600 w-full h-full rounded-full flex items-center justify-center"
+                                  className="text-3xl font-bold text-white bg-gradient-to-br from-purple-600 to-blue-600 w-full h-full rounded-full flex items-center justify-center shadow-lg"
                                 >
                                   {drawNumbers[index]}
                                 </motion.div>
@@ -377,7 +401,10 @@ const LotteryDraw = () => {
                           ))}
                         </div>
                         <p className="text-lg text-gray-300">
-                          Drawing number {drawNumbers.length + 1} of 4...
+                          {drawNumbers.length < 4 ? 
+                            `Drawing number ${drawNumbers.length + 1} of 4...` : 
+                            'All numbers drawn! 🎉'
+                          }
                         </p>
                       </div>
                     ) : (
