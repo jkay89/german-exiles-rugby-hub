@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.resend-api-test]
 verify_jwt = false
 
+[functions.simple-email-test]
+verify_jwt = false
+
 [functions.debug-lucky-dip-email]
 verify_jwt = false
 
