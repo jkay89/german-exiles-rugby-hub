@@ -97,9 +97,8 @@ const LotteryDraw = () => {
       setIsDrawActive(true);
       
       // Automatically conduct draw when timer hits zero (only once)
-      if (!drawInProgress && !drawCompleted && !drawInProgressRef.current && difference <= 0) {
+      if (!drawInProgress && !drawCompleted && difference <= 0) {
         setDrawCompleted(true); // Prevent multiple calls
-        drawInProgressRef.current = true; // Immediate protection against race conditions
         conductDraw();
       }
     }
@@ -143,7 +142,7 @@ const LotteryDraw = () => {
 
   const conductDraw = async () => {
     // Extra protection: check if draw already completed today or in progress
-    if (drawCompleted || drawInProgressRef.current) {
+    if (drawCompleted || drawInProgress) {
       console.log('Draw already completed or in progress, skipping...');
       return;
     }
