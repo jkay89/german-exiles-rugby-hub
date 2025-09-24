@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.test-lucky-dip-winners]
 verify_jwt = false
 
+[functions.resend-debug-test]
+verify_jwt = false
+
 [functions.test-email]
 verify_jwt = false
 
