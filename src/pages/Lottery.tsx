@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import LotteryEntry from "@/components/lottery/LotteryEntry";
 import RecentDraw from "@/components/lottery/RecentDraw";
+import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
 
 const Lottery = () => {
   const { user } = useAuth();
@@ -40,6 +41,9 @@ const Lottery = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Tab Navigation */}
+      <DrawTabNavigation />
+      
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-red-600/20" />
