@@ -15,14 +15,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log("=== TEST LUCKY DIP WINNERS EMAIL STARTING ===");
+    console.log("=== LUCKY DIP WINNERS EMAIL STARTING ===");
     
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Get the most recent test draw and its lucky dip winners
+    // Get the most recent draw and its lucky dip winners
     const { data: drawData, error: drawError } = await supabase
       .from('lottery_draws')
       .select(`
@@ -33,13 +33,12 @@ const handler = async (req: Request): Promise<Response> => {
           is_winner
         )
       `)
-      .eq('is_test_draw', true)
       .eq('lottery_results.is_winner', true)
       .order('created_at', { ascending: false })
       .limit(1);
 
     if (drawError || !drawData || drawData.length === 0) {
-      throw new Error(`No recent test draw found: ${drawError?.message}`);
+      throw new Error(`No recent draw found: ${drawError?.message}`);
     }
 
     const draw = drawData[0];
@@ -88,14 +87,14 @@ const handler = async (req: Request): Promise<Response> => {
       const userEmail = authUser.user.email;
       console.log(`Found email: ${userEmail}`);
 
-      // Send simplified lucky dip winner email (TEST MODE - send to Jay)
+      // Send simplified lucky dip winner email
       try {
-        console.log(`Sending test email for ${userEmail} to jay@germanexilesrl.co.uk...`);
+        console.log(`Sending lucky dip winner email to ${userEmail}...`);
         
         const emailResult = await resend.emails.send({
           from: "German Exiles RL <onboarding@resend.dev>",
-          to: ["jay@germanexilesrl.co.uk"], // TEST MODE: Send to Jay instead
-          subject: `🎉 Lucky Dip Winner TEST for ${userEmail}! £${winner.prize_amount}`,
+          to: [userEmail],
+          subject: `🎉 Lucky Dip Winner! £${winner.prize_amount} - German Exiles RL`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="background: #1e40af; color: white; padding: 30px; text-align: center; border-radius: 10px;">
@@ -139,7 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div style="background: #1f2937; color: #9ca3af; text-align: center; padding: 20px; border-radius: 8px;">
                 <p style="margin: 0; font-weight: bold;">German Exiles Rugby League</p>
-                <p style="margin: 5px 0 0 0; font-size: 14px;">This is a test email - ${new Date().toISOString()}</p>
+                <p style="margin: 5px 0 0 0; font-size: 14px;">Lottery Draw - ${new Date().toISOString()}</p>
               </div>
             </div>
           `,
@@ -170,7 +169,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Test emails sent to ${emailsSent}/${winners.length} lucky dip winners`,
+        message: `Live emails sent to ${emailsSent}/${winners.length} lucky dip winners`,
         drawId: draw.id,
         drawDate: draw.draw_date,
         totalWinners: winners.length,
