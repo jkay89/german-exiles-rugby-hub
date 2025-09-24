@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LotteryEntriesTable from "@/components/admin/LotteryEntriesTable";
 import { TestEmailSender } from "@/components/admin/TestEmailSender";
+import { RegisteredUsersTable } from "@/components/admin/RegisteredUsersTable";
 
 interface LotteryEntry {
   id: string;
@@ -703,6 +704,19 @@ const AdminLottery = () => {
           <TestEmailSender />
         </div>
         
+        {/* Registered Users Management */}
+        <Card className="bg-gray-900 border-gray-800 text-white mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-400" />
+              Registered Lottery Users
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RegisteredUsersTable />
+          </CardContent>
+        </Card>
+
         {/* Lottery Entries Management */}
         <Card className="bg-gray-900 border-gray-800 text-white">
           <CardHeader>

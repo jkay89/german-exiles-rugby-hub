@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.customer-portal]
 verify_jwt = false
+
+[functions.get-lottery-users]
+verify_jwt = false
+
+[functions.delete-lottery-user]
+verify_jwt = false
