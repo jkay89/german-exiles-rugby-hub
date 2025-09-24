@@ -163,19 +163,17 @@ const container = {
 }
 
 const celebrationHeader = {
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  backgroundColor: '#667eea',
   color: 'white',
   padding: '40px 20px',
-  textAlign: 'center' as const,
+  textAlign: 'center',
   borderRadius: '12px 12px 0 0',
-  position: 'relative' as const,
 }
 
 const confetti = {
   fontSize: '24px',
   display: 'inline-block',
   margin: '0 10px',
-  animation: 'bounce 2s infinite',
 }
 
 const mainHeading = {
@@ -204,9 +202,9 @@ const celebration = {
 }
 
 const prizeSection = {
-  textAlign: 'center' as const,
+  textAlign: 'center',
   padding: '30px 20px',
-  background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+  backgroundColor: '#ffecd2',
   borderRadius: '12px',
   margin: '20px 0',
 }
@@ -239,7 +237,7 @@ const randomSelection = {
 
 const messageSection = {
   padding: '30px 20px',
-  textAlign: 'center' as const,
+  textAlign: 'center',
 }
 
 const congratsText = {
@@ -267,11 +265,11 @@ const sectionHeading = {
   fontSize: '20px',
   color: '#1f2937',
   margin: '0 0 15px 0',
-  textAlign: 'center' as const,
+  textAlign: 'center',
 }
 
 const drawInfo = {
-  textAlign: 'center' as const,
+  textAlign: 'center',
 }
 
 const drawText = {
@@ -281,29 +279,26 @@ const drawText = {
 }
 
 const numbersContainer = {
-  display: 'flex',
-  justifyContent: 'center',
-  gap: '10px',
+  textAlign: 'center',
   margin: '20px 0',
-  flexWrap: 'wrap' as const,
 }
 
 const numberBall = {
-  background: 'linear-gradient(135deg, #3b82f6, #1e40af)',
+  backgroundColor: '#3b82f6',
   color: 'white',
   width: '45px',
   height: '45px',
   borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: 'inline-block',
+  textAlign: 'center',
+  lineHeight: '45px',
   fontWeight: 'bold',
   fontSize: '18px',
-  boxShadow: '0 4px 10px rgba(59, 130, 246, 0.3)',
+  margin: '0 5px',
 }
 
 const claimSection = {
-  background: 'linear-gradient(135deg, #fef3c7, #fbbf24)',
+  backgroundColor: '#fef3c7',
   padding: '30px',
   borderRadius: '12px',
   margin: '20px 0',
@@ -313,13 +308,13 @@ const claimHeading = {
   fontSize: '22px',
   color: '#92400e',
   margin: '0 0 15px 0',
-  textAlign: 'center' as const,
+  textAlign: 'center',
 }
 
 const claimIntro = {
   fontSize: '16px',
   color: '#78350f',
-  textAlign: 'center' as const,
+  textAlign: 'center',
   margin: '0 0 20px 0',
   fontWeight: '500',
 }
@@ -329,14 +324,10 @@ const requirementsList = {
 }
 
 const requirement = {
-  background: 'white',
+  backgroundColor: 'white',
   padding: '15px 20px',
   margin: '10px 0',
   borderRadius: '8px',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '15px',
 }
 
 const checkmark = {
@@ -345,12 +336,11 @@ const checkmark = {
 }
 
 const contactBox = {
-  background: 'white',
+  backgroundColor: 'white',
   padding: '25px',
   borderRadius: '12px',
-  textAlign: 'center' as const,
+  textAlign: 'center',
   margin: '20px 0',
-  boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
 }
 
 const contactTitle = {
@@ -377,9 +367,9 @@ const timeline = {
 }
 
 const excitementSection = {
-  textAlign: 'center' as const,
+  textAlign: 'center',
   padding: '30px 20px',
-  background: 'linear-gradient(135deg, #e0f2fe, #81d4fa)',
+  backgroundColor: '#e0f2fe',
   borderRadius: '12px',
   margin: '20px 0',
 }
@@ -398,9 +388,9 @@ const partyEmojis = {
 }
 
 const footer = {
-  background: '#1f2937',
+  backgroundColor: '#1f2937',
   color: '#9ca3af',
-  textAlign: 'center' as const,
+  textAlign: 'center',
   padding: '30px 20px',
   borderRadius: '0 0 12px 12px',
 }
