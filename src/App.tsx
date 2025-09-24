@@ -26,6 +26,7 @@ import Media from "./pages/Media";
 import MediaFolder from "./pages/MediaFolder";
 import Lottery from "./pages/Lottery";
 import LotteryDraw from "./pages/LotteryDraw";
+import TestDraw from "./pages/TestDraw";
 import LotteryTerms from "./pages/LotteryTerms";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LotterySuccess from "./pages/LotterySuccess";
@@ -94,6 +95,7 @@ const App = () => (
                 <Route path="/media/:id" element={<MediaFolder />} />
                 <Route path="/lottery" element={<Lottery />} />
                 <Route path="/lottery/draw" element={<LotteryDraw />} />
+                <Route path="/test-draw" element={<TestDraw />} />
                 <Route path="/lottery/terms" element={<LotteryTerms />} />
                 <Route path="/lottery/privacy" element={<PrivacyPolicy />} />
                 <Route path="/lottery/success" element={<LotterySuccess />} />
