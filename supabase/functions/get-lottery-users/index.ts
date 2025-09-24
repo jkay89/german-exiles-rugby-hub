@@ -19,14 +19,15 @@ serve(async (req) => {
     )
 
     // Get ALL registered users for admin dashboard
-    const { data: { users: allUsers }, error: allUsersError } = await supabaseClient.auth.admin.listUsers();
+    const { data, error: allUsersError } = await supabaseClient.auth.admin.listUsers();
     
     if (allUsersError) {
       console.error('Error fetching all users:', allUsersError);
       throw allUsersError;
     }
 
-    console.log(`Found ${allUsers?.length || 0} total registered users`);
+    const allUsers = data?.users || [];
+    console.log(`Found ${allUsers.length} total registered users`);
 
     // Get user details with lottery participation data
     const users = [];
