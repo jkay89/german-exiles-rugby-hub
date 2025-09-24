@@ -61,7 +61,11 @@ const Lottery = () => {
               Support your club and win big every month
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Button 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => document.getElementById('lottery-entry')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Play Now - £5 per line
               </Button>
               <Button size="lg" variant="outline" asChild>
@@ -270,7 +274,9 @@ const Lottery = () => {
             </div>
             
           {/* Lottery Entry Component */}
-          <LotteryEntry />
+          <div id="lottery-entry">
+            <LotteryEntry />
+          </div>
           
           {/* Dashboard Link for logged-in users */}
           {user && (
