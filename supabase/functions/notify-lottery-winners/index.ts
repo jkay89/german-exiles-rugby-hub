@@ -163,12 +163,15 @@ const handler = async (req: Request): Promise<Response> => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: #dc2626; color: white; padding: 30px; text-align: center; border-radius: 10px;">
             <h1 style="margin: 0; font-size: 32px;">🎉 JACKPOT WINNER! 🎉</h1>
-            <p style="font-size: 24px; margin: 15px 0;">YOU'VE WON £${winner.prizeAmount}!</p>
+            <p style="font-size: 24px; margin: 15px 0;">£${winner.prizeAmount} WINNER!</p>
+            <p style="font-size: 18px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin: 15px 0;">
+              TEST EMAIL - Real winner: ${userEmail.email}
+            </p>
           </div>
           
           <div style="padding: 30px 0;">
-            <h2 style="color: #dc2626;">Congratulations!</h2>
-            <p>You've matched all 4 numbers in the German Exiles Rugby League Lottery and won the JACKPOT!</p>
+            <h2 style="color: #dc2626;">Congratulations to ${userEmail.email}!</h2>
+            <p>This person matched all 4 numbers in the German Exiles Rugby League Lottery and won the JACKPOT!</p>
             
             <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
               <h3 style="margin: 0; font-size: 36px;">£${winner.prizeAmount}</h3>
@@ -179,18 +182,18 @@ const handler = async (req: Request): Promise<Response> => {
               <h3 style="color: #1e40af; margin-top: 0;">Draw Details</h3>
               <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
               <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
-              <p><strong>Your Numbers:</strong> ${winner.numbers ? winner.numbers.join(', ') : 'Matched all 4!'}</p>
+              <p><strong>Winner:</strong> ${userEmail.email}</p>
             </div>
             
             <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0;">
-              <h3 style="color: #92400e; margin-top: 0;">How to Claim Your Prize</h3>
-              <p>To receive your jackpot prize, please email <strong>jay@germanexilesrl.co.uk</strong> with:</p>
+              <h3 style="color: #92400e; margin-top: 0;">Next Steps</h3>
+              <p>Contact ${userEmail.email} to arrange prize claim process.</p>
+              <p>They need to provide:</p>
               <ul>
-                <li>A clear photo of your government-issued ID</li>
-                <li>Your bank account details</li>
-                <li>A copy of this email</li>
+                <li>Government-issued ID</li>
+                <li>Bank account details</li>
+                <li>Proof of entry</li>
               </ul>
-              <p><strong>Prize will be processed within 5-7 working days</strong></p>
             </div>
           </div>
         </div>
@@ -199,13 +202,13 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         await resend.emails.send({
           from: "German Exiles RL <onboarding@resend.dev>",
-          to: [userEmail.email],
-          subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} - German Exiles RL`,
+          to: ["jay@germanexilesrl.co.uk"], // Send to Jay instead due to domain verification
+          subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} for ${userEmail.email} - German Exiles RL`,
           html: jackpotEmailHtml,
         });
-        console.log(`Jackpot email sent to ${userEmail.email}`);
+        console.log(`Jackpot email sent for ${userEmail.email} to jay@germanexilesrl.co.uk`);
       } catch (emailError) {
-        console.error(`Failed to send jackpot email to ${userEmail.email}:`, emailError);
+        console.error(`Failed to send jackpot email for ${userEmail.email}:`, emailError);
       }
     }
 
@@ -229,10 +232,10 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       try {
-        // Render the React Email template for lucky dip winners
+        // Render the React Email template for lucky dip winners (TEST MODE)
         const luckyDipEmailHtml = await renderAsync(
           React.createElement(LuckyDipWinnerEmail, {
-            winnerName: userEmail.email.split('@')[0] || 'Lucky Winner',
+            winnerName: `${userEmail.email.split('@')[0]} (TEST for ${userEmail.email})`,
             prizeAmount: winner.prizeAmount,
             drawDate: draw.draw_date,
             winningNumbers: draw.winning_numbers,
@@ -241,12 +244,12 @@ const handler = async (req: Request): Promise<Response> => {
 
         await resend.emails.send({
           from: "German Exiles RL <onboarding@resend.dev>",
-          to: [userEmail.email],
-          subject: `🎉 LUCKY DIP WINNER! £${winner.prizeAmount} Prize! 🍀 German Exiles RL`,
+          to: ["jay@germanexilesrl.co.uk"], // Send to Jay instead due to domain verification
+          subject: `🎉 LUCKY DIP WINNER! £${winner.prizeAmount} for ${userEmail.email} 🍀 German Exiles RL`,
           html: luckyDipEmailHtml,
         });
 
-        console.log(`Exciting lucky dip email sent to ${userEmail.email}`);
+        console.log(`Exciting lucky dip email sent for ${userEmail.email} to jay@germanexilesrl.co.uk`);
       } catch (emailError) {
         console.error(`Failed to send lucky dip email to ${userEmail.email}:`, emailError);
       }
