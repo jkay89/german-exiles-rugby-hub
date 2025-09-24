@@ -102,7 +102,7 @@ serve(async (req) => {
         draw_date: drawDate,
         winning_numbers: winningNumbers,
         jackpot_amount: jackpotAmount,
-        lucky_dip_amount: 50,
+        lucky_dip_amount: 10,
         random_org_signature: randomOrgData.result.signature
       })
       .select()
@@ -198,7 +198,7 @@ serve(async (req) => {
           draw_id: drawResult.id,
           entry_id: winner.id,
           matches: 0, // Lucky dip doesn't require matches
-          prize_amount: 50,
+          prize_amount: 10,
           is_winner: true
         });
 
@@ -208,7 +208,7 @@ serve(async (req) => {
         winnerResults.push({
           type: 'lucky_dip',
           userId: winner.user_id,
-          prizeAmount: 50
+          prizeAmount: 10
         });
       }
     }
