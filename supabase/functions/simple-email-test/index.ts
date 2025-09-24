@@ -16,42 +16,47 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log("=== SIMPLE EMAIL TEST STARTING ===");
     
-    const { email, message } = await req.json();
-    const testEmail = email || "jay@germanexilesrl.co.uk";
-    const testMessage = message || "This is a simple email test";
+    const { to } = await req.json();
+    const testEmail = to || "jay@germanexilesrl.co.uk";
     
-    console.log(`Sending test email to: ${testEmail}`);
-    console.log(`Test message: ${testMessage}`);
+    console.log(`Sending simple test email to: ${testEmail}`);
     
-    const result = await resend.emails.send({
+    // Send very simple email
+    const emailResult = await resend.emails.send({
       from: "German Exiles RL <onboarding@resend.dev>",
       to: [testEmail],
-      subject: "🧪 Simple Email Test - Lucky Dip Debug",
+      subject: "Simple Test - Resend API Working",
       html: `
-        <h1>Simple Email Test</h1>
-        <p>${testMessage}</p>
-        <p>If you receive this email, the basic email system is working.</p>
+        <h1>Simple Test Email</h1>
+        <p>This is a basic test to verify Resend is working.</p>
         <p>Sent at: ${new Date().toISOString()}</p>
+        <p>If you receive this, the Resend API is functioning correctly.</p>
       `,
     });
 
-    console.log("Email sent successfully:", result);
-
+    console.log("Email sent successfully:", emailResult);
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
-        result,
-        message: `Test email sent to ${testEmail}` 
+        message: "Simple test email sent",
+        emailResult,
+        timestamp: new Date().toISOString()
       }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
-  } catch (error) {
-    console.error("Error sending test email:", error);
+
+  } catch (error: any) {
+    console.error("Error in simple email test:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
