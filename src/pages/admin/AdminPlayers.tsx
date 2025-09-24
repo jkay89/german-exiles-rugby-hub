@@ -107,6 +107,8 @@ const AdminPlayers = () => {
 
   const handleTeamChange = (value: string) => {
     console.log(`Team tab changing from ${activeTeam} to ${value}`);
+    console.log(`Current players count: ${players.length}`);
+    console.log(`Current players teams:`, players.map(p => ({ name: p.name, team: p.team })));
     
     // Update the active team state
     setActiveTeam(value);

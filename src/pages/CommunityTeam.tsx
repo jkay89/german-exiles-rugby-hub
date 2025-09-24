@@ -55,6 +55,22 @@ const CommunityTeam = () => {
     };
 
     loadCommunityPlayers();
+
+    // Set up real-time subscription to refresh when players are added/updated
+    const subscription = supabase
+      .channel('community-players')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'players', filter: 'team=eq.community' }, 
+        () => {
+          console.log('Community team player data changed, reloading...');
+          loadCommunityPlayers();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (

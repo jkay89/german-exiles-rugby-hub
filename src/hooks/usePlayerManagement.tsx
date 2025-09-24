@@ -87,12 +87,16 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         national_number: formData.get('national_number') as string || null,
       };
       
+      console.log(`Adding player to team: ${activeTeam}`, playerData);
+      
       const { data, error } = await supabase.rest
         .from('players')
         .insert(playerData)
         .select();
         
       if (error) throw error;
+      
+      console.log(`Player added successfully:`, data);
       
       toast({
         title: "Player added",
