@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Trophy, Users, ExternalLink, Play, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
 
 interface DrawResult {
   id: string;
@@ -157,6 +158,9 @@ const LotteryDraw = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Tab Navigation */}
+      <DrawTabNavigation />
+      
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20" />

@@ -3,10 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Shield, FileText } from "lucide-react";
+import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
 
 const LotteryTerms = () => {
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Tab Navigation */}
+      <DrawTabNavigation />
+      
       {/* Header */}
       <section className="py-12 px-4 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">

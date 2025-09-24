@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar, Mail, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
 
 const LotterySuccess = () => {
   const [searchParams] = useSearchParams();
@@ -44,6 +45,9 @@ const LotterySuccess = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Tab Navigation */}
+      <DrawTabNavigation />
+      
       <section className="py-20 px-4">
         <div className="max-w-2xl mx-auto">
           <motion.div
