@@ -416,7 +416,6 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log(`Lucky dip winner notification sent to ${winner.email}`);
     }
-    }
 
     return new Response(
       JSON.stringify({ 
