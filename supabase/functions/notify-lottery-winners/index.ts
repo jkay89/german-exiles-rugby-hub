@@ -1,30 +1,35 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import React from 'npm:react@18.3.1';
+import { renderAsync } from 'npm:@react-email/components@0.0.22';
+import { LuckyDipWinnerEmail } from './_templates/lucky-dip-winner.tsx';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+);
 
 interface LotteryDraw {
   id: string;
   draw_date: string;
   winning_numbers: number[];
   jackpot_amount: number;
+  lucky_dip_amount: number;
 }
 
 interface LotteryEntry {
   id: string;
   user_id: string;
   numbers: number[];
-  line_number: number;
+  draw_date: string;
 }
 
 interface UserProfile {
@@ -33,430 +38,221 @@ interface UserProfile {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("Lottery winner notification function triggered");
-
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log("=== NOTIFY LOTTERY WINNERS STARTING ===");
+    
     const { drawId, winners } = await req.json();
-    console.log("Processing draw ID:", drawId, "with", winners?.length || 0, "winners");
+    console.log(`Processing notification for draw ${drawId} with ${winners.length} winners`);
 
-    // Get the lottery draw details
-    const { data: draw, error: drawError } = await supabase
+    // Fetch draw details
+    const { data: drawData, error: drawError } = await supabase
       .from('lottery_draws')
       .select('*')
       .eq('id', drawId)
       .single();
 
-    if (drawError || !draw) {
-      console.error("Error fetching draw:", drawError);
-      throw new Error("Could not fetch lottery draw");
+    if (drawError || !drawData) {
+      throw new Error(`Failed to fetch draw details: ${drawError?.message}`);
     }
 
-    console.log("Draw details:", draw);
+    const draw: LotteryDraw = drawData;
+    console.log(`Draw details: ${draw.draw_date}, numbers: [${draw.winning_numbers.join(', ')}]`);
 
-    if (!winners || winners.length === 0) {
-      console.log("No winners to notify");
-      return new Response(
-        JSON.stringify({ success: true, message: "No winners to notify" }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
+    // Separate winners by type
+    const jackpotWinners = winners.filter((w: any) => w.matches === 4);
+    const luckyDipWinners = winners.filter((w: any) => w.matches === 0 && w.isLuckyDip);
 
-    // Separate jackpot and lucky dip winners
-    const jackpotWinners = winners.filter(w => w.type === 'jackpot');
-    const luckyDipWinners = winners.filter(w => w.type === 'lucky_dip');
-
-    console.log(`Processing ${jackpotWinners.length} jackpot winners and ${luckyDipWinners.length} lucky dip winners`);
-    console.log("All winners data:", JSON.stringify(winners, null, 2));
+    console.log(`Found ${jackpotWinners.length} jackpot winners and ${luckyDipWinners.length} lucky dip winners`);
 
     // Get user emails for all winners
-    const allWinnerEmails = [];
-    
-    console.log(`Starting to fetch emails for ${winners.length} winners...`);
-    
-    for (const winner of winners) {
-      console.log(`Fetching email for user: ${winner.userId}`);
-      const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(winner.userId);
+    const allWinnerIds = winners.map((w: any) => w.userId);
+    const userEmails: UserProfile[] = [];
+
+    console.log("=== FETCHING USER EMAILS ===");
+    for (const userId of allWinnerIds) {
+      console.log(`Fetching email for user: ${userId}`);
+      
+      const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(userId);
       
       if (userError) {
-        console.error(`Error fetching user ${winner.userId}:`, userError);
-      } else if (authUser?.user?.email) {
-        console.log(`Found email for ${winner.userId}: ${authUser.user.email}`);
-        allWinnerEmails.push({
-          ...winner,
+        console.error(`Error getting user ${userId}:`, userError);
+        continue;
+      }
+
+      if (authUser?.user?.email) {
+        userEmails.push({
+          user_id: userId,
           email: authUser.user.email
         });
+        console.log(`Found email for user ${userId}: ${authUser.user.email}`);
       } else {
-        console.log(`No email found for user ${winner.userId}`);
+        console.log(`No email found for user ${userId}`);
       }
     }
 
-    console.log(`Total emails collected: ${allWinnerEmails.length}`);
-    console.log("Winner emails with types:", JSON.stringify(allWinnerEmails.map(w => ({ type: w.type, email: w.email })), null, 2));
+    // Send summary email to admin
+    console.log("=== SENDING SUMMARY EMAIL TO ADMIN ===");
+    const summaryEmailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #1e40af; color: white; padding: 20px; text-align: center; border-radius: 10px;">
+          <h1>🎯 Lottery Draw Results Summary</h1>
+        </div>
+        
+        <div style="padding: 20px 0;">
+          <h2>Draw Details</h2>
+          <p><strong>Date:</strong> ${draw.draw_date}</p>
+          <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
+          <p><strong>Jackpot Amount:</strong> £${draw.jackpot_amount}</p>
+          
+          <h3>Results:</h3>
+          <ul>
+            <li><strong>Jackpot Winners:</strong> ${jackpotWinners.length}</li>
+            <li><strong>Lucky Dip Winners:</strong> ${luckyDipWinners.length}</li>
+            <li><strong>Total Winners:</strong> ${winners.length}</li>
+          </ul>
+          
+          ${winners.length > 0 ? `
+            <h3>Winner Details:</h3>
+            <ul>
+              ${winners.map((w: any) => {
+                const userEmail = userEmails.find(u => u.user_id === w.userId);
+                return `<li>${userEmail?.email || 'Unknown'} - ${w.matches === 4 ? 'Jackpot' : 'Lucky Dip'} - £${w.prizeAmount}</li>`;
+              }).join('')}
+            </ul>
+          ` : '<p>No winners for this draw.</p>'}
+        </div>
+      </div>
+    `;
 
-    // Send summary email to Jay
-    if (allWinnerEmails.length > 0) {
-      const winnersList = allWinnerEmails.map(winner => {
-        return `
-          <li>
-            <strong>Type:</strong> ${winner.type === 'jackpot' ? 'Jackpot Winner' : 'Lucky Dip Winner'}<br>
-            <strong>Player:</strong> ${winner.email}<br>
-            <strong>Prize:</strong> £${winner.prizeAmount}<br>
-            <strong>User ID:</strong> ${winner.userId}
-          </li>
-        `;
-      }).join('');
-
-      const summaryEmailHtml = `
-        <h1>🎉 Lottery Winners Alert!</h1>
-        <p>The following players have won prizes for the draw on ${draw.draw_date}:</p>
-        
-        <h2>Draw Details</h2>
-        <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
-        <p><strong>Jackpot Amount:</strong> £${draw.jackpot_amount}</p>
-        
-        <h2>Winners Summary</h2>
-        <p><strong>Jackpot Winners:</strong> ${jackpotWinners.length}</p>
-        <p><strong>Lucky Dip Winners:</strong> ${luckyDipWinners.length}</p>
-        <p><strong>Total Winners:</strong> ${allWinnerEmails.length}</p>
-        
-        <h2>Winner Details</h2>
-        <ul>
-          ${winnersList}
-        </ul>
-        
-        <hr>
-        <p><em>This is an automated notification from the German Exiles Rugby League Lottery system.</em></p>
-      `;
-
+    try {
       await resend.emails.send({
         from: "German Exiles RL <onboarding@resend.dev>",
         to: ["jay@germanexilesrl.co.uk"],
-        subject: `🎉 Lottery Winners - ${allWinnerEmails.length} winner(s) for ${draw.draw_date}`,
+        subject: `🎯 Lottery Draw Results - ${draw.draw_date} - ${winners.length} Winners`,
         html: summaryEmailHtml,
       });
-
-      console.log("Summary email sent to Jay");
+      console.log("Summary email sent to admin successfully");
+    } catch (summaryError) {
+      console.error("Failed to send summary email:", summaryError);
     }
 
-    // Send emails to jackpot winners with rate limiting
-    const jackpotEmailWinners = allWinnerEmails.filter(w => w.type === 'jackpot');
-    for (let i = 0; i < jackpotEmailWinners.length; i++) {
-      const winner = jackpotEmailWinners[i];
+    // Send jackpot winner emails (if any)
+    console.log("=== SENDING JACKPOT WINNER EMAILS ===");
+    for (let i = 0; i < jackpotWinners.length; i++) {
+      const winner = jackpotWinners[i];
+      const userEmail = userEmails.find(u => u.user_id === winner.userId);
       
-      // Add delay to respect Resend rate limit (2 requests per second)
+      if (!userEmail) {
+        console.log(`No email found for jackpot winner ${winner.userId}`);
+        continue;
+      }
+
+      console.log(`Processing jackpot winner ${i + 1}/${jackpotWinners.length}: ${userEmail.email}`);
+      
+      // Add delay between emails to respect rate limits
       if (i > 0) {
         console.log("Waiting 600ms to respect rate limit...");
         await new Promise(resolve => setTimeout(resolve, 600));
       }
-      const winnerEmailHtml = `
-        <h1>🎉 JACKPOT WINNER! Congratulations!</h1>
-        <p>INCREDIBLE NEWS! You've won the JACKPOT in the German Exiles Rugby League Lottery!</p>
-        
-        <h2>Draw Details</h2>
-        <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
-        <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
-        
-        <h2>Your Jackpot Win</h2>
-        <p><strong>Prize Amount:</strong> £${winner.prizeAmount}</p>
-        <p><strong>Type:</strong> Jackpot Winner (All 4 numbers matched!)</p>
-        
-        <hr>
-        <h3>Next Steps</h3>
-        <p><strong>To claim your prize, please email jay@germanexilesrl.co.uk with:</strong></p>
-        <ul>
-          <li>A copy of your photo ID (passport or driving licence)</li>
-          <li>Your bank details for payment transfer</li>
-          <li>This winning notification email</li>
-        </ul>
-        
-        <p>Your prize will be processed and paid within 5-7 working days after verification.</p>
-        
-        <p><em>Congratulations from everyone at German Exiles Rugby League! This is a fantastic win!</em></p>
-      `;
 
-      await resend.emails.send({
-        from: "German Exiles RL <onboarding@resend.dev>",
-        to: [winner.email],
-        subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} - German Exiles RL Lottery`,
-        html: winnerEmailHtml,
-      });
-
-      console.log(`Jackpot winner notification sent to ${winner.email}`);
-    }
-
-    // Send emails to lucky dip winners with rate limiting
-    console.log("=== STARTING LUCKY DIP EMAIL SECTION ===");
-    const luckyDipEmailWinners = allWinnerEmails.filter(w => w.type === 'lucky_dip');
-    console.log(`Found ${luckyDipEmailWinners.length} lucky dip winners to email`);
-    console.log("Lucky dip winners:", JSON.stringify(luckyDipEmailWinners.map(w => ({ email: w.email, prizeAmount: w.prizeAmount })), null, 2));
-    
-    for (let i = 0; i < luckyDipEmailWinners.length; i++) {
-      const winner = luckyDipEmailWinners[i];
-      console.log(`=== PROCESSING LUCKY DIP EMAIL ${i + 1}/${luckyDipEmailWinners.length} FOR ${winner.email} ===`);
-      
-      // Add delay to respect Resend rate limit (2 requests per second)
-      if (i > 0) {
-        console.log("Waiting 600ms to respect rate limit...");
-        await new Promise(resolve => setTimeout(resolve, 600));
-      }
-      const luckyDipEmailHtml = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Lucky Dip Winner - German Exiles RL</title>
-          <style>
-            body {
-              font-family: 'Arial', sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              background-color: #f8f9fa;
-              padding: 20px;
-            }
-            .email-container {
-              background: white;
-              border-radius: 12px;
-              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-              overflow: hidden;
-            }
-            .header {
-              background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-              color: white;
-              padding: 40px 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: bold;
-            }
-            .winner-badge {
-              background: #fbbf24;
-              color: #92400e;
-              padding: 8px 16px;
-              border-radius: 20px;
-              font-weight: bold;
-              font-size: 14px;
-              margin-top: 15px;
-              display: inline-block;
-            }
-            .content {
-              padding: 40px 30px;
-            }
-            .congratulations {
-              text-align: center;
-              margin-bottom: 30px;
-            }
-            .congratulations h2 {
-              color: #1e40af;
-              font-size: 24px;
-              margin-bottom: 10px;
-            }
-            .prize-box {
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              color: white;
-              padding: 25px;
-              border-radius: 10px;
-              text-align: center;
-              margin: 25px 0;
-            }
-            .prize-amount {
-              font-size: 36px;
-              font-weight: bold;
-              margin: 0;
-            }
-            .prize-label {
-              font-size: 16px;
-              opacity: 0.9;
-              margin-top: 5px;
-            }
-            .draw-details {
-              background: #f1f5f9;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 25px 0;
-            }
-            .draw-details h3 {
-              color: #1e40af;
-              margin-top: 0;
-              margin-bottom: 15px;
-            }
-            .winning-numbers {
-              display: flex;
-              gap: 10px;
-              justify-content: center;
-              margin: 15px 0;
-            }
-            .number-ball {
-              background: #3b82f6;
-              color: white;
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-weight: bold;
-              font-size: 16px;
-            }
-            .next-steps {
-              background: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 20px;
-              margin: 25px 0;
-              border-radius: 0 8px 8px 0;
-            }
-            .next-steps h3 {
-              color: #92400e;
-              margin-top: 0;
-            }
-            .requirements {
-              list-style: none;
-              padding: 0;
-            }
-            .requirements li {
-              background: white;
-              padding: 12px 15px;
-              margin: 8px 0;
-              border-radius: 6px;
-              border-left: 3px solid #f59e0b;
-            }
-            .requirements li:before {
-              content: "✓";
-              color: #10b981;
-              font-weight: bold;
-              margin-right: 10px;
-            }
-            .contact-info {
-              background: #e0f2fe;
-              padding: 20px;
-              border-radius: 8px;
-              text-align: center;
-              margin: 25px 0;
-            }
-            .contact-email {
-              color: #1e40af;
-              font-weight: bold;
-              font-size: 18px;
-              text-decoration: none;
-            }
-            .footer {
-              background: #1f2937;
-              color: #9ca3af;
-              text-align: center;
-              padding: 30px;
-              font-size: 14px;
-            }
-            .footer .logo {
-              color: white;
-              font-weight: bold;
-              font-size: 18px;
-              margin-bottom: 10px;
-            }
-            .timeline {
-              color: #10b981;
-              font-weight: bold;
-              font-size: 16px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="email-container">
-            <div class="header">
-              <h1>🎉 Lucky Dip Winner!</h1>
-              <div class="winner-badge">YOU'VE WON £${winner.prizeAmount}!</div>
+      const jackpotEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #dc2626; color: white; padding: 30px; text-align: center; border-radius: 10px;">
+            <h1 style="margin: 0; font-size: 32px;">🎉 JACKPOT WINNER! 🎉</h1>
+            <p style="font-size: 24px; margin: 15px 0;">YOU'VE WON £${winner.prizeAmount}!</p>
+          </div>
+          
+          <div style="padding: 30px 0;">
+            <h2 style="color: #dc2626;">Congratulations!</h2>
+            <p>You've matched all 4 numbers in the German Exiles Rugby League Lottery and won the JACKPOT!</p>
+            
+            <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <h3 style="margin: 0; font-size: 36px;">£${winner.prizeAmount}</h3>
+              <p style="margin: 5px 0 0 0;">JACKPOT PRIZE!</p>
             </div>
             
-            <div class="content">
-              <div class="congratulations">
-                <h2>Congratulations!</h2>
-                <p>You've been randomly selected as a Lucky Dip winner in the German Exiles Rugby League Lottery!</p>
-              </div>
-              
-              <div class="prize-box">
-                <div class="prize-amount">£${winner.prizeAmount}</div>
-                <div class="prize-label">Lucky Dip Prize</div>
-              </div>
-              
-              <div class="draw-details">
-                <h3>📅 Draw Details</h3>
-                <p><strong>Draw Date:</strong> ${new Date(draw.draw_date).toLocaleDateString('en-GB', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</p>
-                <p><strong>Winning Numbers:</strong></p>
-                <div class="winning-numbers">
-                  ${draw.winning_numbers.map(num => `<div class="number-ball">${num}</div>`).join('')}
-                </div>
-                <p style="text-align: center; margin-top: 15px;"><em>You were randomly selected from all entries - no number matching required!</em></p>
-              </div>
-              
-              <div class="next-steps">
-                <h3>🏆 How to Claim Your Prize</h3>
-                <p>To receive your prize, please send the following to our lottery coordinator:</p>
-                <ul class="requirements">
-                  <li>A clear photo of your government-issued ID (passport or driving licence)</li>
-                  <li>Your bank account details for the prize transfer</li>
-                  <li>A copy of this winning notification email</li>
-                </ul>
-              </div>
-              
-              <div class="contact-info">
-                <p><strong>Send your claim details to:</strong></p>
-                <a href="mailto:jay@germanexilesrl.co.uk" class="contact-email">jay@germanexilesrl.co.uk</a>
-                <p style="margin-top: 15px;">
-                  <span class="timeline">⏱️ Prize will be processed within 5-7 working days</span>
-                </p>
-              </div>
-              
-              <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <p style="color: #6b7280; font-style: italic;">
-                  "Well done and congratulations from everyone at German Exiles Rugby League! 🏉"
-                </p>
-              </div>
+            <div style="background: #f1f5f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #1e40af; margin-top: 0;">Draw Details</h3>
+              <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
+              <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
+              <p><strong>Your Numbers:</strong> ${winner.numbers ? winner.numbers.join(', ') : 'Matched all 4!'}</p>
             </div>
             
-            <div class="footer">
-              <div class="logo">German Exiles Rugby League</div>
-              <p>Supporting rugby league in Germany</p>
-              <p style="font-size: 12px; margin-top: 15px;">
-                This email was sent to confirm your lottery win. Please keep this email as proof of your prize.
-              </p>
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0;">
+              <h3 style="color: #92400e; margin-top: 0;">How to Claim Your Prize</h3>
+              <p>To receive your jackpot prize, please email <strong>jay@germanexilesrl.co.uk</strong> with:</p>
+              <ul>
+                <li>A clear photo of your government-issued ID</li>
+                <li>Your bank account details</li>
+                <li>A copy of this email</li>
+              </ul>
+              <p><strong>Prize will be processed within 5-7 working days</strong></p>
             </div>
           </div>
-        </body>
-        </html>
+        </div>
       `;
 
       try {
-        console.log(`Attempting to send email to ${winner.email}...`);
-        const emailResult = await resend.emails.send({
+        await resend.emails.send({
           from: "German Exiles RL <onboarding@resend.dev>",
-          to: [winner.email],
-          subject: `🎉 Lucky Dip Winner! £${winner.prizeAmount} - German Exiles RL Lottery`,
+          to: [userEmail.email],
+          subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} - German Exiles RL`,
+          html: jackpotEmailHtml,
+        });
+        console.log(`Jackpot email sent to ${userEmail.email}`);
+      } catch (emailError) {
+        console.error(`Failed to send jackpot email to ${userEmail.email}:`, emailError);
+      }
+    }
+
+    // Send lucky dip winner emails using React Email template
+    console.log("=== SENDING LUCKY DIP WINNER EMAILS ===");
+    for (let i = 0; i < luckyDipWinners.length; i++) {
+      const winner = luckyDipWinners[i];
+      const userEmail = userEmails.find(u => u.user_id === winner.userId);
+      
+      if (!userEmail) {
+        console.log(`No email found for lucky dip winner ${winner.userId}`);
+        continue;
+      }
+
+      console.log(`Processing lucky dip winner ${i + 1}/${luckyDipWinners.length}: ${userEmail.email}`);
+      
+      // Add delay between emails to respect rate limits
+      if (i > 0) {
+        console.log("Waiting 600ms to respect rate limit...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
+
+      try {
+        // Render the React Email template for lucky dip winners
+        const luckyDipEmailHtml = await renderAsync(
+          React.createElement(LuckyDipWinnerEmail, {
+            winnerName: userEmail.email.split('@')[0] || 'Lucky Winner',
+            prizeAmount: winner.prizeAmount,
+            drawDate: draw.draw_date,
+            winningNumbers: draw.winning_numbers,
+          })
+        );
+
+        await resend.emails.send({
+          from: "German Exiles RL <onboarding@resend.dev>",
+          to: [userEmail.email],
+          subject: `🎉 LUCKY DIP WINNER! £${winner.prizeAmount} Prize! 🍀 German Exiles RL`,
           html: luckyDipEmailHtml,
         });
 
-        console.log(`Email sent successfully to ${winner.email}:`, emailResult);
+        console.log(`Exciting lucky dip email sent to ${userEmail.email}`);
       } catch (emailError) {
-        console.error(`Failed to send email to ${winner.email}:`, emailError);
+        console.error(`Failed to send lucky dip email to ${userEmail.email}:`, emailError);
       }
     }
     
-    console.log("=== FINISHED LUCKY DIP EMAIL SECTION ===");
+    console.log("=== FINISHED EMAIL NOTIFICATIONS ===");
 
     return new Response(
       JSON.stringify({ 
@@ -464,7 +260,8 @@ const handler = async (req: Request): Promise<Response> => {
         jackpot_winners: jackpotWinners.length,
         lucky_dip_winners: luckyDipWinners.length,
         total_winners: winners.length,
-        draw_date: draw.draw_date 
+        draw_date: draw.draw_date,
+        emails_attempted: userEmails.length
       }),
       {
         status: 200,
@@ -478,7 +275,11 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in notify-lottery-winners function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
