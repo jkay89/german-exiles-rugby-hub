@@ -13,6 +13,12 @@ const LotteryNavigation = () => {
       >
         Play
       </Link>
+      <Link 
+        to="/lottery/draw" 
+        className="text-white hover:text-gray-300 transition-colors font-medium"
+      >
+        The Draw
+      </Link>
       {user && (
         <Button asChild variant="ghost" size="sm">
           <Link to={`/lottery/${user.email?.split('@')[0] || ''}`}>
