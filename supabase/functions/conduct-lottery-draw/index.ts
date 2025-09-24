@@ -125,6 +125,30 @@ serve(async (req) => {
 
     console.log('Draw result stored:', drawResult);
 
+    // Update next draw date to end of next month (only for real draws, not test draws)
+    if (!isTestDraw) {
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+      const nextDrawDate = lastDayOfNextMonth.toISOString().split('T')[0];
+
+      console.log(`Updating next draw date to: ${nextDrawDate}`);
+      
+      const { error: settingsError } = await supabaseClient
+        .from('lottery_settings')
+        .update({ 
+          setting_value: nextDrawDate,
+          updated_at: new Date().toISOString()
+        })
+        .eq('setting_key', 'next_draw_date');
+
+      if (settingsError) {
+        console.error('Error updating next draw date:', settingsError);
+      } else {
+        console.log('Successfully updated next draw date');
+      }
+    }
+
     // Find all winners (jackpot and lucky dip)
     const { data: entries, error: entriesError } = await supabaseClient
       .from('lottery_entries')

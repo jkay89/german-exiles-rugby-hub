@@ -46,6 +46,11 @@ const LotteryDraw = () => {
     return () => clearInterval(timer);
   }, [nextDrawDate]);
 
+  // Reset drawCompleted when nextDrawDate changes (new draw scheduled)
+  useEffect(() => {
+    setDrawCompleted(false);
+  }, [nextDrawDate]);
+
   const calculateNextDrawDate = async () => {
     try {
       const drawDate = await getNextDrawDateFromSettings();
@@ -170,11 +175,9 @@ const LotteryDraw = () => {
         }, 1000);
       }
 
-      // Refresh the latest result
+      // Refresh the latest result and recalculate next draw date
       fetchLatestResult();
-      
-      // Recalculate next draw date
-      calculateNextDrawDate();
+      calculateNextDrawDate(); // This will fetch the updated next draw date from settings
       
     } catch (error) {
       console.error('Error conducting draw:', error);
