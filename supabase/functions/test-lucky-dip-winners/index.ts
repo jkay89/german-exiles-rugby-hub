@@ -88,14 +88,14 @@ const handler = async (req: Request): Promise<Response> => {
       const userEmail = authUser.user.email;
       console.log(`Found email: ${userEmail}`);
 
-      // Send simplified lucky dip winner email
+      // Send simplified lucky dip winner email (TEST MODE - send to Jay)
       try {
-        console.log(`Sending simplified lucky dip email to ${userEmail}...`);
+        console.log(`Sending test email for ${userEmail} to jay@germanexilesrl.co.uk...`);
         
         const emailResult = await resend.emails.send({
           from: "German Exiles RL <onboarding@resend.dev>",
-          to: [userEmail],
-          subject: `🎉 Lucky Dip Winner! £${winner.prize_amount} - German Exiles RL`,
+          to: ["jay@germanexilesrl.co.uk"], // TEST MODE: Send to Jay instead
+          subject: `🎉 Lucky Dip Winner TEST for ${userEmail}! £${winner.prize_amount}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="background: #1e40af; color: white; padding: 30px; text-align: center; border-radius: 10px;">
