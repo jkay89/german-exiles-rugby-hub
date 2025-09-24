@@ -29,6 +29,7 @@ const LotteryDraw = () => {
   const [drawInProgress, setDrawInProgress] = useState(false);
   const [drawNumbers, setDrawNumbers] = useState<number[]>([]);
   const [showingNumbers, setShowingNumbers] = useState(false);
+  const [drawCompleted, setDrawCompleted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -89,8 +90,9 @@ const LotteryDraw = () => {
       setTimeUntilDraw("Draw in progress...");
       setIsDrawActive(true);
       
-      // Automatically conduct draw when timer hits zero
-      if (!drawInProgress && difference <= 0) {
+      // Automatically conduct draw when timer hits zero (only once)
+      if (!drawInProgress && !drawCompleted && difference <= 0) {
+        setDrawCompleted(true); // Prevent multiple calls
         conductDraw();
       }
     }
@@ -277,7 +279,7 @@ const LotteryDraw = () => {
                   </div>
                 </div>
 
-                {isDrawActive && !drawInProgress && (
+                {isDrawActive && !drawInProgress && !drawCompleted && (
                   <div className="text-center">
                     <div className="animate-pulse">
                       <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
