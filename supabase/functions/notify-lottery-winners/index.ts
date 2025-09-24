@@ -41,14 +41,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { draw_id } = await req.json();
-    console.log("Processing draw ID:", draw_id);
+    const { drawId, winners } = await req.json();
+    console.log("Processing draw ID:", drawId, "with", winners?.length || 0, "winners");
 
     // Get the lottery draw details
     const { data: draw, error: drawError } = await supabase
       .from('lottery_draws')
       .select('*')
-      .eq('id', draw_id)
+      .eq('id', drawId)
       .single();
 
     if (drawError || !draw) {
@@ -58,74 +58,63 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Draw details:", draw);
 
-    // Get all active lottery entries
-    const { data: entries, error: entriesError } = await supabase
-      .from('lottery_entries')
-      .select('*')
-      .eq('is_active', true);
-
-    if (entriesError) {
-      console.error("Error fetching entries:", entriesError);
-      throw new Error("Could not fetch lottery entries");
+    if (!winners || winners.length === 0) {
+      console.log("No winners to notify");
+      return new Response(
+        JSON.stringify({ success: true, message: "No winners to notify" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
-    console.log(`Checking ${entries?.length || 0} entries for matches`);
+    // Separate jackpot and lucky dip winners
+    const jackpotWinners = winners.filter(w => w.type === 'jackpot');
+    const luckyDipWinners = winners.filter(w => w.type === 'lucky_dip');
 
-    const winners: Array<{
-      entry: LotteryEntry;
-      matches: number;
-      userEmail?: string;
-    }> = [];
+    console.log(`Processing ${jackpotWinners.length} jackpot winners and ${luckyDipWinners.length} lucky dip winners`);
 
-    // Check each entry for matches
-    for (const entry of entries || []) {
-      const matches = entry.numbers.filter((num: number) => 
-        draw.winning_numbers.includes(num)
-      ).length;
-
-      if (matches >= 2) { // Consider 2+ matches as a win
-        console.log(`Winner found! Entry ${entry.id} has ${matches} matches`);
-        
-        // Get user email from auth.users
-        const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(entry.user_id);
-        
-        winners.push({
-          entry,
-          matches,
-          userEmail: authUser?.user?.email
+    // Get user emails for all winners
+    const allWinnerEmails = [];
+    
+    for (const winner of winners) {
+      const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(winner.userId);
+      if (authUser?.user?.email) {
+        allWinnerEmails.push({
+          ...winner,
+          email: authUser.user.email
         });
       }
     }
 
-    console.log(`Found ${winners.length} winners`);
-
-    if (winners.length > 0) {
-      // Prepare email content
-      const winnersList = winners.map(winner => {
-        const prizeAmount = winner.matches === 4 ? draw.jackpot_amount : 
-                          winner.matches === 3 ? 100 :
-                          winner.matches === 2 ? 10 : 0;
-        
+    // Send summary email to Jay
+    if (allWinnerEmails.length > 0) {
+      const winnersList = allWinnerEmails.map(winner => {
         return `
           <li>
-            <strong>Player:</strong> ${winner.userEmail || 'Unknown'}<br>
-            <strong>Numbers:</strong> ${winner.entry.numbers.join(', ')}<br>
-            <strong>Matches:</strong> ${winner.matches}<br>
-            <strong>Prize:</strong> £${prizeAmount}<br>
-            <strong>Line:</strong> ${winner.entry.line_number}
+            <strong>Type:</strong> ${winner.type === 'jackpot' ? 'Jackpot Winner' : 'Lucky Dip Winner'}<br>
+            <strong>Player:</strong> ${winner.email}<br>
+            <strong>Prize:</strong> £${winner.prizeAmount}<br>
+            <strong>User ID:</strong> ${winner.userId}
           </li>
         `;
       }).join('');
 
-      const emailHtml = `
+      const summaryEmailHtml = `
         <h1>🎉 Lottery Winners Alert!</h1>
-        <p>The following players have winning numbers for the draw on ${draw.draw_date}:</p>
+        <p>The following players have won prizes for the draw on ${draw.draw_date}:</p>
         
         <h2>Draw Details</h2>
         <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
         <p><strong>Jackpot Amount:</strong> £${draw.jackpot_amount}</p>
         
-        <h2>Winners (${winners.length})</h2>
+        <h2>Winners Summary</h2>
+        <p><strong>Jackpot Winners:</strong> ${jackpotWinners.length}</p>
+        <p><strong>Lucky Dip Winners:</strong> ${luckyDipWinners.length}</p>
+        <p><strong>Total Winners:</strong> ${allWinnerEmails.length}</p>
+        
+        <h2>Winner Details</h2>
         <ul>
           ${winnersList}
         </ul>
@@ -134,85 +123,98 @@ const handler = async (req: Request): Promise<Response> => {
         <p><em>This is an automated notification from the German Exiles Rugby League Lottery system.</em></p>
       `;
 
-      // Send notification email
-      const emailResponse = await resend.emails.send({
+      await resend.emails.send({
         from: "German Exiles RL <lottery@germanexilesrl.co.uk>",
         to: ["jay@germanexilesrl.co.uk"],
-        subject: `🎉 Lottery Winners - ${winners.length} winner(s) for ${draw.draw_date}`,
-        html: emailHtml,
+        subject: `🎉 Lottery Winners - ${allWinnerEmails.length} winner(s) for ${draw.draw_date}`,
+        html: summaryEmailHtml,
       });
 
-      console.log("Email sent successfully:", emailResponse);
+      console.log("Summary email sent to Jay");
+    }
 
-      // Send individual winner notifications
-      for (const winner of winners) {
-        if (winner.userEmail) {
-          const prizeAmount = winner.matches === 4 ? draw.jackpot_amount : 
-                            winner.matches === 3 ? 100 :
-                            winner.matches === 2 ? 10 : 0;
-          
-          const winnerEmailHtml = `
-            <h1>🎉 Congratulations! You're a Winner!</h1>
-            <p>Great news! Your lottery numbers have won in the German Exiles Rugby League Lottery!</p>
-            
-            <h2>Draw Details</h2>
-            <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
-            <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
-            
-            <h2>Your Winning Entry</h2>
-            <p><strong>Your Numbers:</strong> ${winner.entry.numbers.join(', ')}</p>
-            <p><strong>Matches:</strong> ${winner.matches} out of 4</p>
-            <p><strong>Prize Amount:</strong> £${prizeAmount}</p>
-            <p><strong>Line Number:</strong> ${winner.entry.line_number}</p>
-            
-            <hr>
-            <h3>Next Steps</h3>
-            <p>Your prize will be paid via bank transfer within 2-3 working days.</p>
-            <p>If you have any questions, please contact us at lottery@germanexilesrl.co.uk</p>
-            
-            <p><em>Congratulations again from the German Exiles Rugby League team!</em></p>
-          `;
+    // Send emails to jackpot winners
+    for (const winner of allWinnerEmails.filter(w => w.type === 'jackpot')) {
+      const winnerEmailHtml = `
+        <h1>🎉 JACKPOT WINNER! Congratulations!</h1>
+        <p>INCREDIBLE NEWS! You've won the JACKPOT in the German Exiles Rugby League Lottery!</p>
+        
+        <h2>Draw Details</h2>
+        <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
+        <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
+        
+        <h2>Your Jackpot Win</h2>
+        <p><strong>Prize Amount:</strong> £${winner.prizeAmount}</p>
+        <p><strong>Type:</strong> Jackpot Winner (All 4 numbers matched!)</p>
+        
+        <hr>
+        <h3>Next Steps</h3>
+        <p><strong>To claim your prize, please email jay@germanexilesrl.co.uk with:</strong></p>
+        <ul>
+          <li>A copy of your photo ID (passport or driving licence)</li>
+          <li>Your bank details for payment transfer</li>
+          <li>This winning notification email</li>
+        </ul>
+        
+        <p>Your prize will be processed and paid within 5-7 working days after verification.</p>
+        
+        <p><em>Congratulations from everyone at German Exiles Rugby League! This is a fantastic win!</em></p>
+      `;
 
-          await resend.emails.send({
-            from: "German Exiles RL <lottery@germanexilesrl.co.uk>",
-            to: [winner.userEmail],
-            subject: `🎉 You Won! £${prizeAmount} Prize from German Exiles RL Lottery`,
-            html: winnerEmailHtml,
-          });
+      await resend.emails.send({
+        from: "German Exiles RL <lottery@germanexilesrl.co.uk>",
+        to: [winner.email],
+        subject: `🎉 JACKPOT WINNER! £${winner.prizeAmount} - German Exiles RL Lottery`,
+        html: winnerEmailHtml,
+      });
 
-          console.log(`Winner notification sent to ${winner.userEmail}`);
-        }
-      }
+      console.log(`Jackpot winner notification sent to ${winner.email}`);
+    }
 
-      // Store lottery results in database
-      for (const winner of winners) {
-        const prizeAmount = winner.matches === 4 ? draw.jackpot_amount : 
-                          winner.matches === 3 ? 100 :
-                          winner.matches === 2 ? 10 : 0;
+    // Send emails to lucky dip winners
+    for (const winner of allWinnerEmails.filter(w => w.type === 'lucky_dip')) {
+      const luckyDipEmailHtml = `
+        <h1>🎉 Lucky Dip Winner! Congratulations!</h1>
+        <p>Great news! You've been selected as a Lucky Dip winner in the German Exiles Rugby League Lottery!</p>
+        
+        <h2>Draw Details</h2>
+        <p><strong>Draw Date:</strong> ${draw.draw_date}</p>
+        <p><strong>Winning Numbers:</strong> ${draw.winning_numbers.join(', ')}</p>
+        
+        <h2>Your Lucky Dip Win</h2>
+        <p><strong>Prize Amount:</strong> £${winner.prizeAmount}</p>
+        <p><strong>Type:</strong> Lucky Dip Winner (Randomly selected from all entries)</p>
+        
+        <hr>
+        <h3>Next Steps</h3>
+        <p><strong>To claim your prize, please email jay@germanexilesrl.co.uk with:</strong></p>
+        <ul>
+          <li>A copy of your photo ID (passport or driving licence)</li>
+          <li>Your bank details for payment transfer</li>
+          <li>This winning notification email</li>
+        </ul>
+        
+        <p>Your prize will be processed and paid within 5-7 working days after verification.</p>
+        
+        <p><em>Well done and congratulations from the German Exiles Rugby League team!</em></p>
+      `;
 
-        const { error: resultError } = await supabase
-          .from('lottery_results')
-          .insert({
-            user_id: winner.entry.user_id,
-            draw_id: draw.id,
-            entry_id: winner.entry.id,
-            matches: winner.matches,
-            prize_amount: prizeAmount,
-            is_winner: true
-          });
+      await resend.emails.send({
+        from: "German Exiles RL <lottery@germanexilesrl.co.uk>",
+        to: [winner.email],
+        subject: `🎉 Lucky Dip Winner! £${winner.prizeAmount} - German Exiles RL Lottery`,
+        html: luckyDipEmailHtml,
+      });
 
-        if (resultError) {
-          console.error("Error storing result:", resultError);
-        }
-      }
-    } else {
-      console.log("No winners found for this draw");
+      console.log(`Lucky dip winner notification sent to ${winner.email}`);
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        winners_count: winners.length,
+        jackpot_winners: jackpotWinners.length,
+        lucky_dip_winners: luckyDipWinners.length,
+        total_winners: winners.length,
         draw_date: draw.draw_date 
       }),
       {
