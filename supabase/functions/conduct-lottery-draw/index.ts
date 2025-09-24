@@ -173,6 +173,26 @@ serve(async (req) => {
     if (drawError) {
       console.error('Error storing draw result:', drawError);
       console.error('Full error object:', JSON.stringify(drawError, null, 2));
+      
+      // Check if it's a unique constraint violation (duplicate draw)
+      if (drawError.code === '23505' && drawError.message.includes('unique_real_draw_per_date')) {
+        console.log('Duplicate draw detected by database constraint');
+        return new Response(
+          JSON.stringify({
+            error: 'A real draw already exists for this date',
+            errorCode: 'DRAW_EXISTS',
+            drawDate: drawDate
+          }),
+          { 
+            status: 409, // Conflict
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
+        );
+      }
+      
       throw drawError;
     }
 

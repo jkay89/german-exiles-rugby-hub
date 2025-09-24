@@ -35,6 +35,7 @@ const LotteryDraw = () => {
   const drawInProgressRef = useRef(false);
   const drawTriggeredRef = useRef(false);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastDrawAttemptRef = useRef<number>(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -59,9 +60,13 @@ const LotteryDraw = () => {
 
   // Reset draw state when nextDrawDate changes (new draw scheduled)
   useEffect(() => {
+    console.log('NextDrawDate changed - resetting draw state');
     setDrawCompleted(false);
     setDrawExists(false);
     drawTriggeredRef.current = false;
+    drawInProgressRef.current = false;
+    lastDrawAttemptRef.current = 0;
+    setAnimationInProgress(false);
     checkIfDrawExists();
   }, [nextDrawDate]);
 
@@ -129,10 +134,20 @@ const LotteryDraw = () => {
       setTimeUntilDraw("Draw in progress...");
       setIsDrawActive(true);
       
-      // Automatically conduct draw when timer hits zero (only once)
-      if (!drawInProgress && !drawCompleted && !drawExists && !drawTriggeredRef.current && difference <= 0) {
-        drawTriggeredRef.current = true; // Prevent multiple calls immediately
-        conductDraw();
+      // Automatically conduct draw when timer hits zero (only once with debounce)
+      const now = Date.now();
+      if (!drawInProgress && !drawCompleted && !drawExists && !drawTriggeredRef.current && 
+          !animationInProgress && difference <= 0 && 
+          (now - lastDrawAttemptRef.current) > 5000) { // 5 second debounce
+        
+        console.log('Timer reached zero - triggering automatic draw');
+        drawTriggeredRef.current = true;
+        lastDrawAttemptRef.current = now;
+        
+        // Small delay to ensure state is consistent
+        setTimeout(() => {
+          conductDraw();
+        }, 100);
       }
     }
   };
@@ -174,21 +189,35 @@ const LotteryDraw = () => {
   };
 
   const conductDraw = async () => {
-    // Extra protection: check if draw already completed today or in progress
-    if (drawCompleted || drawInProgress || drawExists || animationInProgress) {
-      console.log('Draw already completed, in progress, exists, or animating - skipping...');
+    console.log('conductDraw called - checking conditions...');
+    
+    // Atomic check with ref for immediate protection
+    if (drawInProgressRef.current) {
+      console.log('Draw already in progress (ref check) - aborting');
       return;
     }
+    
+    // Extra protection: check if draw already completed today or in progress
+    if (drawCompleted || drawInProgress || drawExists || animationInProgress) {
+      console.log('Draw already completed, in progress, exists, or animating - skipping...', {
+        drawCompleted, drawInProgress, drawExists, animationInProgress
+      });
+      return;
+    }
+
+    // Set ref immediately to prevent race conditions
+    drawInProgressRef.current = true;
+    
+    console.log('Starting draw - setting states...');
 
     // Clear any existing animation timeout
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
     }
 
-    // Set both state and ref to prevent race conditions
+    // Set states
     setDrawInProgress(true);
     setAnimationInProgress(true);
-    drawInProgressRef.current = true;
     setDrawNumbers([]);
     setShowingNumbers(false);
     
@@ -214,6 +243,7 @@ const LotteryDraw = () => {
         
         // Animate numbers appearing one by one with proper timing
         for (let i = 0; i < numbers.length; i++) {
+          console.log(`Revealing number ${i + 1}/${numbers.length}: ${numbers[i]}`);
           await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay between numbers
           setDrawNumbers(prev => [...prev, numbers[i]]);
         }
@@ -241,21 +271,40 @@ const LotteryDraw = () => {
       fetchLatestResult();
       calculateNextDrawDate(); // This will fetch the updated next draw date from settings
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error conducting draw:', error);
-      setDrawCompleted(false); // Reset on error so they can try again
-      drawTriggeredRef.current = false; // Reset trigger ref on error
-      drawInProgressRef.current = false; // Reset ref on error
+      
+      // Check if it's the "draw already exists" error from backend
+      const isDrawExistsError = error?.message?.includes('already exists') || 
+                               error?.message?.includes('A real draw already exists');
+      
+      if (isDrawExistsError) {
+        console.log('Draw already exists - marking as completed');
+        setDrawCompleted(true);
+        setDrawExists(true);
+        
+        toast({
+          title: "Draw Already Complete",
+          description: "Today's draw has already been completed. Check the results below!",
+        });
+      } else {
+        // Reset states for retry on other errors
+        setDrawCompleted(false);
+        drawTriggeredRef.current = false;
+        
+        toast({
+          title: "Draw Error",
+          description: error?.message || "There was an error conducting the draw. Please try again.",
+          variant: "destructive",
+        });
+      }
+      
+      // Always reset progress states
+      drawInProgressRef.current = false;
       setAnimationInProgress(false);
       setDrawInProgress(false);
       setShowingNumbers(false);
       setDrawNumbers([]);
-      
-      toast({
-        title: "Draw Error",
-        description: "There was an error conducting the draw. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
