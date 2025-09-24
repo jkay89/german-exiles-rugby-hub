@@ -30,7 +30,9 @@ const LotteryDraw = () => {
   const [drawNumbers, setDrawNumbers] = useState<number[]>([]);
   const [showingNumbers, setShowingNumbers] = useState(false);
   const [drawCompleted, setDrawCompleted] = useState(false);
+  const [drawExists, setDrawExists] = useState(false);
   const drawInProgressRef = useRef(false);
+  const drawTriggeredRef = useRef(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,10 +49,33 @@ const LotteryDraw = () => {
     return () => clearInterval(timer);
   }, [nextDrawDate]);
 
-  // Reset drawCompleted when nextDrawDate changes (new draw scheduled)
+  // Reset draw state when nextDrawDate changes (new draw scheduled)
   useEffect(() => {
     setDrawCompleted(false);
+    setDrawExists(false);
+    drawTriggeredRef.current = false;
+    checkIfDrawExists();
   }, [nextDrawDate]);
+
+  // Check if draw already exists for today
+  const checkIfDrawExists = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingDraw } = await supabase
+        .from('lottery_draws')
+        .select('id')
+        .eq('draw_date', today)
+        .eq('is_test_draw', false)
+        .maybeSingle();
+
+      setDrawExists(!!existingDraw);
+      if (existingDraw) {
+        setDrawCompleted(true);
+      }
+    } catch (error) {
+      console.error('Error checking existing draw:', error);
+    }
+  };
 
   const calculateNextDrawDate = async () => {
     try {
@@ -97,8 +122,8 @@ const LotteryDraw = () => {
       setIsDrawActive(true);
       
       // Automatically conduct draw when timer hits zero (only once)
-      if (!drawInProgress && !drawCompleted && difference <= 0) {
-        setDrawCompleted(true); // Prevent multiple calls
+      if (!drawInProgress && !drawCompleted && !drawExists && !drawTriggeredRef.current && difference <= 0) {
+        drawTriggeredRef.current = true; // Prevent multiple calls immediately
         conductDraw();
       }
     }
@@ -142,8 +167,8 @@ const LotteryDraw = () => {
 
   const conductDraw = async () => {
     // Extra protection: check if draw already completed today or in progress
-    if (drawCompleted || drawInProgress) {
-      console.log('Draw already completed or in progress, skipping...');
+    if (drawCompleted || drawInProgress || drawExists) {
+      console.log('Draw already completed, in progress, or exists - skipping...');
       return;
     }
 
@@ -154,25 +179,6 @@ const LotteryDraw = () => {
     setShowingNumbers(false);
     
     try {
-      // Check if a draw has already been conducted today
-      const today = new Date().toISOString().split('T')[0];
-      const { data: existingDraw } = await supabase
-        .from('lottery_draws')
-        .select('id')
-        .eq('draw_date', today)
-        .eq('is_test_draw', false)
-        .maybeSingle();
-
-      if (existingDraw) {
-        console.log('Draw already exists for today, skipping...');
-        setDrawCompleted(true);
-        toast({
-          title: "Draw Already Complete",
-          description: "Today's draw has already been conducted.",
-        });
-        return;
-      }
-
       // Call the edge function to conduct the draw using RANDOM.ORG
       const { data, error } = await supabase.functions.invoke('conduct-lottery-draw', {
         body: {
@@ -185,6 +191,7 @@ const LotteryDraw = () => {
 
       // Mark as completed immediately to prevent duplicate calls
       setDrawCompleted(true);
+      setDrawExists(true);
 
       // Show animated number reveal
       if (data.drawResult && data.drawResult.winningNumbers) {
@@ -213,6 +220,7 @@ const LotteryDraw = () => {
     } catch (error) {
       console.error('Error conducting draw:', error);
       setDrawCompleted(false); // Reset on error so they can try again
+      drawTriggeredRef.current = false; // Reset trigger ref on error
       drawInProgressRef.current = false; // Reset ref on error
       toast({
         title: "Draw Error",
@@ -224,14 +232,7 @@ const LotteryDraw = () => {
         setDrawInProgress(false);
         setShowingNumbers(false);
         setDrawNumbers([]);
-        // Reset completion flag after successful draw to allow future draws
-        if (drawCompleted) {
-          setTimeout(() => {
-            setDrawCompleted(false);
-            drawInProgressRef.current = false;
-          }, 300000); // 5 minutes
-        }
-      }, 3000); // Reset after 3 seconds
+      }, 3000); // Reset UI after 3 seconds
     }
   };
 
@@ -322,13 +323,23 @@ const LotteryDraw = () => {
                   </div>
                 </div>
 
-                {isDrawActive && !drawInProgress && !drawCompleted && (
+                {isDrawActive && !drawInProgress && !drawCompleted && !drawExists && (
                   <div className="text-center">
                     <div className="animate-pulse">
                       <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
                     </div>
                     <p className="text-xl text-purple-400">Preparing for automatic draw...</p>
                     <p className="text-gray-400">Draw will commence automatically when timer reaches zero</p>
+                  </div>
+                )}
+
+                {drawExists && !drawInProgress && (
+                  <div className="text-center">
+                    <div className="text-green-400 mb-4">
+                      <CheckCircle className="w-16 h-16 mx-auto mb-2" />
+                    </div>
+                    <p className="text-xl text-green-400 font-semibold">Today's Draw Complete!</p>
+                    <p className="text-gray-400">Check the latest results below</p>
                   </div>
                 )}
 
