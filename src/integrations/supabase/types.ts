@@ -738,6 +738,10 @@ export type Database = {
         Args: { _user_email: string }
         Returns: boolean
       }
+      trigger_automatic_draw: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
