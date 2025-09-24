@@ -146,8 +146,16 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Summary email sent to Jay");
     }
 
-    // Send emails to jackpot winners
-    for (const winner of allWinnerEmails.filter(w => w.type === 'jackpot')) {
+    // Send emails to jackpot winners with rate limiting
+    const jackpotEmailWinners = allWinnerEmails.filter(w => w.type === 'jackpot');
+    for (let i = 0; i < jackpotEmailWinners.length; i++) {
+      const winner = jackpotEmailWinners[i];
+      
+      // Add delay to respect Resend rate limit (2 requests per second)
+      if (i > 0) {
+        console.log("Waiting 600ms to respect rate limit...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
       const winnerEmailHtml = `
         <h1>🎉 JACKPOT WINNER! Congratulations!</h1>
         <p>INCREDIBLE NEWS! You've won the JACKPOT in the German Exiles Rugby League Lottery!</p>
@@ -184,14 +192,21 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`Jackpot winner notification sent to ${winner.email}`);
     }
 
-    // Send emails to lucky dip winners
+    // Send emails to lucky dip winners with rate limiting
     console.log("=== STARTING LUCKY DIP EMAIL SECTION ===");
     const luckyDipEmailWinners = allWinnerEmails.filter(w => w.type === 'lucky_dip');
     console.log(`Found ${luckyDipEmailWinners.length} lucky dip winners to email`);
     console.log("Lucky dip winners:", JSON.stringify(luckyDipEmailWinners.map(w => ({ email: w.email, prizeAmount: w.prizeAmount })), null, 2));
     
-    for (const winner of luckyDipEmailWinners) {
-      console.log(`=== PROCESSING LUCKY DIP EMAIL FOR ${winner.email} ===`);
+    for (let i = 0; i < luckyDipEmailWinners.length; i++) {
+      const winner = luckyDipEmailWinners[i];
+      console.log(`=== PROCESSING LUCKY DIP EMAIL ${i + 1}/${luckyDipEmailWinners.length} FOR ${winner.email} ===`);
+      
+      // Add delay to respect Resend rate limit (2 requests per second)
+      if (i > 0) {
+        console.log("Waiting 600ms to respect rate limit...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
       const luckyDipEmailHtml = `
         <!DOCTYPE html>
         <html lang="en">

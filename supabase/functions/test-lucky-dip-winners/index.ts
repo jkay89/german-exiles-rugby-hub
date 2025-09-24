@@ -51,9 +51,16 @@ const handler = async (req: Request): Promise<Response> => {
     let emailsSent = 0;
     const emailResults = [];
 
-    // Send simplified lucky dip emails to each winner
-    for (const winner of winners) {
-      console.log(`=== PROCESSING WINNER: ${winner.user_id} ===`);
+    // Send simplified lucky dip emails to each winner with rate limiting
+    for (let i = 0; i < winners.length; i++) {
+      const winner = winners[i];
+      console.log(`=== PROCESSING WINNER ${i + 1}/${winners.length}: ${winner.user_id} ===`);
+      
+      // Add delay to respect Resend rate limit (2 requests per second)
+      if (i > 0) {
+        console.log("Waiting 600ms to respect rate limit...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
       
       // Get user email
       const { data: authUser, error: userError } = await supabase.auth.admin.getUserById(winner.user_id);
