@@ -67,12 +67,20 @@ const TestDraw = () => {
   };
 
   const conductDraw = async () => {
+    // Prevent multiple simultaneous draws
+    if (drawInProgress) {
+      console.log('Draw already in progress, ignoring request');
+      return;
+    }
+    
     setDrawInProgress(true);
     setDrawNumbers([]);
     setShowingNumbers(false);
     
     try {
       const testDrawDate = new Date().toISOString().split('T')[0];
+      
+      console.log('Starting lottery draw...');
       
       // Call the edge function to conduct the draw using RANDOM.ORG
       const { data, error } = await supabase.functions.invoke('conduct-lottery-draw', {
@@ -83,12 +91,25 @@ const TestDraw = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Draw API error:', error);
+        throw new Error(error.message || 'Failed to conduct draw');
+      }
 
-      // Show animated number reveal
-      if (data.drawResult && data.drawResult.winningNumbers) {
+      console.log('Draw API response:', data);
+
+      // Check for API-level errors in response
+      if (data?.error) {
+        console.error('Draw API returned error:', data.error);
+        throw new Error(data.error);
+      }
+
+      // Show animated number reveal only if we have valid data
+      if (data?.drawResult?.winningNumbers && Array.isArray(data.drawResult.winningNumbers)) {
         setShowingNumbers(true);
         const numbers = data.drawResult.winningNumbers;
+        
+        console.log('Starting number animation with:', numbers);
         
         // Animate numbers appearing one by one
         for (let i = 0; i < numbers.length; i++) {
@@ -103,24 +124,37 @@ const TestDraw = () => {
             description: "The winning numbers have been drawn and results updated.",
           });
         }, 1000);
+        
+        // Refresh the latest result after animation completes
+        setTimeout(() => {
+          fetchLatestResult();
+        }, 2000);
+      } else {
+        console.error('Invalid draw result structure:', data);
+        throw new Error('Invalid response structure from draw API');
       }
-
-      // Refresh the latest result
-      fetchLatestResult();
       
     } catch (error) {
       console.error('Error conducting draw:', error);
       toast({
         title: "Draw Error",
-        description: "There was an error conducting the draw. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error conducting the draw. Please try again.",
         variant: "destructive",
       });
+      
+      // Reset UI state immediately on error
+      setDrawInProgress(false);
+      setShowingNumbers(false);
+      setDrawNumbers([]);
     } finally {
-      setTimeout(() => {
-        setDrawInProgress(false);
-        setShowingNumbers(false);
-        setDrawNumbers([]);
-      }, 3000); // Reset after 3 seconds
+      // Only reset after successful completion (longer delay for animation)
+      if (showingNumbers) {
+        setTimeout(() => {
+          setDrawInProgress(false);
+          setShowingNumbers(false);
+          setDrawNumbers([]);
+        }, 4000); // Longer delay to allow animation to complete
+      }
     }
   };
 

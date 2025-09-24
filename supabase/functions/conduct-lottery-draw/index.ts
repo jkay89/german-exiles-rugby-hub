@@ -51,7 +51,7 @@ serve(async (req) => {
 
     console.log(`Conducting lottery draw for date: ${drawDate}, jackpot: ${jackpotAmount}`);
 
-    // Check if a draw already exists for this date (for non-test draws)
+    // Check if a draw already exists for this date 
     if (!isTestDraw) {
       const { data: existingDraw } = await supabaseClient
         .from('lottery_draws')
@@ -64,11 +64,37 @@ serve(async (req) => {
         console.log('Draw already exists for this date, returning existing draw');
         return new Response(
           JSON.stringify({
-            error: 'Draw already exists for this date',
+            error: 'A real draw already exists for this date',
             existing_draw_id: existingDraw.id
           }),
           { 
             status: 409, // Conflict
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
+        );
+      }
+    } else {
+      // For test draws, check if there's been a recent test draw (within last 10 seconds) to prevent spam
+      const tenSecondsAgo = new Date(Date.now() - 10000).toISOString();
+      const { data: recentTestDraw } = await supabaseClient
+        .from('lottery_draws')
+        .select('id, created_at')
+        .eq('is_test_draw', true)
+        .gte('created_at', tenSecondsAgo)
+        .maybeSingle();
+
+      if (recentTestDraw) {
+        console.log('Recent test draw found, preventing spam');
+        return new Response(
+          JSON.stringify({
+            error: 'Please wait a few seconds between test draws',
+            recent_draw_time: recentTestDraw.created_at
+          }),
+          { 
+            status: 429, // Too Many Requests
             headers: { 
               ...corsHeaders, 
               'Content-Type': 'application/json' 
