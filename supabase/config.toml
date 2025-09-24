@@ -17,3 +17,30 @@ verify_jwt = false
 
 [functions.delete-lottery-user]
 verify_jwt = false
+
+[functions.test-email]
+verify_jwt = false
+
+[functions.conduct-lottery-draw]
+verify_jwt = false
+
+[functions.process-draw-completion]
+verify_jwt = false
+
+[functions.send-lottery-purchase-email]
+verify_jwt = false
+
+[functions.send-lottery-subscription-email]
+verify_jwt = false
+
+[functions.send-test-emails]
+verify_jwt = false
+
+[functions.get-subscription-details]
+verify_jwt = false
+
+[functions.process-lottery-purchase]
+verify_jwt = false
+
+[functions.get-user-emails]
+verify_jwt = false
