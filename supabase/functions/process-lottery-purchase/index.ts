@@ -123,10 +123,13 @@ serve(async (req) => {
           body: {
             userEmail: userRecord.email,
             userName: userRecord.user_metadata?.full_name || userRecord.email?.split('@')[0],
-            numbers: entries[0].numbers,
+            lotteryLines: entries.map(entry => ({
+              numbers: entry.numbers,
+              lineNumber: entry.line_number
+            })),
             drawDate: entries[0].draw_date,
             jackpotAmount: currentJackpot,
-            lineNumber: entries[0].line_number
+            totalLines: entries.length
           }
         });
         console.log('Purchase confirmation email sent');

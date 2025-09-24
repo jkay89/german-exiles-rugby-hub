@@ -27,9 +27,9 @@ serve(async (req) => {
     const { 
       userEmail, 
       userName, 
-      numbers, 
+      lotteryLines, 
       drawDate, 
-      lineNumber 
+      totalLines 
     } = await req.json();
 
     console.log('Sending purchase confirmation email to:', userEmail);
@@ -51,10 +51,10 @@ serve(async (req) => {
     const html = await renderAsync(
       React.createElement(PurchaseConfirmationEmail, {
         customerName: userName,
-        numbers: numbers,
+        lotteryLines: lotteryLines,
         drawDate: drawDate,
         jackpotAmount: currentJackpot,
-        lineNumber: lineNumber,
+        totalLines: totalLines,
       })
     );
 

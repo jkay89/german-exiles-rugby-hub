@@ -14,20 +14,25 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import * as React from 'npm:react@18.3.1'
 
+interface LotteryLine {
+  numbers: number[]
+  lineNumber: number
+}
+
 interface PurchaseConfirmationProps {
   customerName: string
-  numbers: number[]
+  lotteryLines: LotteryLine[]
   drawDate: string
   jackpotAmount: number
-  lineNumber: number
+  totalLines: number
 }
 
 export const PurchaseConfirmationEmail = ({
   customerName,
-  numbers,
+  lotteryLines,
   drawDate,
   jackpotAmount,
-  lineNumber,
+  totalLines,
 }: PurchaseConfirmationProps) => (
   <Html>
     <Head />
@@ -56,17 +61,22 @@ export const PurchaseConfirmationEmail = ({
 
         <Section style={numbersSection}>
           <Heading style={h2}>Your Lucky Numbers</Heading>
-          <Row>
-            {numbers.map((number, index) => (
-              <Column key={index} style={numberCell}>
-                <div style={numberBall}>{number}</div>
-              </Column>
-            ))}
-          </Row>
+          {lotteryLines.map((line, lineIndex) => (
+            <div key={lineIndex} style={lineContainer}>
+              <Text style={lineTitle}>Line {line.lineNumber}</Text>
+              <Row>
+                {line.numbers.map((number, index) => (
+                  <Column key={index} style={numberCell}>
+                    <div style={numberBall}>{number}</div>
+                  </Column>
+                ))}
+              </Row>
+            </div>
+          ))}
         </Section>
 
         <Section style={detailsSection}>
-          <Text style={detailText}><strong>Line Number:</strong> {lineNumber}</Text>
+          <Text style={detailText}><strong>Total Lines:</strong> {totalLines}</Text>
           <Text style={detailText}><strong>Draw Date:</strong> {new Date(drawDate).toLocaleDateString('en-GB', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -182,6 +192,22 @@ const brandText = {
   fontWeight: 'bold',
   textAlign: 'center' as const,
   margin: '10px 0 0',
+}
+
+const lineContainer = {
+  marginBottom: '20px',
+  padding: '15px',
+  backgroundColor: '#ffffff',
+  borderRadius: '6px',
+  border: '1px solid #e1e4e8',
+}
+
+const lineTitle = {
+  fontSize: '14px',
+  fontWeight: 'bold',
+  color: '#586069',
+  margin: '0 0 10px',
+  textAlign: 'center' as const,
 }
 
 const footer = {
