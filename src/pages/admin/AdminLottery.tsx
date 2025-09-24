@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, Save, Calendar, Percent, Gift, Users } from "lucide-react";
+import { Trash2, Plus, Save, Calendar, Percent, Gift, Users, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LotteryEntriesTable from "@/components/admin/LotteryEntriesTable";
@@ -411,6 +411,16 @@ const AdminLottery = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-6 py-12"
       >
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/admin/dashboard")}
+            className="text-white hover:text-gray-300 hover:bg-gray-800"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </div>
         <h1 className="text-3xl font-bold text-white mb-8">Lottery Management</h1>
 
         {/* Recent Winners Section */}
