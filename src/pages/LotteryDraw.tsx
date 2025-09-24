@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,7 @@ const LotteryDraw = () => {
   const [drawNumbers, setDrawNumbers] = useState<number[]>([]);
   const [showingNumbers, setShowingNumbers] = useState(false);
   const [drawCompleted, setDrawCompleted] = useState(false);
+  const drawInProgressRef = useRef(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -96,8 +97,9 @@ const LotteryDraw = () => {
       setIsDrawActive(true);
       
       // Automatically conduct draw when timer hits zero (only once)
-      if (!drawInProgress && !drawCompleted && difference <= 0) {
+      if (!drawInProgress && !drawCompleted && !drawInProgressRef.current && difference <= 0) {
         setDrawCompleted(true); // Prevent multiple calls
+        drawInProgressRef.current = true; // Immediate protection against race conditions
         conductDraw();
       }
     }
@@ -140,13 +142,15 @@ const LotteryDraw = () => {
   };
 
   const conductDraw = async () => {
-    // Extra protection: check if draw already completed today
-    if (drawCompleted) {
-      console.log('Draw already completed, skipping...');
+    // Extra protection: check if draw already completed today or in progress
+    if (drawCompleted || drawInProgressRef.current) {
+      console.log('Draw already completed or in progress, skipping...');
       return;
     }
 
+    // Set both state and ref to prevent race conditions
     setDrawInProgress(true);
+    drawInProgressRef.current = true;
     setDrawNumbers([]);
     setShowingNumbers(false);
     
@@ -210,6 +214,7 @@ const LotteryDraw = () => {
     } catch (error) {
       console.error('Error conducting draw:', error);
       setDrawCompleted(false); // Reset on error so they can try again
+      drawInProgressRef.current = false; // Reset ref on error
       toast({
         title: "Draw Error",
         description: "There was an error conducting the draw. Please try again.",
@@ -220,6 +225,13 @@ const LotteryDraw = () => {
         setDrawInProgress(false);
         setShowingNumbers(false);
         setDrawNumbers([]);
+        // Reset completion flag after successful draw to allow future draws
+        if (drawCompleted) {
+          setTimeout(() => {
+            setDrawCompleted(false);
+            drawInProgressRef.current = false;
+          }, 300000); // 5 minutes
+        }
       }, 3000); // Reset after 3 seconds
     }
   };

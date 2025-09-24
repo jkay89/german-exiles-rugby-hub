@@ -51,6 +51,33 @@ serve(async (req) => {
 
     console.log(`Conducting lottery draw for date: ${drawDate}, jackpot: ${jackpotAmount}`);
 
+    // Check if a draw already exists for this date (for non-test draws)
+    if (!isTestDraw) {
+      const { data: existingDraw } = await supabaseClient
+        .from('lottery_draws')
+        .select('id')
+        .eq('draw_date', drawDate)
+        .eq('is_test_draw', false)
+        .maybeSingle();
+
+      if (existingDraw) {
+        console.log('Draw already exists for this date, returning existing draw');
+        return new Response(
+          JSON.stringify({
+            error: 'Draw already exists for this date',
+            existing_draw_id: existingDraw.id
+          }),
+          { 
+            status: 409, // Conflict
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
+        );
+      }
+    }
+
     // Generate 4 random numbers between 1-32 using RANDOM.ORG
     const randomOrgPayload = {
       jsonrpc: "2.0",
