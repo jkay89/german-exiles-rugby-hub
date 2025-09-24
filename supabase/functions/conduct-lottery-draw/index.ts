@@ -248,7 +248,8 @@ serve(async (req) => {
           userId: winner.user_id,
           prizeAmount: prizeAmount,
           matches: 4,
-          isJackpot: true
+          isJackpot: true,
+          isLuckyDip: false
         });
       }
     }
@@ -275,7 +276,8 @@ serve(async (req) => {
           userId: winner.user_id,
           prizeAmount: 10,
           matches: 0,
-          isJackpot: false
+          isJackpot: false,
+          isLuckyDip: true
         });
       }
     }
