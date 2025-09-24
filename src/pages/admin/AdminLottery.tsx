@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import LotteryEntriesTable from "@/components/admin/LotteryEntriesTable";
 import { TestEmailSender } from "@/components/admin/TestEmailSender";
 import { RegisteredUsersTable } from "@/components/admin/RegisteredUsersTable";
+import RecentWinnersSection from "@/components/admin/RecentWinnersSection";
 
 interface LotteryEntry {
   id: string;
@@ -411,6 +412,11 @@ const AdminLottery = () => {
         className="container mx-auto px-6 py-12"
       >
         <h1 className="text-3xl font-bold text-white mb-8">Lottery Management</h1>
+
+        {/* Recent Winners Section */}
+        <div className="mb-8">
+          <RecentWinnersSection />
+        </div>
 
         {/* Current Jackpot Management */}
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">
