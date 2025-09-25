@@ -8,9 +8,10 @@ import { useTranslation } from "react-i18next";
 interface FixtureGridViewProps {
   fixtures: Fixture[];
   onResultAdded?: () => void;
+  showAddResult?: boolean;
 }
 
-const FixtureGridView = ({ fixtures, onResultAdded }: FixtureGridViewProps) => {
+const FixtureGridView = ({ fixtures, onResultAdded, showAddResult = false }: FixtureGridViewProps) => {
   const { i18n } = useTranslation();
   
   return (
@@ -28,6 +29,7 @@ const FixtureGridView = ({ fixtures, onResultAdded }: FixtureGridViewProps) => {
           locale={i18n.language}
           team={fixture.team}
           onResultAdded={onResultAdded}
+          showAddResult={showAddResult}
         />
       ))}
     </div>

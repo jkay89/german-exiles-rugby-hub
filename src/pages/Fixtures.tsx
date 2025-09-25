@@ -33,7 +33,7 @@ const Fixtures = () => {
     }
     
     return activeTab === "upcoming" 
-      ? <FixtureGridView fixtures={fixtures} onResultAdded={refetch} />
+      ? <FixtureGridView fixtures={fixtures} />
       : <ResultsGridView results={results} />;
   };
 
