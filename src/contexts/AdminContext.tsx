@@ -38,6 +38,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Fetching role for user ID:', userId);
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -51,6 +52,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
 
+      console.log('User role data:', data);
       return data?.role as AdminRole || null;
     } catch (error) {
       console.error('Error in fetchUserRole:', error);
@@ -100,29 +102,35 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('Attempting login for:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error('Auth error:', error);
         return { success: false, error: error.message };
       }
 
       if (data.user) {
+        console.log('User authenticated successfully:', data.user.id);
         // Check if user has any admin role
         const userRole = await fetchUserRole(data.user.id);
         
         if (!userRole) {
+          console.log('No admin role found for user, signing out');
           await supabase.auth.signOut();
           return { success: false, error: 'You do not have admin permissions' };
         }
 
+        console.log('Login successful with role:', userRole);
         return { success: true };
       }
 
       return { success: false, error: 'Authentication failed' };
     } catch (error) {
+      console.error('Login exception:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   };
