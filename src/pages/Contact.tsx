@@ -97,13 +97,20 @@ const Contact = () => {
                 <div>
                   <h3 className="font-bold text-lg mb-2 text-white">{t("social_media")}</h3>
                   <div className="space-y-2">
-                    <a href="#" className="text-german-red hover:text-red-700 block">
+                    <a 
+                      href="https://www.facebook.com/p/German-Exiles-Rugby-League-61569070281435/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-german-red hover:text-red-700 block"
+                    >
                       Facebook
                     </a>
-                    <a href="#" className="text-german-red hover:text-red-700 block">
-                      Twitter
-                    </a>
-                    <a href="#" className="text-german-red hover:text-red-700 block">
+                    <a 
+                      href="https://www.instagram.com/germanexilesrl/?hl=en" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-german-red hover:text-red-700 block"
+                    >
                       Instagram
                     </a>
                   </div>
