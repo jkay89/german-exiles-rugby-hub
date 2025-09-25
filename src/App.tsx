@@ -108,8 +108,8 @@ const App = () => (
                 <Route path="/admin/news" element={<AdminNews />} />
                 <Route path="/admin/media" element={<AdminMedia />} />
                 <Route path="/admin/sponsors" element={<AdminSponsors />} />
-        <Route path="/admin/fixtures" element={<AdminFixtures />} />
-        <Route path="/admin/committee" element={<AdminCommittee />} />
+                <Route path="/admin/fixtures" element={<AdminFixtures />} />
+                <Route path="/admin/committee" element={<AdminCommittee />} />
                 <Route path="/admin/documents" element={<AdminDocuments />} />
                 <Route path="/admin/lottery" element={<AdminLottery />} />
                 <Route path="/admin/users" element={<AdminUsers />} />

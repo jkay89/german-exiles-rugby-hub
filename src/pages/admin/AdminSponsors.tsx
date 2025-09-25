@@ -36,7 +36,7 @@ interface Sponsor {
 }
 
 const AdminSponsors = () => {
-  const { isAuthenticated } = useAdmin();
+  const { isAuthenticated, isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);

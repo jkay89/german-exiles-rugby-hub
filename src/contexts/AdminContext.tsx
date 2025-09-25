@@ -1,14 +1,24 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+type AdminRole = 'website_overlord' | 'admin' | 'user' | 'lottery_admin';
+
 interface AdminContextType {
-  isAuthenticated: boolean;
-  currentAdmin: string | null;
   user: User | null;
+  isAuthenticated: boolean;
+  role: AdminRole | null;
   loading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  isWebsiteOverlord: boolean;
+  isAdmin: boolean;
+  isUserAdmin: boolean;
+  isLotteryAdmin: boolean;
+  hasPermission: (requiredRole: AdminRole | AdminRole[]) => boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  currentAdmin: string | null;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -21,71 +31,71 @@ export const useAdmin = () => {
   return context;
 };
 
-interface AdminProviderProps {
-  children: React.ReactNode;
-}
-
-export const AdminProvider = ({ children }: AdminProviderProps) => {
+export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState<AdminRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Defer admin role check to prevent auth deadlock
-          setTimeout(() => {
-            checkAdminRole(session.user.id);
-          }, 0);
-        } else {
-          setIsAuthenticated(false);
-          setLoading(false);
-        }
-      }
-    );
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return null;
+      }
+
+      return data?.role as AdminRole || null;
+    } catch (error) {
+      console.error('Error in fetchUserRole:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    // Get initial session
+    const getInitialSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // Defer admin role check to prevent auth deadlock
-        setTimeout(() => {
-          checkAdminRole(session.user.id);
-        }, 0);
-      } else {
-        setIsAuthenticated(false);
+        setUser(session.user);
+        const userRole = await fetchUserRole(session.user.id);
+        setRole(userRole);
+      }
+      setLoading(false);
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          const userRole = await fetchUserRole(session.user.id);
+          setRole(userRole);
+        } else {
+          setUser(null);
+          setRole(null);
+        }
         setLoading(false);
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .rpc('is_admin', { _user_id: userId });
-      
-      if (error) {
-        console.error('Error checking admin role:', error);
-        setIsAuthenticated(false);
-      } else {
-        setIsAuthenticated(data === true);
-      }
-    } catch (error) {
-      console.error('Error checking admin role:', error);
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
@@ -100,16 +110,10 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
       }
 
       if (data.user) {
-        // Check if user has admin role
-        const { data: isAdminResult, error: roleError } = await supabase
-          .rpc('is_admin', { _user_id: data.user.id });
+        // Check if user has any admin role
+        const userRole = await fetchUserRole(data.user.id);
         
-        if (roleError) {
-          await supabase.auth.signOut();
-          return { success: false, error: 'Failed to verify admin permissions' };
-        }
-
-        if (!isAdminResult) {
+        if (!userRole) {
           await supabase.auth.signOut();
           return { success: false, error: 'You do not have admin permissions' };
         }
@@ -123,21 +127,46 @@ export const AdminProvider = ({ children }: AdminProviderProps) => {
     }
   };
 
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setRole(null);
   };
 
-  const value = {
-    isAuthenticated,
-    currentAdmin: user?.email || null,
+  const logout = signOut;
+
+  // Permission helpers
+  const isWebsiteOverlord = role === 'website_overlord';
+  const isAdmin = role === 'admin' || role === 'website_overlord';
+  const isUserAdmin = role === 'user' || role === 'admin' || role === 'website_overlord';
+  const isLotteryAdmin = role === 'lottery_admin' || role === 'website_overlord';
+
+  const hasPermission = (requiredRole: AdminRole | AdminRole[]): boolean => {
+    if (!role) return false;
+
+    const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    
+    // Website overlord has access to everything
+    if (role === 'website_overlord') return true;
+    
+    return requiredRoles.includes(role);
+  };
+
+  const value: AdminContextType = {
     user,
+    role,
+    isAuthenticated: !!user && !!role,
     loading,
+    signIn,
+    signOut,
+    isWebsiteOverlord,
+    isAdmin,
+    isUserAdmin,
+    isLotteryAdmin,
+    hasPermission,
     login,
     logout,
+    currentAdmin: user?.email || null,
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

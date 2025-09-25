@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield } from "lucide-react";
 
 const AdminDashboard = () => {
-  const { isAuthenticated, currentAdmin, logout } = useAdmin();
+  const { isAuthenticated, currentAdmin, logout, isWebsiteOverlord, isAdmin, isUserAdmin, isLotteryAdmin } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,140 +38,157 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Edit className="h-5 w-5 text-german-gold" />
-                Players Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Add, edit, or remove players from various teams.</p>
-              <Link to="/admin/players">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Players</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Images className="h-5 w-5 text-german-gold" />
-                News Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Create, edit, or delete news articles.</p>
-              <Link to="/admin/news">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage News</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Folder className="h-5 w-5 text-german-gold" />
-                Media Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Upload and organize photos and videos.</p>
-              <Link to="/admin/media">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Media</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5 text-german-gold" />
-                Sponsor Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Add, edit, or remove sponsors from the website.</p>
-              <Link to="/admin/sponsors">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Sponsors</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-german-gold" />
-                Fixtures & Results
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Manage fixtures and update match results.</p>
-              <Link to="/admin/fixtures">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Fixtures</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-german-gold" />
-                Committee Members
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Manage committee member profiles and contact details.</p>
-              <Link to="/admin/committee">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Committee</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-german-gold" />
-                Documents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Upload and manage club documents and resources.</p>
-              <Link to="/admin/documents">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Documents</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Ticket className="h-5 w-5 text-german-gold" />
-                Lottery Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Manage lottery draws, results, and next draw dates.</p>
-              <Link to="/admin/lottery">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Lottery</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-900 border-gray-800 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-german-gold" />
-                Admin Users
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">Manage admin users and invite new administrators.</p>
+          {isWebsiteOverlord && (
+            <Card className="bg-gray-900 border-german-red border-2 hover:border-german-gold transition-colors cursor-pointer">
               <Link to="/admin/users">
-                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Admins</Button>
+                <CardHeader className="text-center">
+                  <Shield className="h-12 w-12 text-german-gold mx-auto mb-2" />
+                  <CardTitle className="text-white">User Management</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-400 text-center">
+                    Create and manage admin users with different permission levels
+                  </p>
+                </CardContent>
               </Link>
-            </CardContent>
-          </Card>
+            </Card>
+          )}
+
+          {isUserAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit className="h-5 w-5 text-german-gold" />
+                  Players Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Add, edit, or remove players from various teams.</p>
+                <Link to="/admin/players">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Players</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isUserAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Images className="h-5 w-5 text-german-gold" />
+                  News Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Create, edit, or delete news articles.</p>
+                <Link to="/admin/news">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage News</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isUserAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Folder className="h-5 w-5 text-german-gold" />
+                  Media Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Upload and organize photos and videos.</p>
+                <Link to="/admin/media">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Media</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+        
+          {isAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-german-gold" />
+                  Sponsor Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Add, edit, or remove sponsors from the website.</p>
+                <Link to="/admin/sponsors">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Sponsors</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isUserAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-german-gold" />
+                  Fixtures & Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Manage fixtures and update match results.</p>
+                <Link to="/admin/fixtures">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Fixtures</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-german-gold" />
+                  Committee Members
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Manage committee member profiles and contact details.</p>
+                <Link to="/admin/committee">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Committee</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-german-gold" />
+                  Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Upload and manage club documents and resources.</p>
+                <Link to="/admin/documents">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Documents</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {isLotteryAdmin && (
+            <Card className="bg-gray-900 border-gray-800 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="h-5 w-5 text-german-gold" />
+                  Lottery Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 mb-4">Manage lottery draws, results, and next draw dates.</p>
+                <Link to="/admin/lottery">
+                  <Button className="w-full bg-german-red hover:bg-german-gold">Manage Lottery</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">

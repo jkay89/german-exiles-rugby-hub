@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { NewsArticle, fetchNewsArticles, createNewsArticle, updateNewsArticle, deleteNewsArticle } from "@/utils/newsUtils";
 
 const AdminNews = () => {
-  const { isAuthenticated } = useAdmin();
+  const { isAuthenticated, isUserAdmin } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
