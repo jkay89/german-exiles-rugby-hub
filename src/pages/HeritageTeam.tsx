@@ -184,7 +184,6 @@ const HeritageTeam = () => {
             </div>
           ) : (
             <div className="text-white">
-              <h2 className="text-2xl mb-4">Found {players.length} Heritage Players:</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {players.map((player, index) => (
                   <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
