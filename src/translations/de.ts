@@ -63,6 +63,7 @@ export default {
   heritage: "Herkunft",
   german: "Deutsch",
   british: "Britisch",
+  unaffiliated: "Vereinslos",
   
   // Community Team translations
   community_team_title: "Community Team",

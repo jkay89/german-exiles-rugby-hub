@@ -71,6 +71,7 @@ export default {
   heritage: "Heritage",
   german: "German",
   british: "British",
+  unaffiliated: "Unaffiliated",
   
   // Community Team translations
   community_team_title: "Community Players",
