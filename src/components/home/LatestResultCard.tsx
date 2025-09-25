@@ -114,7 +114,7 @@ export const LatestResultCard = () => {
                 </span>
               </div>
               <h3 className="text-lg font-bold">
-                {latestResult.is_home ? "German Exiles" : latestResult.opponent} vs {latestResult.is_home ? latestResult.opponent : "German Exiles"}
+                {latestResult.is_home ? `${latestResult.team} vs ${latestResult.opponent}` : `${latestResult.opponent} vs ${latestResult.team}`}
               </h3>
               <p className="text-sm text-gray-300">
                 {format(parseISO(latestResult.date), "MMMM d, yyyy")}

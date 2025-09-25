@@ -34,8 +34,9 @@ const ResultsGridView = ({ results }: ResultsGridViewProps) => {
               </span>
             </div>
             <CardTitle className="text-xl font-bold text-german-gold flex items-center justify-between">
-              <span className="truncate">{result.opponent}</span>
-              <span className="text-sm ml-2 text-gray-400 truncate">({result.team})</span>
+              <span className="truncate">
+                {result.is_home ? `${result.team} vs ${result.opponent}` : `${result.opponent} vs ${result.team}`}
+              </span>
             </CardTitle>
             <div className="mt-2">
               <div className="flex items-center text-sm text-gray-300">

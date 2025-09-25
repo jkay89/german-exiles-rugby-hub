@@ -68,8 +68,9 @@ const FixtureCard = ({
           </span>
         </div>
         <CardTitle className="text-xl font-bold text-german-gold flex items-center justify-between">
-          <span className="truncate">{opponent}</span>
-          {team && <span className="text-sm ml-2 text-gray-400 truncate">({team})</span>}
+          <span className="truncate">
+            {is_home ? `${team || 'German Exiles'} vs ${opponent}` : `${opponent} vs ${team || 'German Exiles'}`}
+          </span>
         </CardTitle>
         <CardDescription className="text-gray-300 flex flex-col gap-1 mt-2">
           <div className="flex items-center text-sm">

@@ -96,7 +96,7 @@ export const NextFixtureCard = () => {
                 </span>
               </div>
               <h3 className="text-lg font-bold">
-                {nextFixture.is_home ? "German Exiles" : nextFixture.opponent} vs {nextFixture.is_home ? nextFixture.opponent : "German Exiles"}
+                {nextFixture.is_home ? `${nextFixture.team || 'German Exiles'} vs ${nextFixture.opponent}` : `${nextFixture.opponent} vs ${nextFixture.team || 'German Exiles'}`}
               </h3>
             </div>
             <p className="text-german-gold flex items-center">
