@@ -104,7 +104,7 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <span className="text-gradient animate-shimmer inline-block">{t("hero_title")}</span>
+              <span className="text-gradient inline-block">{t("hero_title")}</span>
             </motion.h1>
           </motion.div>
           
