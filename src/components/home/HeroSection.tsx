@@ -50,7 +50,7 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
       initial="hidden"
       animate={isLoaded ? "visible" : "hidden"}
       variants={containerVariants}
-      className="relative h-[70vh] bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
+      className="relative h-[70vh] bg-gradient-to-br from-black via-gray-900 to-black overflow-visible"
     >
       {/* Animated background elements */}
       <div className="absolute inset-0">
@@ -97,7 +97,7 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
         >
           <motion.div
             variants={itemVariants}
-            className="mb-6"
+            className="mb-6 overflow-visible"
           >
             <motion.h1 
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-relaxed pb-2"
