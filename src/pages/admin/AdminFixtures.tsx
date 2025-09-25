@@ -413,6 +413,7 @@ const AdminFixtures = () => {
                       <SelectContent className="bg-gray-800 text-white">
                         <SelectItem value="German Exiles">German Exiles</SelectItem>
                         <SelectItem value="Germany RL">Germany RL</SelectItem>
+                        <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -602,6 +603,7 @@ const AdminFixtures = () => {
                       <SelectContent className="bg-gray-800 text-white">
                         <SelectItem value="German Exiles">German Exiles</SelectItem>
                         <SelectItem value="Germany RL">Germany RL</SelectItem>
+                        <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
