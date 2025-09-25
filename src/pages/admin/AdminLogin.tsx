@@ -55,10 +55,19 @@ const AdminLogin = () => {
             <p className="text-gray-400 mb-6">You are authenticated as {user.email}</p>
             <Button 
               onClick={() => window.location.href = "/admin/dashboard"}
-              className="w-full bg-german-red hover:bg-german-gold text-white"
+              className="w-full bg-german-red hover:bg-german-gold text-white mb-4"
             >
               Access Admin Dashboard
             </Button>
+            <div className="space-y-2">
+              <p className="text-gray-400 text-center text-sm">Quick Access Links:</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <a href="/admin/players" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Players</a>
+                <a href="/admin/news" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">News</a>
+                <a href="/admin/fixtures" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Fixtures</a>
+                <a href="/admin/users" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Users</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
