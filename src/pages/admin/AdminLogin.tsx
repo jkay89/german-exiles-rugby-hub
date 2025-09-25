@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -11,45 +10,23 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated, loading } = useAdmin();
+  const { login, isAuthenticated, loading, user } = useAdmin();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Wait for auth state to load before redirecting
+  // Temporary bypass: If user exists, go to dashboard regardless of loading state
   useEffect(() => {
+    if (user && user.email === 'jay@germanexilesrl.co.uk') {
+      console.log('Bypassing loading, going to dashboard for website overlord');
+      navigate("/admin/dashboard");
+      return;
+    }
+    
+    // Normal flow: wait for loading to complete before redirecting
     if (!loading && isAuthenticated) {
       navigate("/admin/dashboard");
     }
-  }, [loading, isAuthenticated, navigate]);
-
-  // Show loading while auth state is being determined
-  if (loading) {
-    return (
-      <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white">
-          <p>Loading auth state...</p>
-          <p className="text-sm text-gray-400 mt-2">If this persists, there may be a database connection issue</p>
-        </div>
-      </div>
-    );
-  }
-
-  // If user is authenticated and we're still loading role, show login form anyway
-  if (isAuthenticated) {
-    return (
-      <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <p>You are already authenticated.</p>
-          <button 
-            onClick={() => navigate("/admin/dashboard")} 
-            className="mt-4 px-4 py-2 bg-german-red text-white rounded"
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  }, [user, loading, isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
