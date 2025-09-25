@@ -7,7 +7,6 @@ import PageHeader from "@/components/fixtures/PageHeader";
 import FixtureTabs from "@/components/fixtures/FixtureTabs";
 import FixtureGridView from "@/components/fixtures/FixtureGridView";
 import ResultsGridView from "@/components/fixtures/ResultsGridView";
-import PlayerStatsTable from "@/components/fixtures/PlayerStatsTable";
 import { useFixtures, FixtureTabType } from "@/hooks/useFixtures";
 import { LoadingState, ErrorState, EmptyState } from "@/components/fixtures/FixtureStates";
 
@@ -63,8 +62,6 @@ const Fixtures = () => {
         </div>
 
         {renderContent()}
-        
-        <PlayerStatsTable />
       </motion.div>
     </div>
   );

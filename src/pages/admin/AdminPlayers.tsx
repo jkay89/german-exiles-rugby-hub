@@ -12,10 +12,7 @@ import { usePlayerManagement } from "@/hooks/usePlayerManagement";
 import { Player } from "@/utils/playerUtils";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { UploadCloud, LineChart } from "lucide-react";
-import PlayerStatsForm from "@/components/admin/PlayerStatsForm";
-import { usePlayerStatsManagement } from "@/hooks/usePlayerStatsManagement";
-import { PlayerStats } from "@/utils/playerStats";
+import { UploadCloud } from "lucide-react";
 
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
@@ -25,10 +22,6 @@ const AdminPlayers = () => {
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showExilesImportDialog, setShowExilesImportDialog] = useState(false);
-  const [activeView, setActiveView] = useState<"manage" | "stats">("manage");
-  const [showStatsForm, setShowStatsForm] = useState(false);
-  const [editingStats, setEditingStats] = useState<PlayerStats | null>(null);
-  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
 
   // Use our custom hooks for player management
   const { 
@@ -43,29 +36,6 @@ const AdminPlayers = () => {
     setShowAddForm(false);
     setEditingPlayer(null);
   });
-
-  // Use our custom hook for player stats management
-  const {
-    loading: statsLoading,
-    playerStats,
-    loadPlayerStats,
-    handleSaveStats
-  } = usePlayerStatsManagement();
-
-  // Load all players for stats management
-  const loadAllPlayers = async () => {
-    try {
-      const { data, error } = await supabase.rest
-        .from('players')
-        .select('*')
-        .order('name');
-        
-      if (error) throw error;
-      setAllPlayers(data || []);
-    } catch (error) {
-      console.error('Error loading all players:', error);
-    }
-  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -95,8 +65,6 @@ const AdminPlayers = () => {
       
       // Load initial data
       loadPlayers();
-      loadPlayerStats();
-      loadAllPlayers();
     }
   }, [isAuthenticated, navigate]);
 
@@ -134,32 +102,6 @@ const AdminPlayers = () => {
     setShowExilesImportDialog(false);
   };
 
-  const handleAddStats = () => {
-    setEditingStats(null);
-    setShowStatsForm(true);
-  };
-
-  const handleSavePlayerStats = async (stats: Partial<PlayerStats>) => {
-    await handleSaveStats(stats);
-    setShowStatsForm(false);
-    setEditingStats(null);
-  };
-
-  const handleEditStats = (stats: PlayerStats) => {
-    setEditingStats(stats);
-    setShowStatsForm(true);
-  };
-
-  const handleTabChange = (value: string) => {
-    setActiveView(value as "manage" | "stats");
-    
-    if (value === "stats") {
-      // Load stats-related data
-      loadAllPlayers();
-      loadPlayerStats();
-    }
-  };
-
   if (!isAuthenticated) {
     return null;
   }
@@ -179,25 +121,8 @@ const AdminPlayers = () => {
           </Link>
         </div>
 
-        {/* Main tabs (Manage Players / Player Stats) */}
-        <Tabs 
-          defaultValue="manage" 
-          value={activeView} 
-          onValueChange={handleTabChange} 
-          className="mb-8"
-        >
-          <TabsList className="bg-gray-800">
-            <TabsTrigger value="manage" className="data-[state=active]:bg-german-red">
-              Manage Players
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="data-[state=active]:bg-german-red">
-              Player Stats
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="manage">
-            {/* Team selector for adding new players */}
-            <PlayerTeamSelector onSelectTeam={handleTeamSelect} />
+        {/* Team selector for adding new players */}
+        <PlayerTeamSelector onSelectTeam={handleTeamSelect} />
 
             {/* Import heritage team button (only visible when heritage team is selected) */}
             {activeTeam === "heritage" && (
@@ -356,106 +281,6 @@ const AdminPlayers = () => {
                 </TabsContent>
               </Tabs>
             </div>
-          </TabsContent>
-
-          <TabsContent value="stats">
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">Player Statistics</h2>
-                <Button 
-                  onClick={handleAddStats}
-                  className="bg-german-red hover:bg-german-gold flex items-center gap-2"
-                >
-                  <LineChart size={16} />
-                  Update Player Stats
-                </Button>
-              </div>
-              
-              {showStatsForm && (
-                <div className="mb-8 p-6 border border-gray-700 rounded-lg bg-gray-800">
-                  <h3 className="text-lg font-semibold text-white mb-4">
-                    {editingStats ? "Edit Player Statistics" : "Add Player Statistics"}
-                  </h3>
-                  <PlayerStatsForm
-                    onSubmit={handleSavePlayerStats}
-                    onCancel={() => setShowStatsForm(false)}
-                    initialStats={editingStats || undefined}
-                    players={allPlayers}
-                  />
-                </div>
-              )}
-              
-              {/* Player Stats Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-gray-400 uppercase bg-gray-800">
-                    <tr>
-                      <th className="px-4 py-3">Player</th>
-                      <th className="px-4 py-3">Team</th>
-                      <th className="px-4 py-3">Games</th>
-                      <th className="px-4 py-3">Trys</th>
-                      <th className="px-4 py-3">Points</th>
-                      <th className="px-4 py-3">Yellow Cards</th>
-                      <th className="px-4 py-3">Red Cards</th>
-                      <th className="px-4 py-3">MotM</th>
-                      <th className="px-4 py-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {statsLoading ? (
-                      <tr>
-                        <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
-                          Loading player statistics...
-                        </td>
-                      </tr>
-                    ) : playerStats.length > 0 ? (
-                      playerStats.map((stat) => {
-                        // Find the player to get their team
-                        const player = allPlayers.find(p => p.id === stat.playerId);
-                        
-                        return (
-                          <tr key={stat.id} className="bg-gray-900 border-b border-gray-800">
-                            <td className="px-4 py-3 text-white">
-                              <div className="flex items-center">
-                                <div className="font-medium">{stat.name}</div>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-white">
-                              {player?.team === "heritage" ? "Heritage Team" : 
-                              player?.team === "exiles9s" ? "Exiles 9s" : "Community Team"}
-                            </td>
-                            <td className="px-4 py-3 text-white">{stat.gamesPlayed}</td>
-                            <td className="px-4 py-3 text-white">{stat.trysScored}</td>
-                            <td className="px-4 py-3 text-white">{stat.pointsScored}</td>
-                            <td className="px-4 py-3 text-white">{stat.yellowCards}</td>
-                            <td className="px-4 py-3 text-white">{stat.redCards}</td>
-                            <td className="px-4 py-3 text-white">{stat.manOfTheMatch}</td>
-                            <td className="px-4 py-3">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleEditStats(stat)}
-                                className="text-gray-400 hover:text-white"
-                              >
-                                Edit
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
-                          No player statistics found. Click "Update Player Stats" to add statistics.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
       </motion.div>
     </div>
   );
