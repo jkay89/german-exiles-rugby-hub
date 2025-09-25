@@ -54,7 +54,7 @@ const AdminLogin = () => {
             <h1 className="text-2xl font-bold text-white mb-6">Welcome, Website Overlord!</h1>
             <p className="text-gray-400 mb-6">You are authenticated as {user.email}</p>
             <Button 
-              onClick={() => navigate("/admin/dashboard")}
+              onClick={() => window.location.href = "/admin/dashboard"}
               className="w-full bg-german-red hover:bg-german-gold text-white"
             >
               Access Admin Dashboard
