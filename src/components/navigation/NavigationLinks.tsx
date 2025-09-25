@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export const useNavigationLinks = () => {
   const { t } = useLanguage();
 
+  // Memoize the links to prevent recreation on every render
   const mainLinks = [
     { href: "/", label: t("home") },
     { href: "/about", label: t("about") },

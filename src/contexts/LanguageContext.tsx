@@ -33,6 +33,15 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
+    // During hot reload or development, provide a fallback to prevent crashes
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('useLanguage called outside LanguageProvider, using fallback');
+      return {
+        language: 'en' as Language,
+        setLanguage: () => {},
+        t: (key: string) => key // Return the key as fallback
+      };
+    }
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
