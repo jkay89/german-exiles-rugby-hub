@@ -22,11 +22,13 @@ const HeritageTeam = () => {
       try {
         const data = await fetchPlayersByTeam("heritage");
         console.log("Loaded heritage team players:", data);
+        console.log("Players array length:", data.length);
         setPlayers(data);
       } catch (error) {
         console.error("Error loading heritage team players:", error);
       } finally {
         setLoading(false);
+        console.log("Loading state set to false");
       }
     };
     
@@ -179,7 +181,7 @@ const HeritageTeam = () => {
             <motion.div
               variants={containerVariants}
               initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
+              animate="visible"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
             >
               {players.map((player, index) => (
