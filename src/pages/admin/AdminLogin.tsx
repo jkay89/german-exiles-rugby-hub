@@ -10,23 +10,28 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasRedirected, setHasRedirected] = useState(false);
   const { login, isAuthenticated, loading, user } = useAdmin();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Temporary bypass: If user exists, go to dashboard regardless of loading state
+  // Prevent redirect loop with a flag
   useEffect(() => {
+    if (hasRedirected) return;
+    
     if (user && user.email === 'jay@germanexilesrl.co.uk') {
       console.log('Bypassing loading, going to dashboard for website overlord');
-      navigate("/admin/dashboard");
+      setHasRedirected(true);
+      navigate("/admin/dashboard", { replace: true });
       return;
     }
     
     // Normal flow: wait for loading to complete before redirecting
     if (!loading && isAuthenticated) {
-      navigate("/admin/dashboard");
+      setHasRedirected(true);
+      navigate("/admin/dashboard", { replace: true });
     }
-  }, [user, loading, isAuthenticated, navigate]);
+  }, [user, loading, isAuthenticated, navigate, hasRedirected]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
