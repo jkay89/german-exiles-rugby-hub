@@ -13,7 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export const DesktopNavigation = () => {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t } = useLanguage(); // Fix for context issue
   const { mainLinks, teamLinks, CLUB_SHOP_URL } = useNavigationLinks();
 
   const isActive = (path: string) => location.pathname === path;
