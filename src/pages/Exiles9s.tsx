@@ -84,69 +84,24 @@ const Exiles9s = () => {
               <Loader2 className="h-12 w-12 text-german-gold animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {players.map((player, index) => (
-                <motion.div
-                  key={player.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                    <CardHeader className="flex flex-col items-center">
-                      <div className="flex items-center justify-center w-full mb-4 space-x-8">
-                        <div className="flex flex-col items-center">
-                          <div className="w-10 h-10 rounded-full bg-german-red flex items-center justify-center text-white font-bold">
-                            {player.number}
-                          </div>
-                        </div>
-                        
-                        <div className="w-56 h-56 flex items-center justify-center">
-                          {player.photo_url ? (
-                            <img 
-                              src={player.photo_url}
-                              alt={player.name}
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-german-red flex items-center justify-center text-white text-2xl">
-                              {player.name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col items-center">
-                          {player.heritage && (
-                            <img 
-                              src={getHeritageFlag(player.heritage)}
-                              alt={`${player.heritage} Flag`}
-                              className="w-8 h-5 object-cover rounded"
-                            />
-                          )}
-                        </div>
+            <div className="text-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {players.map((player, index) => (
+                  <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-german-gold font-bold">#{player.number} {player.name}</h3>
+                      <p className="text-gray-300">{player.position}</p>
+                      <p className="text-gray-400">{player.club}</p>
+                      <p className="text-gray-400">Heritage: {player.heritage}</p>
+                    </div>
+                    {player.photo_url && (
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img src={player.photo_url} alt={player.name} className="w-full h-full object-cover rounded" />
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
-                      {player.position && player.position !== "None" && (
-                        <p className="text-german-red font-semibold">{player.position}</p>
-                      )}
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <div className="space-y-2">
-                        {player.club && player.club !== "None" && (
-                          <p className="text-sm text-gray-300">
-                            <span className="text-german-gold font-semibold">{t("club")}:</span> {player.club}
-                          </p>
-                        )}
-                        {player.bio && (
-                          <p className="text-sm text-german-gold font-semibold">
-                            {getPlayerRole(player.bio)}
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

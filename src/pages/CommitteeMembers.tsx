@@ -56,53 +56,28 @@ const CommitteeMembers = () => {
               <Loader2 className="h-12 w-12 text-german-gold animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {members.map((member, index) => (
-                <motion.div
-                  key={member.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                    <CardHeader className="flex flex-col items-center">
-                      <div className="w-32 h-32 mb-4 rounded-full overflow-hidden flex items-center justify-center bg-gray-800">
-                        {member.photo_url ? (
-                          <img 
-                            src={member.photo_url}
-                            alt={member.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="bg-german-red flex items-center justify-center text-white text-3xl w-full h-full">
-                            {member.name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                      <p className="text-german-red font-semibold">{member.role}</p>
-                    </CardHeader>
-                    <CardContent className="text-center space-y-2">
+            <div className="text-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {members.map((member, index) => (
+                  <div key={member.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-german-gold font-bold">{member.name}</h3>
+                      <p className="text-gray-300">{member.role}</p>
                       {member.contact_email && (
-                        <div className="flex items-center justify-center text-sm text-german-gold">
-                          <Mail className="h-4 w-4 mr-2" />
-                          <a href={`mailto:${member.contact_email}`} className="hover:underline">
-                            {member.contact_email}
-                          </a>
-                        </div>
+                        <p className="text-gray-400">{member.contact_email}</p>
                       )}
                       {member.contact_number && (
-                        <div className="flex items-center justify-center text-sm text-german-gold">
-                          <Phone className="h-4 w-4 mr-2" />
-                          <a href={`tel:${member.contact_number}`} className="hover:underline">
-                            {member.contact_number}
-                          </a>
-                        </div>
+                        <p className="text-gray-400">{member.contact_number}</p>
                       )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                    </div>
+                    {member.photo_url && (
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover rounded" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -98,64 +98,36 @@ const CommunityTeam = () => {
 
       <section className="py-16 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {players.map((player, index) => (
-              <motion.div
-                key={player.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="bg-black border-german-red hover:border-german-gold transition-colors duration-300">
-                  <CardHeader className="flex flex-col items-center">
-                    <div className="flex items-center justify-center w-full mb-4 space-x-8">
-                      <div className="flex flex-col items-center">
-                        <img 
-                          src="/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png"
-                          alt="German Exiles Logo"
-                          className="w-8 h-8 object-contain"
-                        />
-                        <span className="text-sm mt-2 text-gray-300">{player.teamNumber}</span>
-                      </div>
-                      
-                      <Avatar className="w-24 h-24">
-                        <AvatarImage src={player.image} alt={player.name} />
-                        <AvatarFallback className="bg-german-red text-white text-2xl">
-                          {player.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="flex flex-col items-center">
-                        {player.countryHeritage === "DE" ? (
-                          <img 
-                            src="/lovable-uploads/8765443e-9005-4411-b6f9-6cf0bbf78182.png"
-                            alt="German Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        ) : (
-                          <img 
-                            src="/lovable-uploads/a18e25c3-ea1c-4820-a9a0-900357680eeb.png"
-                            alt="British Flag"
-                            className="w-8 h-5 object-cover rounded"
-                          />
-                        )}
-                        <span className="text-sm mt-2 text-gray-300">
-                          {player.nationalTeamNumber || "N/A"}
-                        </span>
-                      </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="text-white">Loading community players...</div>
+            </div>
+          ) : players.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-white text-xl">No community players found</p>
+              <p className="text-gray-400 mt-2">Please check back later</p>
+            </div>
+          ) : (
+            <div className="text-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {players.map((player, index) => (
+                  <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-german-gold font-bold">#{player.teamNumber} {player.name}</h3>
+                      <p className="text-gray-300">{player.position}</p>
+                      <p className="text-gray-400">{player.club}</p>
+                      <p className="text-gray-400">Heritage: {player.countryHeritage === "DE" ? "German" : "British"}</p>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
-                    <p className="text-german-red font-semibold">{player.position}</p>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm text-german-gold">
-                      {t("heritage")}: {player.countryHeritage === "DE" ? t("german") : t("british")}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    {player.image && (
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img src={player.image} alt={player.name} className="w-full h-full object-cover rounded" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
