@@ -411,10 +411,8 @@ const AdminFixtures = () => {
                         <SelectValue placeholder="Select team" />
                       </SelectTrigger>
                       <SelectContent className="bg-gray-800 text-white">
-                        <SelectItem value="Heritage Team">Heritage Team</SelectItem>
-                        <SelectItem value="Community Team">Community Team</SelectItem>
-                        <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
-                        <SelectItem value="National Team">National Team</SelectItem>
+                        <SelectItem value="German Exiles">German Exiles</SelectItem>
+                        <SelectItem value="Germany RL">Germany RL</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -602,10 +600,8 @@ const AdminFixtures = () => {
                         <SelectValue placeholder="Select team" />
                       </SelectTrigger>
                       <SelectContent className="bg-gray-800 text-white">
-                        <SelectItem value="Heritage Team">Heritage Team</SelectItem>
-                        <SelectItem value="Community Team">Community Team</SelectItem>
-                        <SelectItem value="Exiles 9s">Exiles 9s</SelectItem>
-                        <SelectItem value="National Team">National Team</SelectItem>
+                        <SelectItem value="German Exiles">German Exiles</SelectItem>
+                        <SelectItem value="Germany RL">Germany RL</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
