@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 import { fetchPlayersByTeam, Player } from "@/utils/playerUtils";
-import { Loader2, Star, Trophy, MapPin, User } from "lucide-react";
+import { Loader2, Trophy, MapPin, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
@@ -93,30 +93,6 @@ const HeritageTeam = () => {
               className="w-full h-full object-contain"
             />
           </motion.div>
-          
-          {/* Floating stars */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [-10, 10, -10],
-                opacity: [0.3, 1, 0.3],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              <Star className="w-6 h-6 text-german-gold" />
-            </motion.div>
-          ))}
         </div>
 
         <div className="container mx-auto px-6 relative z-10 text-center">
