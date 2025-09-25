@@ -19,7 +19,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        'norwester': ['Norwester', 'sans-serif'],
+        'montserrat': ['Montserrat', 'sans-serif'],
         'playfair': ['Playfair Display', 'serif'],
         'mono': ['JetBrains Mono', 'monospace'],
       },
