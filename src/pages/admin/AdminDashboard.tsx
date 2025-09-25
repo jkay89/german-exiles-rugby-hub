@@ -131,6 +131,21 @@ const AdminDashboard = () => {
           <Card className="bg-gray-900 border-gray-800 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-german-gold" />
+                Coaching & Support Staff
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Manage coaching and support staff profiles and information.</p>
+              <Link to="/admin/coaching">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Coaching Staff</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-german-gold" />
                 Documents
               </CardTitle>
