@@ -21,6 +21,7 @@ export default {
       fontFamily: {
         'montserrat': ['Montserrat', 'sans-serif'],
         'playfair': ['Playfair Display', 'serif'],
+        'mono': ['JetBrains Mono', 'monospace'],
       },
       colors: {
         "german-red": "#DD1F3D",
