@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -11,14 +11,24 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated } = useAdmin();
+  const { login, isAuthenticated, loading } = useAdmin();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    navigate("/admin/dashboard");
-    return null;
+  // Wait for auth state to load before redirecting
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/admin/dashboard");
+    }
+  }, [loading, isAuthenticated, navigate]);
+
+  // Show loading while auth state is being determined
+  if (loading) {
+    return (
+      <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
