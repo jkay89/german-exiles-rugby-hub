@@ -187,13 +187,17 @@ const HeritageTeam = () => {
               <h2 className="text-2xl mb-4">Found {players.length} Heritage Players:</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {players.map((player, index) => (
-                  <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold">
-                    <h3 className="text-german-gold font-bold">#{player.number} {player.name}</h3>
-                    <p className="text-gray-300">{player.position}</p>
-                    <p className="text-gray-400">{player.club}</p>
-                    <p className="text-gray-400">Heritage: {player.heritage}</p>
+                  <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-german-gold font-bold">#{player.number} {player.name}</h3>
+                      <p className="text-gray-300">{player.position}</p>
+                      <p className="text-gray-400">{player.club}</p>
+                      <p className="text-gray-400">Heritage: {player.heritage}</p>
+                    </div>
                     {player.photo_url && (
-                      <img src={player.photo_url} alt={player.name} className="w-16 h-16 rounded mt-2" />
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img src={player.photo_url} alt={player.name} className="w-full h-full object-cover rounded" />
+                      </div>
                     )}
                   </div>
                 ))}
