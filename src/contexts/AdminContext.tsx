@@ -52,8 +52,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
 
-      console.log('User role data:', data);
-      return data?.role as AdminRole || null;
+      console.log('User role data received:', data);
+      const role = data?.role as AdminRole || null;
+      console.log('Final role assigned:', role);
+      return role;
     } catch (error) {
       console.error('Error in fetchUserRole:', error);
       return null;
