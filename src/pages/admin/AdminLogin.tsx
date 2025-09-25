@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +11,15 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, user } = useAdmin();
+  const { login, isAuthenticated } = useAdmin();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    navigate("/admin/dashboard");
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,35 +51,6 @@ const AdminLogin = () => {
       setIsLoading(false);
     }
   };
-
-  // If user is already authenticated, show dashboard link
-  if (user && user.email === 'jay@germanexilesrl.co.uk') {
-    return (
-      <div className="pt-16 min-h-screen bg-black">
-        <div className="container mx-auto px-6 py-12">
-          <div className="max-w-md mx-auto bg-gray-900 p-8 rounded-lg border border-gray-800 text-center">
-            <h1 className="text-2xl font-bold text-white mb-6">Welcome, Website Overlord!</h1>
-            <p className="text-gray-400 mb-6">You are authenticated as {user.email}</p>
-            <Button 
-              onClick={() => window.location.href = "/admin/dashboard"}
-              className="w-full bg-german-red hover:bg-german-gold text-white mb-4"
-            >
-              Access Admin Dashboard
-            </Button>
-            <div className="space-y-2">
-              <p className="text-gray-400 text-center text-sm">Quick Access Links:</p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <a href="/admin/players" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Players</a>
-                <a href="/admin/news" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">News</a>
-                <a href="/admin/fixtures" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Fixtures</a>
-                <a href="/admin/users" className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded text-center block">Users</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pt-16 min-h-screen bg-black">

@@ -15,7 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { UploadCloud } from "lucide-react";
 
 const AdminPlayers = () => {
-  const { isAuthenticated, isUserAdmin } = useAdmin();
+  const { isAuthenticated } = useAdmin();
   const navigate = useNavigate();
   const [activeTeam, setActiveTeam] = useState("heritage");
   const [showAddForm, setShowAddForm] = useState(false);
@@ -40,8 +40,6 @@ const AdminPlayers = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/admin");
-    } else if (!isUserAdmin) {
-      navigate("/admin/dashboard");
     } else {
       // Check if storage bucket exists, create if it doesn't
       const ensureStorageBucket = async () => {
@@ -68,7 +66,7 @@ const AdminPlayers = () => {
       // Load initial data
       loadPlayers();
     }
-  }, [isAuthenticated, isUserAdmin, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleTeamSelect = (team: string) => {
     setActiveTeam(team);
@@ -104,7 +102,7 @@ const AdminPlayers = () => {
     setShowExilesImportDialog(false);
   };
 
-  if (!isAuthenticated || !isUserAdmin) {
+  if (!isAuthenticated) {
     return null;
   }
 

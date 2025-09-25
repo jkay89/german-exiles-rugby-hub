@@ -23,7 +23,7 @@ import { format } from "date-fns";
 import { Folder, Images, Plus, Trash2, Upload, Edit, X } from "lucide-react";
 
 const AdminMedia = () => {
-  const { isAuthenticated, isUserAdmin } = useAdmin();
+  const { isAuthenticated } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [folders, setFolders] = useState<MediaFolder[]>([]);

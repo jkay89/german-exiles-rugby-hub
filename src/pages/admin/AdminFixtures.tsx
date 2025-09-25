@@ -49,7 +49,7 @@ interface Result {
 }
 
 const AdminFixtures = () => {
-  const { isAuthenticated, isUserAdmin } = useAdmin();
+  const { isAuthenticated } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("fixtures");
@@ -66,8 +66,6 @@ const AdminFixtures = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/admin");
-    } else if (!isUserAdmin) {
-      navigate("/admin/dashboard");
     } else {
       if (activeTab === "fixtures") {
         fetchFixtures();
@@ -75,7 +73,7 @@ const AdminFixtures = () => {
         fetchResults();
       }
     }
-  }, [isAuthenticated, isUserAdmin, navigate, activeTab]);
+  }, [isAuthenticated, navigate, activeTab]);
 
   const fetchFixtures = async () => {
     setLoading(true);
@@ -347,7 +345,7 @@ const AdminFixtures = () => {
     }
   };
 
-  if (!isAuthenticated || !isUserAdmin) {
+  if (!isAuthenticated) {
     return null;
   }
 

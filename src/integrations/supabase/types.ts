@@ -719,10 +719,6 @@ export type Database = {
         Args: { _user_email: string }
         Returns: boolean
       }
-      create_first_website_overlord: {
-        Args: { _user_email: string }
-        Returns: boolean
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -738,27 +734,8 @@ export type Database = {
         Args: { _user_id?: string }
         Returns: boolean
       }
-      is_lottery_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      is_user_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      is_website_overlord: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
       promote_to_admin: {
         Args: { _user_email: string }
-        Returns: boolean
-      }
-      promote_user: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_email: string
-        }
         Returns: boolean
       }
       trigger_automatic_draw: {
@@ -767,7 +744,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "website_overlord" | "admin" | "user" | "lottery_admin"
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -895,7 +872,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["website_overlord", "admin", "user", "lottery_admin"],
+      app_role: ["admin", "user"],
     },
   },
 } as const
