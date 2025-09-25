@@ -26,7 +26,27 @@ const AdminLogin = () => {
   if (loading) {
     return (
       <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">
+          <p>Loading auth state...</p>
+          <p className="text-sm text-gray-400 mt-2">If this persists, there may be a database connection issue</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated and we're still loading role, show login form anyway
+  if (isAuthenticated) {
+    return (
+      <div className="pt-16 min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <p>You are already authenticated.</p>
+          <button 
+            onClick={() => navigate("/admin/dashboard")} 
+            className="mt-4 px-4 py-2 bg-german-red text-white rounded"
+          >
+            Go to Dashboard
+          </button>
+        </div>
       </div>
     );
   }
