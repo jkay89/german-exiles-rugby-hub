@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -10,28 +10,9 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasRedirected, setHasRedirected] = useState(false);
-  const { login, isAuthenticated, loading, user } = useAdmin();
+  const { login, user } = useAdmin();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  // Prevent redirect loop with a flag
-  useEffect(() => {
-    if (hasRedirected) return;
-    
-    if (user && user.email === 'jay@germanexilesrl.co.uk') {
-      console.log('Bypassing loading, going to dashboard for website overlord');
-      setHasRedirected(true);
-      navigate("/admin/dashboard", { replace: true });
-      return;
-    }
-    
-    // Normal flow: wait for loading to complete before redirecting
-    if (!loading && isAuthenticated) {
-      setHasRedirected(true);
-      navigate("/admin/dashboard", { replace: true });
-    }
-  }, [user, loading, isAuthenticated, navigate, hasRedirected]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +44,26 @@ const AdminLogin = () => {
       setIsLoading(false);
     }
   };
+
+  // If user is already authenticated, show dashboard link
+  if (user && user.email === 'jay@germanexilesrl.co.uk') {
+    return (
+      <div className="pt-16 min-h-screen bg-black">
+        <div className="container mx-auto px-6 py-12">
+          <div className="max-w-md mx-auto bg-gray-900 p-8 rounded-lg border border-gray-800 text-center">
+            <h1 className="text-2xl font-bold text-white mb-6">Welcome, Website Overlord!</h1>
+            <p className="text-gray-400 mb-6">You are authenticated as {user.email}</p>
+            <Button 
+              onClick={() => navigate("/admin/dashboard")}
+              className="w-full bg-german-red hover:bg-german-gold text-white"
+            >
+              Access Admin Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16 min-h-screen bg-black">
