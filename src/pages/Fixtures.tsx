@@ -13,7 +13,7 @@ import { LoadingState, ErrorState, EmptyState } from "@/components/fixtures/Fixt
 const Fixtures = () => {
   const [activeTab, setActiveTab] = useState<FixtureTabType>("upcoming");
   const navigate = useNavigate();
-  const { fixtures, results, loading: dataLoading, error } = useFixtures(activeTab);
+  const { fixtures, results, loading: dataLoading, error, refetch } = useFixtures(activeTab);
 
   const renderContent = () => {
     if (dataLoading) {
@@ -33,7 +33,7 @@ const Fixtures = () => {
     }
     
     return activeTab === "upcoming" 
-      ? <FixtureGridView fixtures={fixtures} />
+      ? <FixtureGridView fixtures={fixtures} onResultAdded={refetch} />
       : <ResultsGridView results={results} />;
   };
 
