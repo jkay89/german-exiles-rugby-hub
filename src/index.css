@@ -116,6 +116,9 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-german-gold to-german-red bg-clip-text text-transparent;
+    padding-bottom: 0.1em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
   
   .card-interactive {
