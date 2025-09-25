@@ -65,12 +65,20 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
+      console.log('AdminContext: Getting initial session...');
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('AdminContext: Session:', session);
+      
       if (session?.user) {
+        console.log('AdminContext: User found, setting user and fetching role...');
         setUser(session.user);
         const userRole = await fetchUserRole(session.user.id);
+        console.log('AdminContext: Role fetched, setting role:', userRole);
         setRole(userRole);
+      } else {
+        console.log('AdminContext: No user found');
       }
+      console.log('AdminContext: Setting loading to false');
       setLoading(false);
     };
 
@@ -79,6 +87,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('AdminContext: Auth state change:', event, session);
         if (session?.user) {
           setUser(session.user);
           const userRole = await fetchUserRole(session.user.id);
