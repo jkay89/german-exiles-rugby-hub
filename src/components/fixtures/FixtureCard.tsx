@@ -17,7 +17,6 @@ interface FixtureCardProps {
   locale: string;
   team?: string;
   onResultAdded?: () => void;
-  showAddResult?: boolean;
 }
 
 const FixtureCard = ({
@@ -30,8 +29,7 @@ const FixtureCard = ({
   competition,
   locale,
   team,
-  onResultAdded,
-  showAddResult = false
+  onResultAdded
 }: FixtureCardProps) => {
   
   const formatDate = (dateString: string) => {
@@ -95,7 +93,7 @@ const FixtureCard = ({
           <p className="text-sm text-gray-300">{location}</p>
         </div>
         
-        {showAddResult && onResultAdded && (
+        {onResultAdded && (
           <div className="flex justify-center">
             <AddResultForm 
               fixture={{

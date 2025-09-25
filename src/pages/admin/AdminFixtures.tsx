@@ -18,7 +18,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Plus, Edit, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format, parseISO } from "date-fns";
-import AddResultForm from "@/components/fixtures/AddResultForm";
 
 // Fixture type
 interface Fixture {
@@ -551,31 +550,24 @@ const AdminFixtures = () => {
                           <td className="px-4 py-3 text-sm text-gray-300">{fixture.location}</td>
                           <td className="px-4 py-3 text-sm text-gray-300">{fixture.competition}</td>
                           <td className="px-4 py-3 text-sm text-gray-300">
-                             <div className="flex gap-2">
-                               <AddResultForm 
-                                 fixture={fixture}
-                                 onResultAdded={() => {
-                                   fetchFixtures();
-                                   fetchResults();
-                                 }}
-                               />
-                               <Button 
-                                 size="sm" 
-                                 variant="outline" 
-                                 className="flex items-center gap-1"
-                                 onClick={() => setEditingFixture(fixture)}
-                               >
-                                 <Edit className="h-3 w-3" /> Edit
-                               </Button>
-                               <Button 
-                                 size="sm" 
-                                 variant="destructive"
-                                 className="flex items-center gap-1"
-                                 onClick={() => setDeleteItemId(fixture.id)}
-                               >
-                                 <Trash2 className="h-3 w-3" /> Delete
-                               </Button>
-                             </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="flex items-center gap-1"
+                                onClick={() => setEditingFixture(fixture)}
+                              >
+                                <Edit className="h-3 w-3" /> Edit
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                className="flex items-center gap-1"
+                                onClick={() => setDeleteItemId(fixture.id)}
+                              >
+                                <Trash2 className="h-3 w-3" /> Delete
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
