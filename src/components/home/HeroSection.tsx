@@ -100,7 +100,7 @@ const HeroSection = ({ isLoaded }: HeroSectionProps) => {
             className="mb-6"
           >
             <motion.h1 
-              className="text-5xl md:text-7xl font-bold text-white mb-4 leading-normal"
+              className="text-5xl md:text-7xl font-bold text-white mb-6 leading-relaxed pb-2"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
