@@ -191,7 +191,7 @@ const AdminDocuments = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="pt-16 min-h-screen bg-black text-white p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-german-gold">Document Management</h1>
