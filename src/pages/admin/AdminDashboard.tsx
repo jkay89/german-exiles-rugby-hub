@@ -8,16 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield } from "lucide-react";
 
 const AdminDashboard = () => {
-  const { isAuthenticated, currentAdmin, logout, isWebsiteOverlord, isAdmin, isUserAdmin, isLotteryAdmin } = useAdmin();
+  const { isAuthenticated, currentAdmin, logout, isWebsiteOverlord, isAdmin, isUserAdmin, isLotteryAdmin, user } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Bypass authentication check for jay@germanexilesrl.co.uk
+    if (user?.email === 'jay@germanexilesrl.co.uk') {
+      return; // Skip redirect for website overlord
+    }
+    
     if (!isAuthenticated) {
       navigate("/admin");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
-  if (!isAuthenticated) {
+  // Allow access for jay@germanexilesrl.co.uk even if authentication is pending
+  if (!isAuthenticated && user?.email !== 'jay@germanexilesrl.co.uk') {
     return null;
   }
 
