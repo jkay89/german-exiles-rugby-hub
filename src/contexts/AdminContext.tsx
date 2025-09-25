@@ -47,6 +47,8 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         .limit(1)
         .maybeSingle();
 
+      console.log('Raw response from user_roles:', { data, error });
+
       if (error) {
         console.error('Error fetching user role:', error);
         return null;
