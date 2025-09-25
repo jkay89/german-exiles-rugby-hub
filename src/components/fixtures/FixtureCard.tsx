@@ -3,8 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPinIcon, Calendar, Clock } from "lucide-react";
 import { format, parseISO } from 'date-fns';
 import { enGB, de } from 'date-fns/locale';
-import AddResultForm from "./AddResultForm";
-import { Fixture } from "@/hooks/useFixtures";
 
 interface FixtureCardProps {
   id: string;
@@ -16,7 +14,6 @@ interface FixtureCardProps {
   competition: string;
   locale: string;
   team?: string;
-  onResultAdded?: () => void;
 }
 
 const FixtureCard = ({
@@ -28,8 +25,7 @@ const FixtureCard = ({
   is_home,
   competition,
   locale,
-  team,
-  onResultAdded
+  team
 }: FixtureCardProps) => {
   
   const formatDate = (dateString: string) => {
@@ -92,24 +88,6 @@ const FixtureCard = ({
           <MapPinIcon className="h-4 w-4 mt-1 mr-2 text-german-gold flex-shrink-0" />
           <p className="text-sm text-gray-300">{location}</p>
         </div>
-        
-        {onResultAdded && (
-          <div className="flex justify-center">
-            <AddResultForm 
-              fixture={{
-                id,
-                date,
-                time,
-                opponent,
-                location,
-                is_home,
-                competition,
-                team
-              } as Fixture}
-              onResultAdded={onResultAdded}
-            />
-          </div>
-        )}
       </CardContent>
     </Card>
   );
