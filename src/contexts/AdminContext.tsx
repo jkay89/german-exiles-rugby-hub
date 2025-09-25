@@ -39,6 +39,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const fetchUserRole = async (userId: string) => {
     try {
       console.log('Fetching role for user ID:', userId);
+      
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
