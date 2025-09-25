@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Plus, Edit, Trash2 } from "lucide-react";
+import AddResultForm from "@/components/fixtures/AddResultForm";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format, parseISO } from "date-fns";
 
@@ -551,6 +552,10 @@ const AdminFixtures = () => {
                           <td className="px-4 py-3 text-sm text-gray-300">{fixture.competition}</td>
                           <td className="px-4 py-3 text-sm text-gray-300">
                             <div className="flex gap-2">
+                              <AddResultForm 
+                                fixture={fixture}
+                                onResultAdded={fetchFixtures}
+                              />
                               <Button 
                                 size="sm" 
                                 variant="outline" 
