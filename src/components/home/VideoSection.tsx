@@ -14,7 +14,7 @@ const VideoSection = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.8 }}
-          className="max-w-2xl mx-auto"
+          className="max-w-xl mx-auto"
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-german-gold/20">
             <video
