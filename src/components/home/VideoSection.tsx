@@ -7,20 +7,19 @@ const VideoSection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+    <section className="py-12 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-2xl mx-auto"
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-german-gold/20">
             <video
-              className="w-full h-auto"
+              className="w-full h-auto max-h-80 object-cover"
               controls
-              poster="/lovable-uploads/nrld-team-photo.jpg"
               preload="metadata"
             >
               <source src="/videos/hero-video.mp4" type="video/mp4" />
