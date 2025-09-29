@@ -18,7 +18,7 @@ const VideoSection = () => {
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-german-gold/20">
             <video
-              className="w-full h-auto max-h-80 object-cover"
+              className="w-full h-auto"
               controls
               preload="metadata"
             >
