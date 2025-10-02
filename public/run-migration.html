@@ -42,6 +42,9 @@
 <body>
   <h1>Cloudinary Migration Tool</h1>
   <p>This will migrate all images from Supabase Storage to Cloudinary.</p>
+  <p style="color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 6px;">
+    ⚠️ <strong>Important:</strong> If you just created this function, wait 2-3 minutes for it to deploy before clicking the buttons.
+  </p>
   
   <button onclick="runMigration('players', 'players', 'photo_url', 'id', 'rugby-players')">
     Migrate Player Photos
@@ -61,9 +64,19 @@
 
   <div class="log" id="log"></div>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    
     const SUPABASE_URL = 'https://hmjwfnsygwzijjgrygia.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtandmbnN5Z3d6aWpqZ3J5Z2lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1Njc4NzQsImV4cCI6MjA2MTE0Mzg3NH0.2Dq0R0-LZ4mjT0Wi5oueCIGOh__GDwoY7fJx4-YPEPo';
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Make functions available globally
+    window.supabaseClient = supabase;
+    window.log = log;
+    window.runMigration = runMigration;
+    window.runAllMigrations = runAllMigrations;
 
     function log(message, type = 'info') {
       const logEl = document.getElementById('log');
@@ -79,25 +92,23 @@
       log(`Starting migration for ${bucket}...`, 'info');
       
       try {
-        const response = await fetch(
-          `${SUPABASE_URL}/functions/v1/migrate-to-cloudinary`,
+        // Use Supabase client to invoke function
+        const { data: result, error: invokeError } = await window.supabaseClient.functions.invoke(
+          'migrate-to-cloudinary',
           {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_ANON_KEY
-            },
-            body: JSON.stringify({
+            body: {
               bucket,
               table,
               urlColumn,
               idColumn,
               folder
-            })
+            }
           }
         );
 
-        const result = await response.json();
+        if (invokeError) {
+          throw new Error(invokeError.message);
+        }
         
         if (result.error) {
           log(`Error: ${result.error}`, 'error');
@@ -130,25 +141,23 @@
         log(`Starting migration for ${bucket}...`, 'info');
         
         try {
-          const response = await fetch(
-            `${SUPABASE_URL}/functions/v1/migrate-to-cloudinary`,
+          // Use Supabase client to invoke function
+          const { data: result, error: invokeError } = await window.supabaseClient.functions.invoke(
+            'migrate-to-cloudinary',
             {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_ANON_KEY
-              },
-              body: JSON.stringify({
+              body: {
                 bucket,
                 table,
                 urlColumn,
                 idColumn,
                 folder
-              })
+              }
             }
           );
 
-          const result = await response.json();
+          if (invokeError) {
+            throw new Error(invokeError.message);
+          }
           
           if (result.error) {
             log(`Error in ${bucket}: ${result.error}`, 'error');
