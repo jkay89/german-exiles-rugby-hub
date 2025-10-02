@@ -44,6 +44,7 @@ import AdminDocuments from "./pages/admin/AdminDocuments";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCoaching from "./pages/admin/AdminCoaching";
+import CloudinaryMigration from "./pages/admin/CloudinaryMigration";
 import { AdminProvider } from "./contexts/AdminContext";
 import { setupSupabase } from "./lib/supabase-setup";
 import { seedInitialContent } from "./utils/seedInitialContent";
@@ -115,6 +116,7 @@ const App = () => (
                 <Route path="/admin/documents" element={<AdminDocuments />} />
                 <Route path="/admin/lottery" element={<AdminLottery />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/cloudinary-migration" element={<CloudinaryMigration />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
