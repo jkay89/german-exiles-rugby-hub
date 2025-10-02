@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Run Cloudinary Migration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      background: #10b981;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #059669;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .info { color: #3b82f6; }
+  </style>
+</head>
+<body>
+  <h1>Cloudinary Migration Tool</h1>
+  <p>This will migrate all images from Supabase Storage to Cloudinary.</p>
+  
+  <button onclick="runMigration('players', 'players', 'photo_url', 'id', 'rugby-players')">
+    Migrate Player Photos
+  </button>
+  <button onclick="runMigration('media', 'media_items', 'url', 'id', 'rugby-media')">
+    Migrate Media Items
+  </button>
+  <button onclick="runMigration('news', 'news', 'image_url', 'id', 'rugby-news')">
+    Migrate News Images
+  </button>
+  <button onclick="runMigration('sponsors', 'sponsors', 'logo_url', 'id', 'rugby-sponsors')">
+    Migrate Sponsor Logos
+  </button>
+  <button onclick="runAllMigrations()" style="background: #3b82f6;">
+    Migrate All
+  </button>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://hmjwfnsygwzijjgrygia.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtandmbnN5Z3d6aWpqZ3J5Z2lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1Njc4NzQsImV4cCI6MjA2MTE0Mzg3NH0.2Dq0R0-LZ4mjT0Wi5oueCIGOh__GDwoY7fJx4-YPEPo';
+
+    function log(message, type = 'info') {
+      const logEl = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      logEl.innerHTML += `<div class="${type}">[${time}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function runMigration(bucket, table, urlColumn, idColumn, folder) {
+      const btn = event.target;
+      btn.disabled = true;
+      
+      log(`Starting migration for ${bucket}...`, 'info');
+      
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/functions/v1/migrate-to-cloudinary`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({
+              bucket,
+              table,
+              urlColumn,
+              idColumn,
+              folder
+            })
+          }
+        );
+
+        const result = await response.json();
+        
+        if (result.error) {
+          log(`Error: ${result.error}`, 'error');
+        } else {
+          log(`✓ Migration complete for ${bucket}!`, 'success');
+          log(`Total: ${result.total}, Migrated: ${result.migrated}, Failed: ${result.failed}`, 'success');
+          if (result.errors && result.errors.length > 0) {
+            log(`Errors: ${JSON.stringify(result.errors)}`, 'error');
+          }
+        }
+      } catch (error) {
+        log(`Error: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function runAllMigrations() {
+      const btn = event.target;
+      btn.disabled = true;
+      
+      const migrations = [
+        ['players', 'players', 'photo_url', 'id', 'rugby-players'],
+        ['media', 'media_items', 'url', 'id', 'rugby-media'],
+        ['news', 'news', 'image_url', 'id', 'rugby-news'],
+        ['sponsors', 'sponsors', 'logo_url', 'id', 'rugby-sponsors']
+      ];
+
+      for (const [bucket, table, urlColumn, idColumn, folder] of migrations) {
+        log(`Starting migration for ${bucket}...`, 'info');
+        
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/functions/v1/migrate-to-cloudinary`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON_KEY
+              },
+              body: JSON.stringify({
+                bucket,
+                table,
+                urlColumn,
+                idColumn,
+                folder
+              })
+            }
+          );
+
+          const result = await response.json();
+          
+          if (result.error) {
+            log(`Error in ${bucket}: ${result.error}`, 'error');
+          } else {
+            log(`✓ ${bucket} complete! Total: ${result.total}, Migrated: ${result.migrated}, Failed: ${result.failed}`, 'success');
+            if (result.errors && result.errors.length > 0) {
+              log(`Errors in ${bucket}: ${JSON.stringify(result.errors)}`, 'error');
+            }
+          }
+        } catch (error) {
+          log(`Error in ${bucket}: ${error.message}`, 'error');
+        }
+      }
+      
+      log('All migrations complete!', 'success');
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>
