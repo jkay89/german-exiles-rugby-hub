@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Edit, Upload, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -85,20 +86,13 @@ const AdminNews = () => {
       // Handle file upload if there's an image
       let imageUrl = null;
       if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('news')
-          .upload(fileName, selectedFile);
-          
-        if (uploadError) throw uploadError;
-        
-        const { data } = supabase.storage
-          .from('news')
-          .getPublicUrl(fileName);
-          
-        imageUrl = data.publicUrl;
+        toast({
+          title: "Uploading image",
+          description: "Please wait while we upload to Cloudinary...",
+        });
+
+        const result = await uploadToCloudinary(selectedFile, 'news');
+        imageUrl = result.url;
       }
       
       // Create the news article
@@ -141,20 +135,13 @@ const AdminNews = () => {
       // Handle file upload if there's a new image
       let imageUrl = editingArticle.image_url;
       if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('news')
-          .upload(fileName, selectedFile);
-          
-        if (uploadError) throw uploadError;
-        
-        const { data } = supabase.storage
-          .from('news')
-          .getPublicUrl(fileName);
-          
-        imageUrl = data.publicUrl;
+        toast({
+          title: "Uploading image",
+          description: "Please wait while we upload to Cloudinary...",
+        });
+
+        const result = await uploadToCloudinary(selectedFile, 'news');
+        imageUrl = result.url;
       }
       
       // Update the news article

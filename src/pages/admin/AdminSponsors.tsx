@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import {
   Form,
   FormControl,
@@ -78,23 +79,13 @@ const AdminSponsors = () => {
   };
 
   const uploadLogo = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    toast({
+      title: "Uploading logo",
+      description: "Please wait while we upload to Cloudinary...",
+    });
 
-    const { error: uploadError } = await supabase.storage
-      .from('sponsors')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('sponsors')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
+    const result = await uploadToCloudinary(file, 'sponsors');
+    return result.url;
   };
 
   const handleSponsorSubmit = async (formData: any) => {

@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Loader2, Plus, Edit, Trash2, FileText, Download } from "lucide-react";
 import { fetchDocuments, createDocument, updateDocument, deleteDocument, Document } from "@/utils/documentUtils";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import DocumentForm from "@/components/admin/DocumentForm";
 
 const AdminDocuments = () => {
@@ -53,23 +53,13 @@ const AdminDocuments = () => {
         return;
       }
 
-      const fileName = `${Date.now()}-${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(`documents/${fileName}`, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('media')
-        .getPublicUrl(`documents/${fileName}`);
+      toast.info('Uploading document to Cloudinary...');
+      const result = await uploadToCloudinary(file, 'documents');
 
       const documentData = {
         title: formData.get('title') as string,
         description: formData.get('description') as string || null,
-        file_url: publicUrl,
+        file_url: result.url,
         file_type: file.type || 'application/octet-stream',
         category: formData.get('category') as string,
       };
@@ -101,20 +91,9 @@ const AdminDocuments = () => {
         const file = fileInput?.files?.[0];
         
         if (file) {
-          const fileName = `${Date.now()}-${file.name}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('media')
-            .upload(`documents/${fileName}`, file);
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('media')
-            .getPublicUrl(`documents/${fileName}`);
-          
-          fileUrl = publicUrl;
+          toast.info('Uploading document to Cloudinary...');
+          const result = await uploadToCloudinary(file, 'documents');
+          fileUrl = result.url;
           fileType = file.type || 'application/octet-stream';
         }
       }

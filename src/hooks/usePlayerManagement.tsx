@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import { Player } from "@/utils/playerUtils";
 
 export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) => {
@@ -58,20 +59,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-            
-          if (uploadError) throw uploadError;
-          
-          const { data } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-            
-          photoUrl = data.publicUrl;
+          toast({
+            title: "Uploading photo",
+            description: "Please wait while we upload to Cloudinary...",
+          });
+
+          const result = await uploadToCloudinary(file, 'players');
+          photoUrl = result.url;
         }
       }
       
@@ -132,20 +126,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-            
-          if (uploadError) throw uploadError;
-          
-          const { data } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-            
-          photoUrl = data.publicUrl;
+          toast({
+            title: "Uploading photo",
+            description: "Please wait while we upload to Cloudinary...",
+          });
+
+          const result = await uploadToCloudinary(file, 'players');
+          photoUrl = result.url;
         }
       }
       

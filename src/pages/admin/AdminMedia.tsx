@@ -18,6 +18,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import { MediaFolder, MediaItem, fetchMediaFolders } from "@/utils/mediaUtils";
 import { format } from "date-fns";
 import { Folder, Images, Plus, Trash2, Upload, Edit, X } from "lucide-react";
@@ -199,23 +200,10 @@ const AdminMedia = () => {
       
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${i}.${fileExt}`;
-        const filePath = `${fileName}`;
         
-        // Upload to storage
-        const { error: uploadError } = await supabase.storage
-          .from('media')
-          .upload(filePath, file);
-        
-        if (uploadError) throw uploadError;
-        
-        // Get public URL
-        const { data } = supabase.storage
-          .from('media')
-          .getPublicUrl(filePath);
-        
-        const fileUrl = data.publicUrl;
+        // Upload to Cloudinary
+        const result = await uploadToCloudinary(file, 'media');
+        const fileUrl = result.url;
         
         // Determine file type (image or video)
         const fileType = file.type.startsWith('image/') ? 'image' : 

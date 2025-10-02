@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Loader2, Plus, Edit, Trash2, Mail, Phone } from "lucide-react";
 import { fetchCommitteeMembers, createCommitteeMember, updateCommitteeMember, deleteCommitteeMember, CommitteeMember } from "@/utils/committeeUtils";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import CommitteeForm from "@/components/admin/CommitteeForm";
 
 const AdminCommittee = () => {
@@ -54,20 +54,9 @@ const AdminCommittee = () => {
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileName = `${Date.now()}-${file.name}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-          
-          photoUrl = publicUrl;
+          toast.info('Uploading image to Cloudinary...');
+          const result = await uploadToCloudinary(file, 'committee-members');
+          photoUrl = result.url;
         }
       }
 
@@ -105,20 +94,9 @@ const AdminCommittee = () => {
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileName = `${Date.now()}-${file.name}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-          
-          photoUrl = publicUrl;
+          toast.info('Uploading image to Cloudinary...');
+          const result = await uploadToCloudinary(file, 'committee-members');
+          photoUrl = result.url;
         }
       }
 
