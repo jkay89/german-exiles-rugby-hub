@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Loader2, Plus, Edit, Trash2, Mail, Phone } from "lucide-react";
 import { fetchCoachingStaff, createCoachingStaffMember, updateCoachingStaffMember, deleteCoachingStaffMember, CoachingStaffMember } from "@/utils/coachingStaffUtils";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import CoachingStaffForm from "@/components/admin/CoachingStaffForm";
 
 const AdminCoaching = () => {
@@ -54,20 +54,9 @@ const AdminCoaching = () => {
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileName = `${Date.now()}-${file.name}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-          
-          photoUrl = publicUrl;
+          toast.info('Uploading image to Cloudinary...');
+          const result = await uploadToCloudinary(file, 'coaching-staff');
+          photoUrl = result.url;
         }
       }
 
@@ -106,20 +95,9 @@ const AdminCoaching = () => {
         const file = photoInput?.files?.[0];
         
         if (file) {
-          const fileName = `${Date.now()}-${file.name}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('players')
-            .upload(fileName, file);
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('players')
-            .getPublicUrl(fileName);
-          
-          photoUrl = publicUrl;
+          toast.info('Uploading image to Cloudinary...');
+          const result = await uploadToCloudinary(file, 'coaching-staff');
+          photoUrl = result.url;
         }
       }
 
