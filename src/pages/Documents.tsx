@@ -5,9 +5,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 import { fetchDocuments, Document } from "@/utils/documentUtils";
 import { Loader2, Download, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Documents = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -16,16 +18,22 @@ const Documents = () => {
       setLoading(true);
       try {
         const data = await fetchDocuments();
+        console.log("Fetched documents:", data);
         setDocuments(data);
       } catch (error) {
         console.error("Error loading documents:", error);
+        toast({
+          title: "Error loading documents",
+          description: error instanceof Error ? error.message : "Failed to load documents",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
     
     loadDocuments();
-  }, []);
+  }, [toast]);
 
   const getCategoryDisplayName = (category: string) => {
     switch (category) {
