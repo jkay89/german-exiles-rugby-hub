@@ -59,17 +59,17 @@ serve(async (req) => {
         const arrayBuffer = await fileData.arrayBuffer();
         let processedArrayBuffer = arrayBuffer;
         
-        // Check file size - if over 8MB, resize it
-        const maxSize = 8 * 1024 * 1024; // 8MB
-        if (arrayBuffer.byteLength > maxSize) {
-          console.log(`File ${file.name} is ${arrayBuffer.byteLength} bytes, resizing...`);
+        // Check file size - if over 5MB, resize it aggressively
+        const targetSize = 5 * 1024 * 1024; // 5MB to be safe
+        if (arrayBuffer.byteLength > targetSize) {
+          console.log(`File ${file.name} is ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB, resizing...`);
           
           try {
             // Decode image
             const image = await Image.decode(new Uint8Array(arrayBuffer));
             
-            // Calculate new dimensions (max 2000px on longest side)
-            const maxDimension = 2000;
+            // Calculate new dimensions (max 1500px on longest side for large files)
+            const maxDimension = 1500;
             let newWidth = image.width;
             let newHeight = image.height;
             
@@ -88,13 +88,34 @@ serve(async (req) => {
             // Resize image
             const resized = image.resize(newWidth, newHeight);
             
-            // Encode as JPEG with 85% quality
-            const encoded = await resized.encodeJPEG(85);
+            // Encode as JPEG with 75% quality for aggressive compression
+            const encoded = await resized.encodeJPEG(75);
             processedArrayBuffer = encoded.buffer;
             
-            console.log(`Resized ${file.name} from ${arrayBuffer.byteLength} to ${processedArrayBuffer.byteLength} bytes`);
+            console.log(`Resized ${file.name} from ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB to ${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB`);
+            
+            // If still too large after compression, skip it
+            if (processedArrayBuffer.byteLength > 10 * 1024 * 1024) {
+              console.log(`File ${file.name} still too large after compression (${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB), skipping...`);
+              results.failed++;
+              results.errors.push({
+                file: file.name,
+                error: "File too large even after compression - please resize manually",
+              });
+              continue;
+            }
           } catch (resizeError) {
-            console.error(`Failed to resize ${file.name}, using original:`, resizeError);
+            console.error(`Failed to resize ${file.name}:`, resizeError);
+            // If original is over 10MB, skip it
+            if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
+              console.log(`Original file ${file.name} is too large and resize failed, skipping...`);
+              results.failed++;
+              results.errors.push({
+                file: file.name,
+                error: "File too large and resize failed",
+              });
+              continue;
+            }
             processedArrayBuffer = arrayBuffer;
           }
         }
