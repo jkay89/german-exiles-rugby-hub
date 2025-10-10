@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Image } from "https://deno.land/x/imagescript@1.2.15/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,9 +56,51 @@ serve(async (req) => {
 
         if (downloadError) throw downloadError;
 
-        // Convert blob to base64 in chunks to avoid stack overflow
         const arrayBuffer = await fileData.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
+        let processedArrayBuffer = arrayBuffer;
+        
+        // Check file size - if over 8MB, resize it
+        const maxSize = 8 * 1024 * 1024; // 8MB
+        if (arrayBuffer.byteLength > maxSize) {
+          console.log(`File ${file.name} is ${arrayBuffer.byteLength} bytes, resizing...`);
+          
+          try {
+            // Decode image
+            const image = await Image.decode(new Uint8Array(arrayBuffer));
+            
+            // Calculate new dimensions (max 2000px on longest side)
+            const maxDimension = 2000;
+            let newWidth = image.width;
+            let newHeight = image.height;
+            
+            if (image.width > image.height) {
+              if (image.width > maxDimension) {
+                newWidth = maxDimension;
+                newHeight = Math.round((image.height * maxDimension) / image.width);
+              }
+            } else {
+              if (image.height > maxDimension) {
+                newHeight = maxDimension;
+                newWidth = Math.round((image.width * maxDimension) / image.height);
+              }
+            }
+            
+            // Resize image
+            const resized = image.resize(newWidth, newHeight);
+            
+            // Encode as JPEG with 85% quality
+            const encoded = await resized.encodeJPEG(85);
+            processedArrayBuffer = encoded.buffer;
+            
+            console.log(`Resized ${file.name} from ${arrayBuffer.byteLength} to ${processedArrayBuffer.byteLength} bytes`);
+          } catch (resizeError) {
+            console.error(`Failed to resize ${file.name}, using original:`, resizeError);
+            processedArrayBuffer = arrayBuffer;
+          }
+        }
+
+        // Convert to base64 in chunks to avoid stack overflow
+        const uint8Array = new Uint8Array(processedArrayBuffer);
         let base64 = '';
         const chunkSize = 8192;
         
