@@ -55,11 +55,20 @@ serve(async (req) => {
 
         if (downloadError) throw downloadError;
 
-        // Convert blob to base64
+        // Convert blob to base64 in chunks to avoid stack overflow
         const arrayBuffer = await fileData.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const uint8Array = new Uint8Array(arrayBuffer);
+        let base64 = '';
+        const chunkSize = 8192;
+        
+        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+          const chunk = uint8Array.subarray(i, i + chunkSize);
+          base64 += String.fromCharCode.apply(null, Array.from(chunk));
+        }
+        
+        const base64Encoded = btoa(base64);
         const mimeType = file.metadata?.mimetype || "image/jpeg";
-        const dataUri = `data:${mimeType};base64,${base64}`;
+        const dataUri = `data:${mimeType};base64,${base64Encoded}`;
 
         // Upload to Cloudinary
         const timestamp = Math.round(new Date().getTime() / 1000);
