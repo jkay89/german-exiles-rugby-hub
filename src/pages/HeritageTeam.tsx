@@ -236,7 +236,7 @@ const HeritageTeam = () => {
                             <img 
                               src={player.sponsor_logo_url} 
                               alt={player.sponsor_name || 'Sponsor'}
-                              className="h-10 object-contain"
+                              className="h-20 object-contain"
                             />
                           </a>
                         ) : (
