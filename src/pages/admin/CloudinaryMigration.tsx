@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, CloudUpload, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CloudUpload, CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
 
 interface MigrationJob {
   bucket: string;
@@ -79,6 +79,8 @@ interface MigrationResult {
   total: number;
   migrated: number;
   failed: number;
+  skipped: number;
+  remaining: number;
   errors: Array<{ file: string; error: string }>;
 }
 
@@ -116,8 +118,10 @@ const CloudinaryMigration = () => {
         [job.label]: data
       }));
 
-      if (data.failed > 0) {
-        toast.warning(`${job.label}: Migrated ${data.migrated}/${data.total} files. ${data.failed} failed.`);
+      if (data.failed > 0 || data.skipped > 0) {
+        toast.warning(`${job.label}: Migrated ${data.migrated}/${data.total} files. ${data.failed} failed, ${data.skipped} skipped. ${data.remaining} remaining.`);
+      } else if (data.remaining > 0) {
+        toast.success(`${job.label}: Migrated ${data.migrated} files. ${data.remaining} files remaining - click again to continue.`);
       } else {
         toast.success(`${job.label}: Successfully migrated all ${data.migrated} files!`);
       }
@@ -225,6 +229,24 @@ const CloudinaryMigration = () => {
                             <span className="text-red-400 flex items-center gap-1">
                               <XCircle className="h-4 w-4" />
                               {result.failed}
+                            </span>
+                          </div>
+                        )}
+                        {result.skipped > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-400">Skipped (too large):</span>
+                            <span className="text-yellow-400 flex items-center gap-1">
+                              <AlertCircle className="h-4 w-4" />
+                              {result.skipped}
+                            </span>
+                          </div>
+                        )}
+                        {result.remaining > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-400">Remaining:</span>
+                            <span className="text-blue-400 flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {result.remaining}
                             </span>
                           </div>
                         )}

@@ -25,9 +25,9 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { bucket, table, urlColumn, idColumn, folder } = await req.json();
+    const { bucket, table, urlColumn, idColumn, folder, batchSize = 5 } = await req.json();
 
-    console.log(`Starting migration for bucket: ${bucket}, table: ${table}`);
+    console.log(`Starting migration for bucket: ${bucket}, table: ${table}, batch size: ${batchSize}`);
 
     // List all files in the bucket
     const { data: files, error: listError } = await supabase.storage
@@ -38,39 +38,38 @@ serve(async (req) => {
 
     console.log(`Found ${files?.length || 0} files in bucket ${bucket}`);
 
-    // Filter out large files before processing
-    const maxFileSize = 8 * 1024 * 1024; // 8MB limit
-    const filesToProcess = (files || []).filter(file => {
-      const size = file.metadata?.size || 0;
-      if (size > maxFileSize) {
-        console.log(`Skipping ${file.name} - ${(size / 1024 / 1024).toFixed(2)}MB (exceeds 8MB limit)`);
-        return false;
-      }
-      return true;
-    });
-
-    const skippedFiles = (files?.length || 0) - filesToProcess.length;
+    // Process only a small batch at a time (default 5 files max)
+    const maxFilesPerRun = Math.min(batchSize, 5);
+    const filesToProcess = (files || []).slice(0, maxFilesPerRun);
     
     const results = {
       total: files?.length || 0,
       migrated: 0,
       failed: 0,
-      skipped: skippedFiles,
+      skipped: 0,
+      remaining: Math.max(0, (files?.length || 0) - maxFilesPerRun),
       errors: [] as any[],
     };
 
-    if (skippedFiles > 0) {
-      results.errors.push({
-        file: "Large files",
-        error: `${skippedFiles} files over 8MB were skipped - please resize these manually first`,
-      });
-    }
+    console.log(`Processing ${filesToProcess.length} files (${results.remaining} remaining)`);
 
-    // Process files one at a time with delay to avoid memory buildup
+    // Process each file with strict size checking
     for (const file of filesToProcess) {
       try {
-        console.log(`Migrating file: ${file.name} (${((file.metadata?.size || 0) / 1024 / 1024).toFixed(2)}MB)`);
+        // Skip if file size is too large (check metadata first)
+        const fileSize = file.metadata?.size || 0;
+        if (fileSize > 8 * 1024 * 1024) {
+          console.log(`Skipping ${file.name} - ${(fileSize / 1024 / 1024).toFixed(2)}MB (too large)`);
+          results.skipped++;
+          results.errors.push({
+            file: file.name,
+            error: `File too large (${(fileSize / 1024 / 1024).toFixed(2)}MB) - resize manually`,
+          });
+          continue;
+        }
 
+        console.log(`Processing: ${file.name} (${(fileSize / 1024 / 1024).toFixed(2)}MB)`);
+        
         // Download file from Supabase storage
         const { data: fileData, error: downloadError } = await supabase.storage
           .from(bucket)
