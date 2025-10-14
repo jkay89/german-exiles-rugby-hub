@@ -36,28 +36,12 @@ const Documents = () => {
   }, [toast]);
 
   const handleDownload = (document: Document) => {
-    // For Cloudinary URLs, we can force download by adding fl_attachment flag
-    let downloadUrl = document.file_url;
-    
-    // If it's a Cloudinary URL, add the download flag
-    if (downloadUrl.includes('cloudinary.com')) {
-      // Insert fl_attachment before the version number
-      downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
-    }
-    
-    // Create a temporary link and trigger download
-    const link = window.document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `${document.title}.${document.file_type.split('/')[1] || 'pdf'}`;
-    link.target = '_blank';
-    
-    window.document.body.appendChild(link);
-    link.click();
-    window.document.body.removeChild(link);
+    // Simply open the URL in a new tab - the browser will handle download based on content-type
+    window.open(document.file_url, '_blank');
     
     toast({
-      title: "Download started",
-      description: `Downloading ${document.title}`,
+      title: "Opening document",
+      description: `Opening ${document.title}`,
     });
   };
 
