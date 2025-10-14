@@ -165,13 +165,24 @@ const CloudinaryMigration = () => {
           <CardContent className="text-gray-300 space-y-2">
             <p>This tool will:</p>
             <ol className="list-decimal list-inside space-y-1 ml-4">
-              <li>Download each file from Supabase Storage</li>
-              <li>Upload it to Cloudinary in the appropriate folder</li>
+              <li>Process 5 files at a time to avoid memory issues</li>
+              <li>Skip files over 8MB (need manual compression first)</li>
+              <li>Resize files over 3MB automatically</li>
+              <li>Upload to Cloudinary in the appropriate folder</li>
               <li>Update database records with new Cloudinary URLs</li>
             </ol>
-            <p className="text-yellow-400 mt-4">
-              ⚠️ Warning: This process cannot be undone. Make sure you have backups before proceeding.
-            </p>
+            <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded">
+              <p className="text-yellow-400 font-medium mb-2">
+                ⚠️ Have files over 8MB?
+              </p>
+              <Button
+                onClick={() => navigate("/admin/media-compression")}
+                variant="outline"
+                size="sm"
+              >
+                Compress Large Files First →
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
