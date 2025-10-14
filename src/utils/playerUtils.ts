@@ -11,6 +11,8 @@ export interface Player {
   bio?: string | null;
   photo_url?: string | null;
   national_number?: string | null;
+  sponsor_name?: string | null;
+  sponsor_logo_url?: string | null;
 }
 
 // Fetch all players

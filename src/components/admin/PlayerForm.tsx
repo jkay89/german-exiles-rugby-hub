@@ -29,6 +29,8 @@ interface PlayerFormProps {
     bio?: string;
     photo_url?: string;
     national_number?: string;
+    sponsor_name?: string;
+    sponsor_logo_url?: string;
   };
 }
 
@@ -172,6 +174,26 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
             placeholder="e.g. #204"
             className="bg-gray-800 border-gray-700 text-white"
             defaultValue={initialValues?.national_number || ""}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <Label className="text-gray-400">Sponsor Name</Label>
+          <Input
+            name="sponsor_name"
+            placeholder="Sponsor name"
+            className="bg-gray-800 border-gray-700 text-white"
+            defaultValue={initialValues?.sponsor_name || ""}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <Label className="text-gray-400">Sponsor Logo URL</Label>
+          <Input
+            name="sponsor_logo_url"
+            placeholder="https://example.com/logo.png"
+            className="bg-gray-800 border-gray-700 text-white"
+            defaultValue={initialValues?.sponsor_logo_url || ""}
           />
         </div>
 

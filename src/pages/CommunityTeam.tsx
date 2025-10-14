@@ -109,21 +109,33 @@ const CommunityTeam = () => {
             </div>
           ) : (
             <div className="text-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {players.map((player, index) => (
-                  <div key={player.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-german-gold font-bold">#{player.teamNumber} {player.name}</h3>
-                      <p className="text-gray-300">{player.position}</p>
-                      <p className="text-gray-400">{player.club}</p>
-                      <p className="text-gray-400">Heritage: {player.countryHeritage === "DE" ? "German" : "British"}</p>
-                    </div>
-                    {player.image && (
-                      <div className="w-24 h-24 flex-shrink-0">
-                        <img src={player.image} alt={player.name} className="w-full h-full object-cover rounded" />
+                  <Card key={player.id} className="bg-gray-800 border-german-gold">
+                    <CardContent className="p-6">
+                      <div className="flex gap-4 mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-german-gold font-bold text-lg mb-2">
+                            #{player.teamNumber} {player.name}
+                          </h3>
+                          <p className="text-gray-300 mb-1">{player.position}</p>
+                          <p className="text-gray-400 text-sm">{player.club}</p>
+                          <p className="text-gray-400 text-sm">Heritage: {player.countryHeritage === "DE" ? "German" : "British"}</p>
+                        </div>
+                        {player.image && (
+                          <div className="w-24 h-24 flex-shrink-0">
+                            <img src={player.image} alt={player.name} className="w-full h-full object-cover rounded" />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                      
+                      {player.bio && (
+                        <p className="text-gray-300 text-sm mb-3 border-t border-gray-700 pt-3">
+                          {player.bio}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </div>

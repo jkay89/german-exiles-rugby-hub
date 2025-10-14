@@ -80,6 +80,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         bio: formData.get('bio') as string || null,
         photo_url: photoUrl,
         national_number: formData.get('national_number') as string || null,
+        sponsor_name: formData.get('sponsor_name') as string || null,
+        sponsor_logo_url: formData.get('sponsor_logo_url') as string || null,
       };
       
       console.log(`Adding player to team: ${activeTeam}`, playerData);
@@ -146,6 +148,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         bio: formData.get('bio') as string || null,
         photo_url: photoUrl,
         national_number: formData.get('national_number') as string || null,
+        sponsor_name: formData.get('sponsor_name') as string || null,
+        sponsor_logo_url: formData.get('sponsor_logo_url') as string || null,
       };
       
       const { error } = await supabase.rest
