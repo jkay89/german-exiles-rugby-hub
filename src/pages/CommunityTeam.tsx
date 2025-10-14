@@ -22,6 +22,7 @@ const CommunityTeam = () => {
   const { t } = useLanguage();
   const [players, setPlayers] = useState<PlayerProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedBios, setExpandedBios] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const loadCommunityPlayers = async () => {
@@ -72,6 +73,24 @@ const CommunityTeam = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const toggleBio = (playerId: string) => {
+    setExpandedBios(prev => ({
+      ...prev,
+      [playerId]: !prev[playerId]
+    }));
+  };
+
+  const truncateBio = (bio: string, playerId: string) => {
+    const lines = bio.split('\n');
+    const isExpanded = expandedBios[playerId];
+    
+    if (isExpanded || lines.length <= 4) {
+      return bio;
+    }
+    
+    return lines.slice(0, 4).join('\n');
+  };
 
   return (
     <div className="pt-16 min-h-screen bg-black">
@@ -130,10 +149,27 @@ const CommunityTeam = () => {
                       </div>
                       
                       {player.bio && (
-                        <p className="text-gray-300 text-sm mb-3 border-t border-gray-700 pt-3">
-                          {player.bio}
-                        </p>
+                        <div className="border-t border-gray-700 pt-3 mb-3">
+                          <p className="text-gray-300 text-sm whitespace-pre-line">
+                            {truncateBio(player.bio, player.id)}
+                          </p>
+                          {player.bio.split('\n').length > 4 && (
+                            <button
+                              onClick={() => toggleBio(player.id)}
+                              className="text-german-gold text-sm mt-2 hover:underline"
+                            >
+                              {expandedBios[player.id] ? '...See Less' : '...See More'}
+                            </button>
+                          )}
+                        </div>
                       )}
+                      
+                      <div className="border-t border-gray-700 pt-3">
+                        <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
+                        <div className="flex items-center gap-2 text-gray-500 italic text-sm">
+                          <span>Available to sponsor</span>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
