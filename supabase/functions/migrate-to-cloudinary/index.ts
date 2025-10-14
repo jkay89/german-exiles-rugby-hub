@@ -49,6 +49,27 @@ serve(async (req) => {
       try {
         console.log(`Migrating file: ${file.name}`);
 
+        // Check file metadata size first - skip files over 15MB to avoid memory issues
+        const { data: fileInfo, error: infoError } = await supabase.storage
+          .from(bucket)
+          .list('', { 
+            search: file.name 
+          });
+
+        const fileSize = fileInfo?.[0]?.metadata?.size || 0;
+        const fileSizeMB = fileSize / 1024 / 1024;
+        
+        // Skip files over 15MB - they cause memory issues
+        if (fileSize > 15 * 1024 * 1024) {
+          console.log(`Skipping ${file.name} - file is ${fileSizeMB.toFixed(2)}MB (too large for edge function processing)`);
+          results.failed++;
+          results.errors.push({
+            file: file.name,
+            error: `File too large (${fileSizeMB.toFixed(2)}MB) - please resize manually before migration`,
+          });
+          continue;
+        }
+
         // Download file from Supabase storage
         const { data: fileData, error: downloadError } = await supabase.storage
           .from(bucket)
@@ -59,8 +80,8 @@ serve(async (req) => {
         const arrayBuffer = await fileData.arrayBuffer();
         let processedArrayBuffer = arrayBuffer;
         
-        // Check file size - if over 5MB, resize it aggressively
-        const targetSize = 5 * 1024 * 1024; // 5MB to be safe
+        // Check file size - if over 3MB, resize it
+        const targetSize = 3 * 1024 * 1024; // 3MB threshold
         if (arrayBuffer.byteLength > targetSize) {
           console.log(`File ${file.name} is ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB, resizing...`);
           
@@ -68,8 +89,8 @@ serve(async (req) => {
             // Decode image
             const image = await Image.decode(new Uint8Array(arrayBuffer));
             
-            // Calculate new dimensions (max 1500px on longest side for large files)
-            const maxDimension = 1500;
+            // More aggressive resizing - max 1200px
+            const maxDimension = 1200;
             let newWidth = image.width;
             let newHeight = image.height;
             
@@ -88,35 +109,22 @@ serve(async (req) => {
             // Resize image
             const resized = image.resize(newWidth, newHeight);
             
-            // Encode as JPEG with 75% quality for aggressive compression
-            const encoded = await resized.encodeJPEG(75);
+            // Encode as JPEG with 70% quality for better compression
+            const encoded = await resized.encodeJPEG(70);
             processedArrayBuffer = encoded.buffer;
             
             console.log(`Resized ${file.name} from ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB to ${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB`);
             
-            // If still too large after compression, skip it
-            if (processedArrayBuffer.byteLength > 10 * 1024 * 1024) {
-              console.log(`File ${file.name} still too large after compression (${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB), skipping...`);
-              results.failed++;
-              results.errors.push({
-                file: file.name,
-                error: "File too large even after compression - please resize manually",
-              });
-              continue;
-            }
+            // Clear the original to free memory
+            (arrayBuffer as any) = null;
           } catch (resizeError) {
             console.error(`Failed to resize ${file.name}:`, resizeError);
-            // If original is over 10MB, skip it
-            if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
-              console.log(`Original file ${file.name} is too large and resize failed, skipping...`);
-              results.failed++;
-              results.errors.push({
-                file: file.name,
-                error: "File too large and resize failed",
-              });
-              continue;
-            }
-            processedArrayBuffer = arrayBuffer;
+            results.failed++;
+            results.errors.push({
+              file: file.name,
+              error: `Resize failed: ${resizeError.message}`,
+            });
+            continue;
           }
         }
 
