@@ -53,6 +53,15 @@ const Exiles9s = () => {
     return lines.slice(0, 2).join('\n');
   };
 
+  const formatSponsorUrl = (url: string | null | undefined): string => {
+    if (!url) return '#';
+    // If URL doesn't start with http:// or https://, add https://
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
+  };
+
   // Function to get the correct flag based on heritage
   const getHeritageFlag = (heritage: string | null): string | null => {
     if (!heritage) return null;
@@ -144,7 +153,7 @@ const Exiles9s = () => {
                         <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
                         {player.sponsor_logo_url ? (
                           <a 
-                            href={player.sponsor_website || '#'} 
+                            href={formatSponsorUrl(player.sponsor_website)} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="block hover:opacity-80 transition"
