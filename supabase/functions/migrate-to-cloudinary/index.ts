@@ -38,20 +38,51 @@ serve(async (req) => {
 
     console.log(`Found ${files?.length || 0} files in bucket ${bucket}`);
 
+    // Check which files have already been migrated by looking for Cloudinary URLs in the database
+    const { data: dbRecords, error: dbError } = await supabase
+      .from(table)
+      .select(`${idColumn}, ${urlColumn}`);
+
+    if (dbError) {
+      console.error("Error fetching database records:", dbError);
+    }
+
+    const migratedFiles = new Set<string>();
+    if (dbRecords) {
+      for (const record of dbRecords) {
+        const url = record[urlColumn];
+        if (url && url.includes('cloudinary.com')) {
+          // Extract filename from Cloudinary URL to mark as migrated
+          const parts = url.split('/');
+          const filename = parts[parts.length - 1].split('.')[0];
+          migratedFiles.add(filename);
+        }
+      }
+    }
+
+    // Filter out already migrated files
+    const unmigrated = (files || []).filter(file => {
+      const fileBaseName = file.name.split('.')[0];
+      return !migratedFiles.has(fileBaseName);
+    });
+
+    console.log(`Total files: ${files?.length}, Already migrated: ${migratedFiles.size}, Remaining: ${unmigrated.length}`);
+
     // Process only a small batch at a time (default 5 files max)
     const maxFilesPerRun = Math.min(batchSize, 5);
-    const filesToProcess = (files || []).slice(0, maxFilesPerRun);
+    const filesToProcess = unmigrated.slice(0, maxFilesPerRun);
     
     const results = {
       total: files?.length || 0,
       migrated: 0,
       failed: 0,
       skipped: 0,
-      remaining: Math.max(0, (files?.length || 0) - maxFilesPerRun),
+      remaining: Math.max(0, unmigrated.length - maxFilesPerRun),
+      alreadyMigrated: migratedFiles.size,
       errors: [] as any[],
     };
 
-    console.log(`Processing ${filesToProcess.length} files (${results.remaining} remaining)`);
+    console.log(`Processing ${filesToProcess.length} files (${results.remaining} remaining, ${results.alreadyMigrated} already done)`);
 
     // Process each file with strict size checking
     for (const file of filesToProcess) {

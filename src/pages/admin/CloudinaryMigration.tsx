@@ -81,6 +81,7 @@ interface MigrationResult {
   failed: number;
   skipped: number;
   remaining: number;
+  alreadyMigrated: number;
   errors: Array<{ file: string; error: string }>;
 }
 
@@ -119,11 +120,11 @@ const CloudinaryMigration = () => {
       }));
 
       if (data.failed > 0 || data.skipped > 0) {
-        toast.warning(`${job.label}: Migrated ${data.migrated}/${data.total} files. ${data.failed} failed, ${data.skipped} skipped. ${data.remaining} remaining.`);
+        toast.warning(`${job.label}: Migrated ${data.migrated}/${data.total} files. ${data.failed} failed, ${data.skipped} skipped. ${data.remaining} remaining (${data.alreadyMigrated} already done).`);
       } else if (data.remaining > 0) {
-        toast.success(`${job.label}: Migrated ${data.migrated} files. ${data.remaining} files remaining - click again to continue.`);
+        toast.success(`${job.label}: Migrated ${data.migrated} files. ${data.remaining} files remaining (${data.alreadyMigrated} already done) - click again to continue.`);
       } else {
-        toast.success(`${job.label}: Successfully migrated all ${data.migrated} files!`);
+        toast.success(`${job.label}: Successfully migrated all files! Total: ${data.alreadyMigrated + data.migrated}`);
       }
     } catch (error: any) {
       console.error("Migration error:", error);
@@ -258,6 +259,15 @@ const CloudinaryMigration = () => {
                             <span className="text-blue-400 flex items-center gap-1">
                               <Clock className="h-4 w-4" />
                               {result.remaining}
+                            </span>
+                          </div>
+                        )}
+                        {result.alreadyMigrated > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-400">Already migrated:</span>
+                            <span className="text-green-400 flex items-center gap-1">
+                              <CheckCircle className="h-4 w-4" />
+                              {result.alreadyMigrated}
                             </span>
                           </div>
                         )}
