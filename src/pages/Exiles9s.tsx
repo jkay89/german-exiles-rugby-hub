@@ -144,15 +144,15 @@ const Exiles9s = () => {
                         <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
                         {player.sponsor_logo_url && player.sponsor_name ? (
                           <a 
-                            href={player.sponsor_logo_url} 
+                            href={player.sponsor_website || '#'} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 hover:opacity-80 transition"
+                            className="block hover:opacity-80 transition"
                           >
                             <img 
                               src={player.sponsor_logo_url} 
                               alt={player.sponsor_name}
-                              className="h-8 object-contain"
+                              className="h-10 object-contain"
                             />
                           </a>
                         ) : (

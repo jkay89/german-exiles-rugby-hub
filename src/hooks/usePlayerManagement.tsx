@@ -51,6 +51,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     
     try {
       let photoUrl = null;
+      let sponsorLogoUrl = null;
       
       // Handle file upload if there's a selected file
       const hasSelectedFile = formData.get('selectedFile') === 'true';
@@ -68,6 +69,23 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           photoUrl = result.url;
         }
       }
+
+      // Handle sponsor logo upload if there's a selected sponsor logo
+      const hasSelectedSponsorLogo = formData.get('selectedSponsorLogo') === 'true';
+      if (hasSelectedSponsorLogo) {
+        const sponsorLogoInput = e.currentTarget.querySelector('input[name="sponsor_logo"]') as HTMLInputElement;
+        const sponsorFile = sponsorLogoInput?.files?.[0];
+        
+        if (sponsorFile) {
+          toast({
+            title: "Uploading sponsor logo",
+            description: "Please wait while we upload to Cloudinary...",
+          });
+
+          const result = await uploadToCloudinary(sponsorFile, 'sponsors');
+          sponsorLogoUrl = result.url;
+        }
+      }
       
       // Create the player object
       const playerData = {
@@ -81,7 +99,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         photo_url: photoUrl,
         national_number: formData.get('national_number') as string || null,
         sponsor_name: formData.get('sponsor_name') as string || null,
-        sponsor_logo_url: formData.get('sponsor_logo_url') as string || null,
+        sponsor_logo_url: sponsorLogoUrl,
+        sponsor_website: formData.get('sponsor_website') as string || null,
       };
       
       console.log(`Adding player to team: ${activeTeam}`, playerData);
@@ -120,6 +139,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     
     try {
       let photoUrl = editingPlayer.photo_url;
+      let sponsorLogoUrl = editingPlayer.sponsor_logo_url;
       
       // Handle file upload if there's a selected file
       const hasSelectedFile = formData.get('selectedFile') === 'true';
@@ -137,6 +157,23 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           photoUrl = result.url;
         }
       }
+
+      // Handle sponsor logo upload if there's a selected sponsor logo
+      const hasSelectedSponsorLogo = formData.get('selectedSponsorLogo') === 'true';
+      if (hasSelectedSponsorLogo) {
+        const sponsorLogoInput = e.currentTarget.querySelector('input[name="sponsor_logo"]') as HTMLInputElement;
+        const sponsorFile = sponsorLogoInput?.files?.[0];
+        
+        if (sponsorFile) {
+          toast({
+            title: "Uploading sponsor logo",
+            description: "Please wait while we upload to Cloudinary...",
+          });
+
+          const result = await uploadToCloudinary(sponsorFile, 'sponsors');
+          sponsorLogoUrl = result.url;
+        }
+      }
       
       // Update the player object
       const playerData = {
@@ -149,7 +186,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         photo_url: photoUrl,
         national_number: formData.get('national_number') as string || null,
         sponsor_name: formData.get('sponsor_name') as string || null,
-        sponsor_logo_url: formData.get('sponsor_logo_url') as string || null,
+        sponsor_logo_url: sponsorLogoUrl,
+        sponsor_website: formData.get('sponsor_website') as string || null,
       };
       
       const { error } = await supabase.rest

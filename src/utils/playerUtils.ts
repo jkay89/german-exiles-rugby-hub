@@ -13,6 +13,7 @@ export interface Player {
   national_number?: string | null;
   sponsor_name?: string | null;
   sponsor_logo_url?: string | null;
+  sponsor_website?: string | null;
 }
 
 // Fetch all players
