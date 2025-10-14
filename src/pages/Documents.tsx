@@ -35,38 +35,30 @@ const Documents = () => {
     loadDocuments();
   }, [toast]);
 
-  const handleDownload = async (document: Document) => {
-    try {
-      // Fetch the file as a blob
-      const response = await fetch(document.file_url);
-      const blob = await response.blob();
-      
-      // Create a download link
-      const url = window.URL.createObjectURL(blob);
-      const link = window.document.createElement('a');
-      link.href = url;
-      link.download = `${document.title}.${document.file_type.split('/')[1] || 'pdf'}`;
-      
-      // Trigger download
-      window.document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      window.document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Download started",
-        description: `Downloading ${document.title}`,
-      });
-    } catch (error) {
-      console.error("Download error:", error);
-      toast({
-        title: "Download failed",
-        description: "Could not download the document. Please try again.",
-        variant: "destructive",
-      });
+  const handleDownload = (document: Document) => {
+    // For Cloudinary URLs, we can force download by adding fl_attachment flag
+    let downloadUrl = document.file_url;
+    
+    // If it's a Cloudinary URL, add the download flag
+    if (downloadUrl.includes('cloudinary.com')) {
+      // Insert fl_attachment before the version number
+      downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
     }
+    
+    // Create a temporary link and trigger download
+    const link = window.document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${document.title}.${document.file_type.split('/')[1] || 'pdf'}`;
+    link.target = '_blank';
+    
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
+    
+    toast({
+      title: "Download started",
+      description: `Downloading ${document.title}`,
+    });
   };
 
   const getCategoryDisplayName = (category: string) => {
