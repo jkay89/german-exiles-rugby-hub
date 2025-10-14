@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { fetchDocuments, Document } from "@/utils/documentUtils";
 import { Loader2, Download, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Documents = () => {
   const { t } = useLanguage();
@@ -38,37 +39,42 @@ const Documents = () => {
   const handleDownload = async (document: Document) => {
     try {
       toast({
-        title: "Preparing download",
-        description: `Fetching ${document.title}...`,
+        title: "Downloading document",
+        description: `Preparing ${document.title}...`,
       });
 
-      // For Cloudinary URLs, try to fetch with no-cors mode
-      const response = await fetch(document.file_url, {
-        mode: 'no-cors',
-        credentials: 'omit'
+      // Use edge function to proxy the download
+      const { data, error } = await supabase.functions.invoke('download-document', {
+        body: { url: document.file_url }
+      });
+
+      if (error) throw error;
+
+      // Create blob from the response
+      const blob = new Blob([data], { 
+        type: document.file_type || 'application/octet-stream' 
       });
       
-      // Since we can't read the response with no-cors, just open in new tab
-      // This will let the browser handle it
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
       const link = window.document.createElement('a');
-      link.href = document.file_url;
-      link.download = document.title;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.href = url;
+      link.download = `${document.title}.${document.file_type.split('/')[1] || 'pdf'}`;
       
       window.document.body.appendChild(link);
       link.click();
       window.document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
       
       toast({
-        title: "Download started",
-        description: `Opening ${document.title}`,
+        title: "Download complete",
+        description: `Downloaded ${document.title}`,
       });
     } catch (error) {
       console.error("Download error:", error);
       toast({
         title: "Download failed",
-        description: "Could not download the document. Please contact support.",
+        description: "Could not download the document. Please try re-uploading it from the admin panel.",
         variant: "destructive",
       });
     }
