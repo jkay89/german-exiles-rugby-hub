@@ -29,15 +29,19 @@ serve(async (req) => {
       throw new Error("No file provided");
     }
 
-    console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}`);
+    // Determine if this is an image or other file type
+    const isImage = file.type.startsWith('image/');
+    const resourceType = isImage ? 'image' : 'raw';
+    
+    console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}, resourceType: ${resourceType}`);
 
     // Convert file to array buffer
     let arrayBuffer = await file.arrayBuffer();
     let processedArrayBuffer = arrayBuffer;
     
-    // Check file size - if over 5MB, resize it aggressively
-    const targetSize = 5 * 1024 * 1024; // 5MB to be safe
-    if (arrayBuffer.byteLength > targetSize) {
+    // Only resize images over 5MB
+    const targetSize = 5 * 1024 * 1024;
+    if (isImage && arrayBuffer.byteLength > targetSize) {
       console.log(`File is ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB, resizing...`);
       
       try {
@@ -100,10 +104,12 @@ serve(async (req) => {
     // Generate timestamp for signature
     const timestamp = Math.round(new Date().getTime() / 1000);
     
-    // Create signature
+    // Create signature - include resource_type in signature for raw files
     const encoder = new TextEncoder();
-    const dataToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-    const data = encoder.encode(dataToSign);
+    const signatureParams = resourceType === 'raw' 
+      ? `folder=${folder}&resource_type=${resourceType}&timestamp=${timestamp}${apiSecret}`
+      : `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+    const data = encoder.encode(signatureParams);
     const hashBuffer = await crypto.subtle.digest("SHA-1", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -115,9 +121,14 @@ serve(async (req) => {
     uploadData.append("timestamp", timestamp.toString());
     uploadData.append("api_key", apiKey);
     uploadData.append("signature", signature);
+    
+    // Add resource_type for non-images
+    if (resourceType === 'raw') {
+      uploadData.append("resource_type", "raw");
+    }
 
-    // Upload to Cloudinary
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+    // Upload to Cloudinary - use appropriate endpoint
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
     
     console.log(`Uploading to Cloudinary: ${uploadUrl}`);
     

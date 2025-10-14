@@ -35,14 +35,43 @@ const Documents = () => {
     loadDocuments();
   }, [toast]);
 
-  const handleDownload = (document: Document) => {
-    // Simply open the URL in a new tab - the browser will handle download based on content-type
-    window.open(document.file_url, '_blank');
-    
-    toast({
-      title: "Opening document",
-      description: `Opening ${document.title}`,
-    });
+  const handleDownload = async (document: Document) => {
+    try {
+      toast({
+        title: "Preparing download",
+        description: `Fetching ${document.title}...`,
+      });
+
+      // For Cloudinary URLs, try to fetch with no-cors mode
+      const response = await fetch(document.file_url, {
+        mode: 'no-cors',
+        credentials: 'omit'
+      });
+      
+      // Since we can't read the response with no-cors, just open in new tab
+      // This will let the browser handle it
+      const link = window.document.createElement('a');
+      link.href = document.file_url;
+      link.download = document.title;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+      
+      toast({
+        title: "Download started",
+        description: `Opening ${document.title}`,
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Download failed",
+        description: "Could not download the document. Please contact support.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getCategoryDisplayName = (category: string) => {
