@@ -217,7 +217,7 @@ const HeritageTeam = () => {
                       
                       <div className="border-t border-gray-700 pt-3">
                         <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
-                        {player.sponsor_logo_url && player.sponsor_name ? (
+                        {player.sponsor_logo_url ? (
                           <a 
                             href={player.sponsor_website || '#'} 
                             target="_blank" 
@@ -226,7 +226,7 @@ const HeritageTeam = () => {
                           >
                             <img 
                               src={player.sponsor_logo_url} 
-                              alt={player.sponsor_name}
+                              alt={player.sponsor_name || 'Sponsor'}
                               className="h-10 object-contain"
                             />
                           </a>
