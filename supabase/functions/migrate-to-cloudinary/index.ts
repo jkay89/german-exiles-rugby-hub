@@ -38,37 +38,38 @@ serve(async (req) => {
 
     console.log(`Found ${files?.length || 0} files in bucket ${bucket}`);
 
+    // Filter out large files before processing
+    const maxFileSize = 8 * 1024 * 1024; // 8MB limit
+    const filesToProcess = (files || []).filter(file => {
+      const size = file.metadata?.size || 0;
+      if (size > maxFileSize) {
+        console.log(`Skipping ${file.name} - ${(size / 1024 / 1024).toFixed(2)}MB (exceeds 8MB limit)`);
+        return false;
+      }
+      return true;
+    });
+
+    const skippedFiles = (files?.length || 0) - filesToProcess.length;
+    
     const results = {
       total: files?.length || 0,
       migrated: 0,
       failed: 0,
+      skipped: skippedFiles,
       errors: [] as any[],
     };
 
-    for (const file of files || []) {
+    if (skippedFiles > 0) {
+      results.errors.push({
+        file: "Large files",
+        error: `${skippedFiles} files over 8MB were skipped - please resize these manually first`,
+      });
+    }
+
+    // Process files one at a time with delay to avoid memory buildup
+    for (const file of filesToProcess) {
       try {
-        console.log(`Migrating file: ${file.name}`);
-
-        // Check file metadata size first - skip files over 15MB to avoid memory issues
-        const { data: fileInfo, error: infoError } = await supabase.storage
-          .from(bucket)
-          .list('', { 
-            search: file.name 
-          });
-
-        const fileSize = fileInfo?.[0]?.metadata?.size || 0;
-        const fileSizeMB = fileSize / 1024 / 1024;
-        
-        // Skip files over 15MB - they cause memory issues
-        if (fileSize > 15 * 1024 * 1024) {
-          console.log(`Skipping ${file.name} - file is ${fileSizeMB.toFixed(2)}MB (too large for edge function processing)`);
-          results.failed++;
-          results.errors.push({
-            file: file.name,
-            error: `File too large (${fileSizeMB.toFixed(2)}MB) - please resize manually before migration`,
-          });
-          continue;
-        }
+        console.log(`Migrating file: ${file.name} (${((file.metadata?.size || 0) / 1024 / 1024).toFixed(2)}MB)`);
 
         // Download file from Supabase storage
         const { data: fileData, error: downloadError } = await supabase.storage
@@ -189,6 +190,9 @@ serve(async (req) => {
 
         results.migrated++;
         console.log(`Successfully migrated ${file.name}`);
+        
+        // Small delay between files to allow garbage collection
+        await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
         console.error(`Error migrating ${file.name}:`, error);
         results.failed++;
@@ -196,6 +200,9 @@ serve(async (req) => {
           file: file.name,
           error: error.message,
         });
+        
+        // Longer delay after errors
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
 
