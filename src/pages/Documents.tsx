@@ -35,6 +35,40 @@ const Documents = () => {
     loadDocuments();
   }, [toast]);
 
+  const handleDownload = async (document: Document) => {
+    try {
+      // Fetch the file as a blob
+      const response = await fetch(document.file_url);
+      const blob = await response.blob();
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const link = window.document.createElement('a');
+      link.href = url;
+      link.download = `${document.title}.${document.file_type.split('/')[1] || 'pdf'}`;
+      
+      // Trigger download
+      window.document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      window.document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download started",
+        description: `Downloading ${document.title}`,
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Download failed",
+        description: "Could not download the document. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getCategoryDisplayName = (category: string) => {
     switch (category) {
       case 'constitution':
@@ -115,7 +149,7 @@ const Documents = () => {
                           <CardContent className="text-center">
                             <Button 
                               className="bg-german-red hover:bg-german-gold text-white"
-                              onClick={() => window.open(document.file_url, '_blank')}
+                              onClick={() => handleDownload(document)}
                             >
                               <Download className="h-4 w-4 mr-2" />
                               {t("download_document")}
