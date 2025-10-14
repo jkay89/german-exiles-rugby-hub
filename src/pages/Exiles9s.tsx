@@ -46,11 +46,11 @@ const Exiles9s = () => {
     const lines = bio.split('\n');
     const isExpanded = expandedBios[playerId];
     
-    if (isExpanded || lines.length <= 4) {
+    if (isExpanded || lines.length <= 2) {
       return bio;
     }
     
-    return lines.slice(0, 4).join('\n');
+    return lines.slice(0, 2).join('\n');
   };
 
   // Function to get the correct flag based on heritage
@@ -129,7 +129,7 @@ const Exiles9s = () => {
                           <p className="text-gray-300 text-sm whitespace-pre-line">
                             {truncateBio(player.bio, player.id)}
                           </p>
-                          {player.bio.split('\n').length > 4 && (
+                          {player.bio.split('\n').length > 2 && (
                             <button
                               onClick={() => toggleBio(player.id)}
                               className="text-german-gold text-sm mt-2 hover:underline"
