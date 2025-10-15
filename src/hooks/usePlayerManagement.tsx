@@ -100,7 +100,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         const sponsors = JSON.parse(sponsorsData as string);
         const playerId = data[0].id;
         
-        // Upload sponsor logos and create sponsor records
+        // Upload sponsor logos and create sponsor records (only if they have logos)
         for (const sponsor of sponsors) {
           let sponsorLogoUrl = sponsor.sponsor_logo_url;
           
@@ -108,23 +108,25 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           if (sponsor._logoFile) {
             toast({
               title: "Uploading sponsor logo",
-              description: `Uploading logo for ${sponsor.sponsor_name}...`,
+              description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
             });
             
             const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
             sponsorLogoUrl = result.url;
           }
           
-          // Insert sponsor record
-          await supabase.rest
-            .from('player_sponsors')
-            .insert({
-              player_id: playerId,
-              sponsor_name: sponsor.sponsor_name,
-              sponsor_logo_url: sponsorLogoUrl,
-              sponsor_website: sponsor.sponsor_website || null,
-              display_order: sponsor.display_order,
-            });
+          // Only insert sponsor if it has a logo
+          if (sponsorLogoUrl) {
+            await supabase.rest
+              .from('player_sponsors')
+              .insert({
+                player_id: playerId,
+                sponsor_name: sponsor.sponsor_name || 'Sponsor',
+                sponsor_logo_url: sponsorLogoUrl,
+                sponsor_website: sponsor.sponsor_website || null,
+                display_order: sponsor.display_order,
+              });
+          }
         }
       }
       
@@ -206,7 +208,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           .delete()
           .eq('player_id', editingPlayer.id);
         
-        // Upload sponsor logos and create new sponsor records
+        // Upload sponsor logos and create new sponsor records (only if they have logos)
         for (const sponsor of sponsors) {
           let sponsorLogoUrl = sponsor.sponsor_logo_url;
           
@@ -214,23 +216,25 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           if (sponsor._logoFile) {
             toast({
               title: "Uploading sponsor logo",
-              description: `Uploading logo for ${sponsor.sponsor_name}...`,
+              description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
             });
             
             const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
             sponsorLogoUrl = result.url;
           }
           
-          // Insert sponsor record
-          await supabase.rest
-            .from('player_sponsors')
-            .insert({
-              player_id: editingPlayer.id,
-              sponsor_name: sponsor.sponsor_name,
-              sponsor_logo_url: sponsorLogoUrl,
-              sponsor_website: sponsor.sponsor_website || null,
-              display_order: sponsor.display_order,
-            });
+          // Only insert sponsor if it has a logo
+          if (sponsorLogoUrl) {
+            await supabase.rest
+              .from('player_sponsors')
+              .insert({
+                player_id: editingPlayer.id,
+                sponsor_name: sponsor.sponsor_name || 'Sponsor',
+                sponsor_logo_url: sponsorLogoUrl,
+                sponsor_website: sponsor.sponsor_website || null,
+                display_order: sponsor.display_order,
+              });
+          }
         }
       }
       

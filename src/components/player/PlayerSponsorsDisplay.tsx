@@ -55,32 +55,32 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
 
   if (loading) return null;
 
+  const sponsorsWithLogos = sponsors.filter(s => s.sponsor_logo_url);
+
   return (
     <div className="border-t border-gray-700 pt-3">
       <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
-      {sponsors.length === 0 ? (
+      {sponsorsWithLogos.length === 0 ? (
         <div className="flex items-center gap-2 text-gray-500 italic text-sm">
           <span>Available to sponsor</span>
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          {sponsors
-            .filter(sponsor => sponsor.sponsor_logo_url)
-            .map((sponsor) => (
-              <a 
-                key={sponsor.id}
-                href={formatSponsorUrl(sponsor.sponsor_website)} 
-                target={sponsor.sponsor_website ? "_blank" : "_self"}
-                rel={sponsor.sponsor_website ? "noopener noreferrer" : undefined}
-                className="block"
-              >
-                <img 
-                  src={sponsor.sponsor_logo_url} 
-                  alt={sponsor.sponsor_name || "Sponsor"}
-                  className="h-16 object-contain hover:opacity-80 transition-opacity"
-                />
-              </a>
-            ))}
+          {sponsorsWithLogos.map((sponsor) => (
+            <a 
+              key={sponsor.id}
+              href={formatSponsorUrl(sponsor.sponsor_website)} 
+              target={sponsor.sponsor_website ? "_blank" : "_self"}
+              rel={sponsor.sponsor_website ? "noopener noreferrer" : undefined}
+              className="block"
+            >
+              <img 
+                src={sponsor.sponsor_logo_url} 
+                alt={sponsor.sponsor_name || "Sponsor"}
+                className="h-16 object-contain hover:opacity-80 transition-opacity"
+              />
+            </a>
+          ))}
         </div>
       )}
     </div>
