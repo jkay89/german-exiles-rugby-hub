@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,12 +15,14 @@ import { Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PlayerImageResizer from "./PlayerImageResizer";
 import { PlayerSponsorsManager, PlayerSponsor } from "./PlayerSponsorsManager";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlayerFormProps {
   isEditing: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel?: () => void;
   initialValues?: {
+    id?: string;
     name?: string;
     number?: number | null;
     position?: string;
@@ -48,6 +50,48 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
   const [resizerFile, setResizerFile] = useState<File | null>(null);
   const [playerName, setPlayerName] = useState(initialValues?.name || "");
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>([]);
+  const [loadingSponsors, setLoadingSponsors] = useState(false);
+
+  // Load existing sponsors when editing
+  useEffect(() => {
+    const loadSponsors = async () => {
+      if (isEditing && initialValues?.id) {
+        console.log('Loading sponsors for player:', initialValues.id);
+        setLoadingSponsors(true);
+        try {
+          const { data, error } = await supabase
+            .from('player_sponsors')
+            .select('*')
+            .eq('player_id', initialValues.id)
+            .order('display_order', { ascending: true });
+
+          if (error) {
+            console.error('Error loading sponsors:', error);
+            throw error;
+          }
+          
+          console.log('Loaded sponsors:', data);
+          
+          if (data && data.length > 0) {
+            const loadedSponsors: PlayerSponsor[] = data.map(s => ({
+              id: s.id,
+              sponsor_name: s.sponsor_name,
+              sponsor_logo_url: s.sponsor_logo_url || undefined,
+              sponsor_website: s.sponsor_website || undefined,
+              display_order: s.display_order,
+            }));
+            setSponsors(loadedSponsors);
+          }
+        } catch (error) {
+          console.error('Error loading sponsors:', error);
+        } finally {
+          setLoadingSponsors(false);
+        }
+      }
+    };
+
+    loadSponsors();
+  }, [isEditing, initialValues?.id]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

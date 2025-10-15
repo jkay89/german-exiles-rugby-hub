@@ -27,6 +27,7 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
 
   useEffect(() => {
     const fetchSponsors = async () => {
+      console.log('Fetching sponsors for player:', playerId);
       try {
         const { data, error } = await supabase
           .from('player_sponsors')
@@ -34,7 +35,12 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
           .eq('player_id', playerId)
           .order('display_order', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching sponsors:', error);
+          throw error;
+        }
+        
+        console.log('Fetched sponsors:', data);
         setSponsors(data || []);
       } catch (error) {
         console.error('Error fetching player sponsors:', error);
@@ -46,42 +52,46 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
     fetchSponsors();
   }, [playerId]);
 
-  if (loading || sponsors.length === 0) return null;
+  if (loading) return null;
 
   return (
     <div className="border-t border-gray-700 pt-3">
-      <p className="text-gray-400 text-xs mb-2">
-        {sponsors.length > 1 ? 'Sponsored by' : 'Sponsored by'}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {sponsors.map((sponsor) => (
-          <div key={sponsor.id}>
-            {sponsor.sponsor_logo_url ? (
-              <a 
-                href={formatSponsorUrl(sponsor.sponsor_website)} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block"
-              >
-                <img 
-                  src={sponsor.sponsor_logo_url} 
-                  alt={sponsor.sponsor_name}
-                  className="h-16 object-contain hover:opacity-80 transition-opacity"
-                />
-              </a>
-            ) : (
-              <a 
-                href={formatSponsorUrl(sponsor.sponsor_website)} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-german-gold hover:underline"
-              >
-                {sponsor.sponsor_name}
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+      <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
+      {sponsors.length === 0 ? (
+        <div className="flex items-center gap-2 text-gray-500 italic text-sm">
+          <span>Available to sponsor</span>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {sponsors.map((sponsor) => (
+            <div key={sponsor.id}>
+              {sponsor.sponsor_logo_url ? (
+                <a 
+                  href={formatSponsorUrl(sponsor.sponsor_website)} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <img 
+                    src={sponsor.sponsor_logo_url} 
+                    alt={sponsor.sponsor_name}
+                    className="h-16 object-contain hover:opacity-80 transition-opacity"
+                  />
+                </a>
+              ) : (
+                <a 
+                  href={formatSponsorUrl(sponsor.sponsor_website)} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-german-gold hover:underline"
+                >
+                  {sponsor.sponsor_name}
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
