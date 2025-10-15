@@ -127,12 +127,18 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const form = e.currentTarget;
+    
+    console.log('Form submit - current sponsors state:', sponsors);
+    
     // Add sponsors data to the form as a hidden field
+    // Note: We can't serialize File objects, so we'll handle them separately
     const sponsorsInput = document.createElement('input');
     sponsorsInput.type = 'hidden';
     sponsorsInput.name = 'sponsors';
     sponsorsInput.value = JSON.stringify(sponsors);
     form.appendChild(sponsorsInput);
+    
+    console.log('Form submit - sponsors JSON:', sponsorsInput.value);
     
     onSubmit(e);
   };
