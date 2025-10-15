@@ -132,8 +132,17 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Cloudinary upload failed:", errorText);
-      throw new Error(`Cloudinary upload failed: ${errorText}`);
+      console.error("Cloudinary upload failed:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        resourceType: resourceType,
+        uploadUrl: uploadUrl
+      });
+      throw new Error(`Cloudinary upload failed (${response.status}): ${errorText}`);
     }
 
     const result = await response.json();

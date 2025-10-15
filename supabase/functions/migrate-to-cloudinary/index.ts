@@ -29,6 +29,42 @@ serve(async (req) => {
 
     console.log(`Starting migration for bucket: ${bucket}, table: ${table}, batch size: ${batchSize}`);
 
+    // Get all database records with their URLs
+    const { data: dbRecords, error: dbError } = await supabase
+      .from(table)
+      .select(`${idColumn}, ${urlColumn}`);
+
+    if (dbError) {
+      console.error("Error fetching database records:", dbError);
+      throw dbError;
+    }
+
+    console.log(`Found ${dbRecords?.length || 0} records in database`);
+
+    // Build a map of filename -> record for matching
+    const fileToRecord = new Map<string, any>();
+    let alreadyMigratedCount = 0;
+    
+    if (dbRecords) {
+      for (const record of dbRecords) {
+        const url = record[urlColumn];
+        if (url) {
+          if (url.includes('cloudinary.com')) {
+            // Already on Cloudinary
+            alreadyMigratedCount++;
+          } else if (url.includes(`/storage/v1/object/public/${bucket}/`)) {
+            // Extract filename from Supabase storage URL
+            const filename = url.split(`/storage/v1/object/public/${bucket}/`)[1];
+            if (filename) {
+              fileToRecord.set(filename, record);
+            }
+          }
+        }
+      }
+    }
+
+    console.log(`Records on Cloudinary: ${alreadyMigratedCount}, Records to migrate: ${fileToRecord.size}`);
+
     // List all files in the bucket
     const { data: files, error: listError } = await supabase.storage
       .from(bucket)
@@ -36,37 +72,12 @@ serve(async (req) => {
 
     if (listError) throw listError;
 
-    console.log(`Found ${files?.length || 0} files in bucket ${bucket}`);
+    console.log(`Found ${files?.length || 0} files in storage bucket`);
 
-    // Check which files have already been migrated by looking for Cloudinary URLs in the database
-    const { data: dbRecords, error: dbError } = await supabase
-      .from(table)
-      .select(`${idColumn}, ${urlColumn}`);
+    // Filter to only files that have a matching database record and aren't migrated yet
+    const unmigrated = (files || []).filter(file => fileToRecord.has(file.name));
 
-    if (dbError) {
-      console.error("Error fetching database records:", dbError);
-    }
-
-    const migratedFiles = new Set<string>();
-    if (dbRecords) {
-      for (const record of dbRecords) {
-        const url = record[urlColumn];
-        if (url && url.includes('cloudinary.com')) {
-          // Extract filename from Cloudinary URL to mark as migrated
-          const parts = url.split('/');
-          const filename = parts[parts.length - 1].split('.')[0];
-          migratedFiles.add(filename);
-        }
-      }
-    }
-
-    // Filter out already migrated files
-    const unmigrated = (files || []).filter(file => {
-      const fileBaseName = file.name.split('.')[0];
-      return !migratedFiles.has(fileBaseName);
-    });
-
-    console.log(`Total files: ${files?.length}, Already migrated: ${migratedFiles.size}, Remaining: ${unmigrated.length}`);
+    console.log(`Total files in bucket: ${files?.length}, Matched with DB: ${unmigrated.length}, Already on Cloudinary: ${alreadyMigratedCount}`);
 
     // Process only a small batch at a time (default 5 files max)
     const maxFilesPerRun = Math.min(batchSize, 5);
@@ -78,7 +89,7 @@ serve(async (req) => {
       failed: 0,
       skipped: 0,
       remaining: Math.max(0, unmigrated.length - maxFilesPerRun),
-      alreadyMigrated: migratedFiles.size,
+      alreadyMigrated: alreadyMigratedCount,
       errors: [] as any[],
     };
 
@@ -206,16 +217,19 @@ serve(async (req) => {
 
         console.log(`File uploaded to Cloudinary: ${newUrl}`);
 
-        // Update database with new URL
-        const oldUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${file.name}`;
-        
-        const { error: updateError } = await supabase
-          .from(table)
-          .update({ [urlColumn]: newUrl })
-          .eq(urlColumn, oldUrl);
+        // Update database with new URL using the record ID
+        const record = fileToRecord.get(file.name);
+        if (record) {
+          const { error: updateError } = await supabase
+            .from(table)
+            .update({ [urlColumn]: newUrl })
+            .eq(idColumn, record[idColumn]);
 
-        if (updateError) {
-          console.error(`Failed to update database for ${file.name}:`, updateError);
+          if (updateError) {
+            console.error(`Failed to update database for ${file.name}:`, updateError);
+          } else {
+            console.log(`Updated database record ${record[idColumn]} with new URL`);
+          }
         }
 
         results.migrated++;
