@@ -19,9 +19,10 @@ export interface PlayerSponsor {
 interface PlayerSponsorsManagerProps {
   initialSponsors?: PlayerSponsor[];
   onChange: (sponsors: PlayerSponsor[]) => void;
+  onFileChange?: (index: number, file: File | null) => void;
 }
 
-export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: PlayerSponsorsManagerProps) => {
+export const PlayerSponsorsManager = ({ initialSponsors = [], onChange, onFileChange }: PlayerSponsorsManagerProps) => {
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>(initialSponsors);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -67,6 +68,11 @@ export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: Player
     console.log('Logo change event - file:', file);
     if (!file) return;
 
+    // Notify parent about file change via callback
+    if (onFileChange) {
+      onFileChange(index, file);
+    }
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -75,6 +81,7 @@ export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: Player
     };
     reader.readAsDataURL(file);
     
+    // Still set in local state for UI purposes, but parent will handle actual file
     updateSponsor(index, "_logoFile", file);
     console.log('Set file for sponsor', index, ':', file.name);
   };

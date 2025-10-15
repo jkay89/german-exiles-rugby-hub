@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
   const [playerName, setPlayerName] = useState(initialValues?.name || "");
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>([]);
   const [loadingSponsors, setLoadingSponsors] = useState(false);
+  const sponsorFilesRef = useRef<Map<number, File>>(new Map());
 
   // Load existing sponsors when editing
   useEffect(() => {
@@ -129,45 +130,33 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
     const form = e.currentTarget;
     
     console.log('Form submit - current sponsors state:', sponsors);
-    console.log('Form submit - sponsors detailed:', sponsors.map((s, i) => ({
-      index: i,
-      name: s.sponsor_name,
-      hasLogoUrl: !!s.sponsor_logo_url,
-      hasLogoFile: !!s._logoFile,
-      logoFileName: s._logoFile?.name,
-      hasPreview: !!s._logoPreview
-    })));
+    console.log('Form submit - sponsor files in ref:', Array.from(sponsorFilesRef.current.entries()));
     
-    // Append sponsor files to the form as actual file inputs
-    sponsors.forEach((sponsor, index) => {
-      console.log(`Checking sponsor ${index} for file:`, {
-        hasFile: !!sponsor._logoFile,
-        file: sponsor._logoFile
-      });
+    // Append sponsor files to the form from ref
+    sponsorFilesRef.current.forEach((file, index) => {
+      console.log(`Processing sponsor file ${index} from ref:`, file.name);
       
-      if (sponsor._logoFile) {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.name = `sponsor_file_${index}`;
-        fileInput.style.display = 'none';
-        
-        // Create a DataTransfer to add the file to the input
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(sponsor._logoFile);
-        fileInput.files = dataTransfer.files;
-        
-        form.appendChild(fileInput);
-        console.log(`Appended sponsor file input ${index}:`, sponsor._logoFile.name);
-      }
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.name = `sponsor_file_${index}`;
+      fileInput.style.display = 'none';
+      
+      // Create a DataTransfer to add the file to the input
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+      
+      form.appendChild(fileInput);
+      console.log(`Appended sponsor file input ${index}:`, file.name);
     });
     
-    // Add sponsors metadata (without File objects)
-    const sponsorsMetadata = sponsors.map(s => ({
+    // Add sponsors metadata
+    const sponsorsMetadata = sponsors.map((s, index) => ({
       sponsor_name: s.sponsor_name,
       sponsor_logo_url: s.sponsor_logo_url,
       sponsor_website: s.sponsor_website,
       display_order: s.display_order,
-      _hasFile: !!s._logoFile,
+      _hasFile: sponsorFilesRef.current.has(index),
     }));
     
     const sponsorsInput = document.createElement('input');
@@ -179,6 +168,16 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
     console.log('Form submit - sponsors metadata:', JSON.stringify(sponsorsMetadata));
     
     onSubmit(e);
+  };
+
+  const handleSponsorFileChange = (index: number, file: File | null) => {
+    console.log('PlayerForm received file for sponsor', index, ':', file?.name);
+    if (file) {
+      sponsorFilesRef.current.set(index, file);
+    } else {
+      sponsorFilesRef.current.delete(index);
+    }
+    console.log('Updated sponsor files ref:', Array.from(sponsorFilesRef.current.entries()));
   };
 
   return (
@@ -284,6 +283,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
           <PlayerSponsorsManager
             initialSponsors={sponsors}
             onChange={setSponsors}
+            onFileChange={handleSponsorFileChange}
           />
         </div>
 
