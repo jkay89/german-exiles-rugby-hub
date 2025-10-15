@@ -58,16 +58,19 @@ export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: Player
 
   const handleLogoChange = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('Logo change event - file:', file);
     if (!file) return;
 
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       updateSponsor(index, "_logoPreview", reader.result as string);
+      console.log('Set preview for sponsor', index);
     };
     reader.readAsDataURL(file);
     
     updateSponsor(index, "_logoFile", file);
+    console.log('Set file for sponsor', index, ':', file.name);
   };
 
   return (

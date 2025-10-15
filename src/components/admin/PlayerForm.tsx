@@ -129,9 +129,22 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
     const form = e.currentTarget;
     
     console.log('Form submit - current sponsors state:', sponsors);
+    console.log('Form submit - sponsors detailed:', sponsors.map((s, i) => ({
+      index: i,
+      name: s.sponsor_name,
+      hasLogoUrl: !!s.sponsor_logo_url,
+      hasLogoFile: !!s._logoFile,
+      logoFileName: s._logoFile?.name,
+      hasPreview: !!s._logoPreview
+    })));
     
     // Append sponsor files to the form as actual file inputs
     sponsors.forEach((sponsor, index) => {
+      console.log(`Checking sponsor ${index} for file:`, {
+        hasFile: !!sponsor._logoFile,
+        file: sponsor._logoFile
+      });
+      
       if (sponsor._logoFile) {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
