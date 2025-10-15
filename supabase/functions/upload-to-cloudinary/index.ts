@@ -104,11 +104,9 @@ serve(async (req) => {
     // Generate timestamp for signature
     const timestamp = Math.round(new Date().getTime() / 1000);
     
-    // Create signature - include resource_type in signature for raw files
+    // Create signature - resource type is implied by the endpoint URL, don't include in signature
     const encoder = new TextEncoder();
-    const signatureParams = resourceType === 'raw' 
-      ? `folder=${folder}&resource_type=${resourceType}&timestamp=${timestamp}${apiSecret}`
-      : `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+    const signatureParams = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
     const data = encoder.encode(signatureParams);
     const hashBuffer = await crypto.subtle.digest("SHA-1", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -121,11 +119,6 @@ serve(async (req) => {
     uploadData.append("timestamp", timestamp.toString());
     uploadData.append("api_key", apiKey);
     uploadData.append("signature", signature);
-    
-    // Add resource_type for non-images
-    if (resourceType === 'raw') {
-      uploadData.append("resource_type", "raw");
-    }
 
     // Upload to Cloudinary - use appropriate endpoint
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
