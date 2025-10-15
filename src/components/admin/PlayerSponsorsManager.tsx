@@ -24,6 +24,11 @@ interface PlayerSponsorsManagerProps {
 export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: PlayerSponsorsManagerProps) => {
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>(initialSponsors);
 
+  // Update local state when initialSponsors changes (e.g., after loading from DB)
+  useEffect(() => {
+    setSponsors(initialSponsors);
+  }, [initialSponsors]);
+
   useEffect(() => {
     onChange(sponsors);
   }, [sponsors]);
