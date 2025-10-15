@@ -96,16 +96,21 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       
       // Handle multiple sponsors
       const sponsorsData = formData.get('sponsors');
+      console.log('Sponsors data from form:', sponsorsData);
+      
       if (sponsorsData && data && data[0]) {
         const sponsors = JSON.parse(sponsorsData as string);
+        console.log('Parsed sponsors:', sponsors);
         const playerId = data[0].id;
         
         // Upload sponsor logos and create sponsor records
         for (const sponsor of sponsors) {
+          console.log('Processing sponsor:', sponsor);
           let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
           // Upload sponsor logo if there's a new file
           if (sponsor._logoFile) {
+            console.log('Uploading new logo file for sponsor');
             toast({
               title: "Uploading sponsor logo",
               description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
@@ -113,11 +118,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
             
             const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
             sponsorLogoUrl = result.url;
+            console.log('Uploaded logo URL:', sponsorLogoUrl);
           }
           
           // Only insert sponsor if it has a logo (either existing or newly uploaded)
           if (sponsorLogoUrl) {
-            await supabase.rest
+            console.log('Inserting sponsor with logo:', { sponsor_name: sponsor.sponsor_name, sponsorLogoUrl });
+            const { error: sponsorError } = await supabase.rest
               .from('player_sponsors')
               .insert({
                 player_id: playerId,
@@ -126,6 +133,14 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
                 sponsor_website: sponsor.sponsor_website || null,
                 display_order: sponsor.display_order,
               });
+            
+            if (sponsorError) {
+              console.error('Error inserting sponsor:', sponsorError);
+            } else {
+              console.log('Sponsor inserted successfully');
+            }
+          } else {
+            console.log('Skipping sponsor - no logo URL:', sponsor);
           }
         }
       }
@@ -199,8 +214,11 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       
       // Handle multiple sponsors
       const sponsorsData = formData.get('sponsors');
+      console.log('Update - Sponsors data from form:', sponsorsData);
+      
       if (sponsorsData) {
         const sponsors = JSON.parse(sponsorsData as string);
+        console.log('Update - Parsed sponsors:', sponsors);
         
         // Delete existing sponsors for this player
         await supabase.rest
@@ -210,10 +228,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         
         // Upload sponsor logos and create new sponsor records
         for (const sponsor of sponsors) {
+          console.log('Update - Processing sponsor:', sponsor);
           let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
           // Upload sponsor logo if there's a new file
           if (sponsor._logoFile) {
+            console.log('Update - Uploading new logo file for sponsor');
             toast({
               title: "Uploading sponsor logo",
               description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
@@ -221,11 +241,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
             
             const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
             sponsorLogoUrl = result.url;
+            console.log('Update - Uploaded logo URL:', sponsorLogoUrl);
           }
           
           // Only insert sponsor if it has a logo (either existing or newly uploaded)
           if (sponsorLogoUrl) {
-            await supabase.rest
+            console.log('Update - Inserting sponsor with logo:', { sponsor_name: sponsor.sponsor_name, sponsorLogoUrl });
+            const { error: sponsorError } = await supabase.rest
               .from('player_sponsors')
               .insert({
                 player_id: editingPlayer.id,
@@ -234,6 +256,14 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
                 sponsor_website: sponsor.sponsor_website || null,
                 display_order: sponsor.display_order,
               });
+            
+            if (sponsorError) {
+              console.error('Update - Error inserting sponsor:', sponsorError);
+            } else {
+              console.log('Update - Sponsor inserted successfully');
+            }
+          } else {
+            console.log('Update - Skipping sponsor - no logo URL:', sponsor);
           }
         }
       }
