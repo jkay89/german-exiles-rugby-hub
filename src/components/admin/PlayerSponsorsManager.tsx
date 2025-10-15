@@ -104,27 +104,7 @@ export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: Player
 
           <div className="grid gap-3">
             <div>
-              <Label className="text-gray-400 text-sm">Sponsor Name *</Label>
-              <Input
-                value={sponsor.sponsor_name}
-                onChange={(e) => updateSponsor(index, "sponsor_name", e.target.value)}
-                placeholder="Company name"
-                className="bg-gray-800 border-gray-700 text-white"
-              />
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-sm">Website</Label>
-              <Input
-                value={sponsor.sponsor_website || ""}
-                onChange={(e) => updateSponsor(index, "sponsor_website", e.target.value)}
-                placeholder="https://sponsor-website.com"
-                className="bg-gray-800 border-gray-700 text-white"
-              />
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-sm">Logo</Label>
+              <Label className="text-gray-400 text-sm">Logo *</Label>
               <div className="flex items-center gap-3">
                 <Input
                   type="file"
@@ -140,6 +120,27 @@ export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: Player
                   />
                 )}
               </div>
+            </div>
+
+            <div>
+              <Label className="text-gray-400 text-sm">Website (optional)</Label>
+              <Input
+                value={sponsor.sponsor_website || ""}
+                onChange={(e) => updateSponsor(index, "sponsor_website", e.target.value)}
+                placeholder="https://sponsor-website.com"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">If empty, logo will link to homepage</p>
+            </div>
+
+            <div>
+              <Label className="text-gray-400 text-sm">Sponsor Name (optional)</Label>
+              <Input
+                value={sponsor.sponsor_name}
+                onChange={(e) => updateSponsor(index, "sponsor_name", e.target.value)}
+                placeholder="Company name (for internal reference)"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
             </div>
           </div>
         </div>

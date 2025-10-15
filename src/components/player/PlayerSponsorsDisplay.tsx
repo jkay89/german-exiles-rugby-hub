@@ -14,7 +14,7 @@ interface PlayerSponsorsDisplayProps {
 }
 
 const formatSponsorUrl = (url?: string) => {
-  if (!url) return "#";
+  if (!url) return "/";
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
@@ -64,31 +64,21 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
       ) : (
         <div className="flex flex-wrap gap-2">
           {sponsors.map((sponsor) => (
-            <div key={sponsor.id}>
-              {sponsor.sponsor_logo_url ? (
-                <a 
-                  href={formatSponsorUrl(sponsor.sponsor_website)} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <img 
-                    src={sponsor.sponsor_logo_url} 
-                    alt={sponsor.sponsor_name}
-                    className="h-16 object-contain hover:opacity-80 transition-opacity"
-                  />
-                </a>
-              ) : (
-                <a 
-                  href={formatSponsorUrl(sponsor.sponsor_website)} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-xs text-german-gold hover:underline"
-                >
-                  {sponsor.sponsor_name}
-                </a>
-              )}
-            </div>
+            sponsor.sponsor_logo_url && (
+              <a 
+                key={sponsor.id}
+                href={formatSponsorUrl(sponsor.sponsor_website)} 
+                target={sponsor.sponsor_website ? "_blank" : "_self"}
+                rel={sponsor.sponsor_website ? "noopener noreferrer" : undefined}
+                className="block"
+              >
+                <img 
+                  src={sponsor.sponsor_logo_url} 
+                  alt={sponsor.sponsor_name || "Sponsor"}
+                  className="h-16 object-contain hover:opacity-80 transition-opacity"
+                />
+              </a>
+            )
           ))}
         </div>
       )}
