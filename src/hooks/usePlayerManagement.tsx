@@ -104,19 +104,22 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         const playerId = data[0].id;
         
         // Upload sponsor logos and create sponsor records
-        for (const sponsor of sponsors) {
+        for (let i = 0; i < sponsors.length; i++) {
+          const sponsor = sponsors[i];
           console.log('Processing sponsor:', sponsor);
           let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
-          // Upload sponsor logo if there's a new file
-          if (sponsor._logoFile) {
-            console.log('Uploading new logo file for sponsor');
+          // Check if there's a new file for this sponsor
+          const sponsorFile = formData.get(`sponsor_file_${i}`) as File | null;
+          
+          if (sponsorFile) {
+            console.log('Uploading new logo file for sponsor:', sponsorFile.name);
             toast({
               title: "Uploading sponsor logo",
               description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
             });
             
-            const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
+            const result = await uploadToCloudinary(sponsorFile, 'sponsors');
             sponsorLogoUrl = result.url;
             console.log('Uploaded logo URL:', sponsorLogoUrl);
           }
@@ -227,19 +230,22 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           .eq('player_id', editingPlayer.id);
         
         // Upload sponsor logos and create new sponsor records
-        for (const sponsor of sponsors) {
+        for (let i = 0; i < sponsors.length; i++) {
+          const sponsor = sponsors[i];
           console.log('Update - Processing sponsor:', sponsor);
           let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
-          // Upload sponsor logo if there's a new file
-          if (sponsor._logoFile) {
-            console.log('Update - Uploading new logo file for sponsor');
+          // Check if there's a new file for this sponsor
+          const sponsorFile = formData.get(`sponsor_file_${i}`) as File | null;
+          
+          if (sponsorFile) {
+            console.log('Update - Uploading new logo file for sponsor:', sponsorFile.name);
             toast({
               title: "Uploading sponsor logo",
               description: `Uploading logo for ${sponsor.sponsor_name || 'sponsor'}...`,
             });
             
-            const result = await uploadToCloudinary(sponsor._logoFile, 'sponsors');
+            const result = await uploadToCloudinary(sponsorFile, 'sponsors');
             sponsorLogoUrl = result.url;
             console.log('Update - Uploaded logo URL:', sponsorLogoUrl);
           }

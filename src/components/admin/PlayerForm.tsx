@@ -126,21 +126,40 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const form = e.currentTarget;
+    const formData = new FormData(form);
     
     console.log('Form submit - current sponsors state:', sponsors);
     
-    // Add sponsors data to the form as a hidden field
-    // Note: We can't serialize File objects, so we'll handle them separately
-    const sponsorsInput = document.createElement('input');
-    sponsorsInput.type = 'hidden';
-    sponsorsInput.name = 'sponsors';
-    sponsorsInput.value = JSON.stringify(sponsors);
-    form.appendChild(sponsorsInput);
+    // Handle sponsor files separately since they can't be JSON stringified
+    sponsors.forEach((sponsor, index) => {
+      if (sponsor._logoFile) {
+        formData.append(`sponsor_file_${index}`, sponsor._logoFile);
+        console.log(`Appending sponsor file ${index}:`, sponsor._logoFile.name);
+      }
+    });
     
-    console.log('Form submit - sponsors JSON:', sponsorsInput.value);
+    // Add sponsors metadata (without File objects)
+    const sponsorsMetadata = sponsors.map(s => ({
+      sponsor_name: s.sponsor_name,
+      sponsor_logo_url: s.sponsor_logo_url,
+      sponsor_website: s.sponsor_website,
+      display_order: s.display_order,
+      _hasFile: !!s._logoFile, // Flag to indicate if file exists
+    }));
     
-    onSubmit(e);
+    formData.set('sponsors', JSON.stringify(sponsorsMetadata));
+    console.log('Form submit - sponsors metadata:', JSON.stringify(sponsorsMetadata));
+    
+    // Create a synthetic event with FormData
+    const syntheticEvent = {
+      ...e,
+      currentTarget: form,
+      preventDefault: () => {},
+    } as React.FormEvent<HTMLFormElement>;
+    
+    onSubmit(syntheticEvent);
   };
 
   return (
