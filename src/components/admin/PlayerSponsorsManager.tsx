@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,21 +24,23 @@ interface PlayerSponsorsManagerProps {
 
 export const PlayerSponsorsManager = ({ initialSponsors = [], onChange, onFileChange }: PlayerSponsorsManagerProps) => {
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>(initialSponsors);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitialMount = useRef(true);
 
-  // Only update from initialSponsors on first load or when explicitly changing players
+  // Update from initialSponsors whenever they change
   useEffect(() => {
-    if (!isInitialized || initialSponsors.length === 0) {
-      console.log('Initializing sponsors from props:', initialSponsors);
-      setSponsors(initialSponsors);
-      setIsInitialized(true);
+    console.log('PlayerSponsorsManager - initialSponsors changed:', initialSponsors);
+    setSponsors(initialSponsors);
+  }, [initialSponsors]);
+
+  // Only call onChange after initial mount to avoid infinite loops
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  }, [initialSponsors, isInitialized]);
-
-  useEffect(() => {
     console.log('Sponsors state changed, calling onChange:', sponsors);
     onChange(sponsors);
-  }, [sponsors]);
+  }, [sponsors, onChange]);
 
   const addSponsor = () => {
     const newSponsor: PlayerSponsor = {
