@@ -40,7 +40,8 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
           throw error;
         }
         
-        console.log('Fetched sponsors:', data);
+        console.log('Fetched sponsors for player', playerId, ':', data);
+        console.log('Sponsors with logos:', data?.filter(s => s.sponsor_logo_url));
         setSponsors(data || []);
       } catch (error) {
         console.error('Error fetching player sponsors:', error);
