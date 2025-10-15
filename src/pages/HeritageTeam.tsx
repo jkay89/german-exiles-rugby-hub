@@ -8,6 +8,7 @@ import { Loader2, Trophy, MapPin, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import { PlayerSponsorsDisplay } from "@/components/player/PlayerSponsorsDisplay";
 
 const HeritageTeam = () => {
   const { t } = useLanguage();
@@ -224,27 +225,7 @@ const HeritageTeam = () => {
                         </div>
                       )}
                       
-                      <div className="border-t border-gray-700 pt-3">
-                        <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
-                        {player.sponsor_logo_url ? (
-                          <a 
-                            href={formatSponsorUrl(player.sponsor_website)} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block hover:opacity-80 transition"
-                          >
-                            <img 
-                              src={player.sponsor_logo_url} 
-                              alt={player.sponsor_name || 'Sponsor'}
-                              className="h-20 object-contain"
-                            />
-                          </a>
-                        ) : (
-                          <div className="flex items-center gap-2 text-gray-500 italic text-sm">
-                            <span>Available to sponsor</span>
-                          </div>
-                        )}
-                      </div>
+                      <PlayerSponsorsDisplay playerId={player.id} />
                     </CardContent>
                   </Card>
                 ))}

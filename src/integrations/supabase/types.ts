@@ -463,6 +463,47 @@ export type Database = {
         }
         Relationships: []
       }
+      player_sponsors: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          player_id: string
+          sponsor_logo_url: string | null
+          sponsor_name: string
+          sponsor_website: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          player_id: string
+          sponsor_logo_url?: string | null
+          sponsor_name: string
+          sponsor_website?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          player_id?: string
+          sponsor_logo_url?: string | null
+          sponsor_name?: string
+          sponsor_website?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_sponsors_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_stats: {
         Row: {
           created_at: string

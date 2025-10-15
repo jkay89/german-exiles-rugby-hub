@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PlayerImageResizer from "./PlayerImageResizer";
+import { PlayerSponsorsManager, PlayerSponsor } from "./PlayerSponsorsManager";
 
 interface PlayerFormProps {
   isEditing: boolean;
@@ -46,8 +47,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
   const [showResizer, setShowResizer] = useState(false);
   const [resizerFile, setResizerFile] = useState<File | null>(null);
   const [playerName, setPlayerName] = useState(initialValues?.name || "");
-  const [selectedSponsorLogo, setSelectedSponsorLogo] = useState<File | null>(null);
-  const [sponsorLogoPreview, setSponsorLogoPreview] = useState<string | null>(initialValues?.sponsor_logo_url || null);
+  const [sponsors, setSponsors] = useState<PlayerSponsor[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -81,24 +81,20 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
     setResizerFile(null);
   };
 
-  const handleSponsorLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedSponsorLogo(file);
-      
-      // Create preview
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        if (typeof fileReader.result === 'string') {
-          setSponsorLogoPreview(fileReader.result);
-        }
-      };
-      fileReader.readAsDataURL(file);
-    }
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const form = e.currentTarget;
+    // Add sponsors data to the form as a hidden field
+    const sponsorsInput = document.createElement('input');
+    sponsorsInput.type = 'hidden';
+    sponsorsInput.name = 'sponsors';
+    sponsorsInput.value = JSON.stringify(sponsors);
+    form.appendChild(sponsorsInput);
+    
+    onSubmit(e);
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleFormSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="text-gray-400">Name</Label>
@@ -196,51 +192,11 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
           />
         </div>
 
-        <div>
-          <Label className="text-gray-400">Sponsor Name</Label>
-          <Input
-            name="sponsor_name"
-            placeholder="Sponsor name"
-            className="bg-gray-800 border-gray-700 text-white"
-            defaultValue={initialValues?.sponsor_name || ""}
-          />
-        </div>
-
-        <div>
-          <Label className="text-gray-400">Sponsor Website</Label>
-          <Input
-            name="sponsor_website"
-            placeholder="https://sponsor-website.com"
-            className="bg-gray-800 border-gray-700 text-white"
-            defaultValue={initialValues?.sponsor_website || ""}
-          />
-        </div>
-
         <div className="md:col-span-2">
-          <Label className="text-gray-400">Sponsor Logo</Label>
-          <div className="flex items-center gap-4 mt-2">
-            {sponsorLogoPreview && (
-              <div className="h-16 w-32 border border-gray-600 rounded flex items-center justify-center bg-white p-2">
-                <img src={sponsorLogoPreview} alt="Sponsor logo" className="max-h-full max-w-full object-contain" />
-              </div>
-            )}
-            
-            <label className="cursor-pointer">
-              <div className="flex items-center gap-2 px-4 py-2 border border-gray-600 rounded bg-gray-800 hover:bg-gray-700 transition">
-                <Upload className="h-4 w-4" /> Upload Sponsor Logo
-              </div>
-              <Input 
-                type="file" 
-                name="sponsor_logo" 
-                className="hidden" 
-                accept="image/*"
-                onChange={handleSponsorLogoChange}
-              />
-            </label>
-            <p className="text-sm text-gray-400">
-              {selectedSponsorLogo ? selectedSponsorLogo.name : sponsorLogoPreview ? "Current logo" : "No logo uploaded"}
-            </p>
-          </div>
+          <PlayerSponsorsManager
+            initialSponsors={sponsors}
+            onChange={setSponsors}
+          />
         </div>
 
         <div className="md:col-span-2">
@@ -295,7 +251,6 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
 
       {/* Hidden input to track if we have a selected file */}
       <input type="hidden" name="selectedFile" value={selectedFile ? "true" : "false"} />
-      <input type="hidden" name="selectedSponsorLogo" value={selectedSponsorLogo ? "true" : "false"} />
 
       <div className="flex justify-end gap-2">
         {onCancel && (
