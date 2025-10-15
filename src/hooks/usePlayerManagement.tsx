@@ -100,11 +100,11 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         const sponsors = JSON.parse(sponsorsData as string);
         const playerId = data[0].id;
         
-        // Upload sponsor logos and create sponsor records (only if they have logos)
+        // Upload sponsor logos and create sponsor records
         for (const sponsor of sponsors) {
-          let sponsorLogoUrl = sponsor.sponsor_logo_url;
+          let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
-          // Upload sponsor logo if there's a file
+          // Upload sponsor logo if there's a new file
           if (sponsor._logoFile) {
             toast({
               title: "Uploading sponsor logo",
@@ -115,7 +115,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
             sponsorLogoUrl = result.url;
           }
           
-          // Only insert sponsor if it has a logo
+          // Only insert sponsor if it has a logo (either existing or newly uploaded)
           if (sponsorLogoUrl) {
             await supabase.rest
               .from('player_sponsors')
@@ -208,11 +208,11 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
           .delete()
           .eq('player_id', editingPlayer.id);
         
-        // Upload sponsor logos and create new sponsor records (only if they have logos)
+        // Upload sponsor logos and create new sponsor records
         for (const sponsor of sponsors) {
-          let sponsorLogoUrl = sponsor.sponsor_logo_url;
+          let sponsorLogoUrl = sponsor.sponsor_logo_url || null;
           
-          // Upload sponsor logo if there's a file
+          // Upload sponsor logo if there's a new file
           if (sponsor._logoFile) {
             toast({
               title: "Uploading sponsor logo",
@@ -223,7 +223,7 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
             sponsorLogoUrl = result.url;
           }
           
-          // Only insert sponsor if it has a logo
+          // Only insert sponsor if it has a logo (either existing or newly uploaded)
           if (sponsorLogoUrl) {
             await supabase.rest
               .from('player_sponsors')
