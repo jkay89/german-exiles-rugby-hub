@@ -71,7 +71,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
             throw error;
           }
           
-          console.log('Loaded sponsors:', data);
+          console.log('Loaded sponsors from DB:', data);
           
           if (data && data.length > 0) {
             const loadedSponsors: PlayerSponsor[] = data.map(s => ({
@@ -81,7 +81,11 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
               sponsor_website: s.sponsor_website || undefined,
               display_order: s.display_order,
             }));
+            console.log('Transformed sponsors for state:', loadedSponsors);
             setSponsors(loadedSponsors);
+          } else {
+            console.log('No sponsors found, resetting to empty');
+            setSponsors([]);
           }
         } catch (error) {
           console.error('Error loading sponsors:', error);
