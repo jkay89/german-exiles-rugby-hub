@@ -23,13 +23,19 @@ interface PlayerSponsorsManagerProps {
 
 export const PlayerSponsorsManager = ({ initialSponsors = [], onChange }: PlayerSponsorsManagerProps) => {
   const [sponsors, setSponsors] = useState<PlayerSponsor[]>(initialSponsors);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Update local state when initialSponsors changes (e.g., after loading from DB)
+  // Only update from initialSponsors on first load or when explicitly changing players
   useEffect(() => {
-    setSponsors(initialSponsors);
-  }, [initialSponsors]);
+    if (!isInitialized || initialSponsors.length === 0) {
+      console.log('Initializing sponsors from props:', initialSponsors);
+      setSponsors(initialSponsors);
+      setIsInitialized(true);
+    }
+  }, [initialSponsors, isInitialized]);
 
   useEffect(() => {
+    console.log('Sponsors state changed, calling onChange:', sponsors);
     onChange(sponsors);
   }, [sponsors]);
 
