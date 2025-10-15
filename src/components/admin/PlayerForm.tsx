@@ -126,17 +126,25 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     const form = e.currentTarget;
-    const formData = new FormData(form);
     
     console.log('Form submit - current sponsors state:', sponsors);
     
-    // Handle sponsor files separately since they can't be JSON stringified
+    // Append sponsor files to the form as actual file inputs
     sponsors.forEach((sponsor, index) => {
       if (sponsor._logoFile) {
-        formData.append(`sponsor_file_${index}`, sponsor._logoFile);
-        console.log(`Appending sponsor file ${index}:`, sponsor._logoFile.name);
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.name = `sponsor_file_${index}`;
+        fileInput.style.display = 'none';
+        
+        // Create a DataTransfer to add the file to the input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(sponsor._logoFile);
+        fileInput.files = dataTransfer.files;
+        
+        form.appendChild(fileInput);
+        console.log(`Appended sponsor file input ${index}:`, sponsor._logoFile.name);
       }
     });
     
@@ -146,20 +154,18 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
       sponsor_logo_url: s.sponsor_logo_url,
       sponsor_website: s.sponsor_website,
       display_order: s.display_order,
-      _hasFile: !!s._logoFile, // Flag to indicate if file exists
+      _hasFile: !!s._logoFile,
     }));
     
-    formData.set('sponsors', JSON.stringify(sponsorsMetadata));
+    const sponsorsInput = document.createElement('input');
+    sponsorsInput.type = 'hidden';
+    sponsorsInput.name = 'sponsors';
+    sponsorsInput.value = JSON.stringify(sponsorsMetadata);
+    form.appendChild(sponsorsInput);
+    
     console.log('Form submit - sponsors metadata:', JSON.stringify(sponsorsMetadata));
     
-    // Create a synthetic event with FormData
-    const syntheticEvent = {
-      ...e,
-      currentTarget: form,
-      preventDefault: () => {},
-    } as React.FormEvent<HTMLFormElement>;
-    
-    onSubmit(syntheticEvent);
+    onSubmit(e);
   };
 
   return (
