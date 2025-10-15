@@ -63,8 +63,9 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          {sponsors.map((sponsor) => (
-            sponsor.sponsor_logo_url && (
+          {sponsors
+            .filter(sponsor => sponsor.sponsor_logo_url)
+            .map((sponsor) => (
               <a 
                 key={sponsor.id}
                 href={formatSponsorUrl(sponsor.sponsor_website)} 
@@ -78,8 +79,7 @@ export const PlayerSponsorsDisplay = ({ playerId }: PlayerSponsorsDisplayProps) 
                   className="h-16 object-contain hover:opacity-80 transition-opacity"
                 />
               </a>
-            )
-          ))}
+            ))}
         </div>
       )}
     </div>
