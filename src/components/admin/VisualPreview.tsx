@@ -286,8 +286,10 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
           {elements.map((element) => (
           <div
             key={element.id}
-            className={`absolute cursor-move group ${
-              selectedElement === element.id ? 'ring-2 ring-primary' : ''
+            className={`absolute cursor-move group border-2 ${
+              selectedElement === element.id 
+                ? 'ring-2 ring-primary border-primary' 
+                : 'border-yellow-500/50 hover:border-yellow-500'
             }`}
             style={{
               left: `${element.position_x}px`,
@@ -298,17 +300,22 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
             }}
             onMouseDown={(e) => handleMouseDown(e, element.id)}
           >
+            {/* Show label for visibility */}
+            <div className="absolute top-0 left-0 bg-yellow-500/90 text-black text-xs px-1 py-0.5 rounded-br pointer-events-none z-10">
+              {element.section_label}
+            </div>
+            
             {element.content_type === 'image' ? (
               <img
                 src={element.content_value}
                 alt={element.section_label}
-                className="w-full h-full object-contain rounded border-2 border-border"
+                className="w-full h-full object-contain rounded"
                 draggable={false}
               />
             ) : (
               <video
                 src={element.content_value}
-                className="w-full h-full object-contain rounded border-2 border-border"
+                className="w-full h-full object-contain rounded"
                 controls
               />
             )}
