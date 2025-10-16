@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { PlayerSponsorsDisplay } from "@/components/player/PlayerSponsorsDisplay";
 
 interface PlayerProfile {
   id: string;
@@ -164,12 +165,7 @@ const CommunityTeam = () => {
                         </div>
                       )}
                       
-                      <div className="border-t border-gray-700 pt-3">
-                        <p className="text-gray-400 text-xs mb-2">Sponsored by</p>
-                        <div className="flex items-center gap-2 text-gray-500 italic text-sm">
-                          <span>Available to sponsor</span>
-                        </div>
-                      </div>
+                      <PlayerSponsorsDisplay playerId={player.id} />
                     </CardContent>
                   </Card>
                 ))}
