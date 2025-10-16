@@ -7,6 +7,7 @@ import { fetchDocuments, Document } from "@/utils/documentUtils";
 import { Loader2, Download, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const Documents = () => {
   const { t } = useLanguage();
@@ -104,7 +105,7 @@ const Documents = () => {
   }, {} as Record<string, Document[]>);
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="documents">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -185,7 +186,7 @@ const Documents = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

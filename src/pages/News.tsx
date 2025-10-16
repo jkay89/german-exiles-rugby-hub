@@ -1,10 +1,10 @@
-
 import { motion } from "framer-motion";
 import { Newspaper } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { NewsArticle, fetchNewsArticles } from "@/utils/newsUtils";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const News = () => {
   const { t } = useLanguage();
@@ -28,7 +28,7 @@ const News = () => {
   }, []);
   
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="news">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -94,7 +94,7 @@ const News = () => {
           </motion.div>
         )}
       </motion.div>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

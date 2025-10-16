@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 import PageHeader from "@/components/fixtures/PageHeader";
 import FixtureTabs from "@/components/fixtures/FixtureTabs";
@@ -38,7 +38,7 @@ const Fixtures = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <PageWithPositionedElements page="fixtures" className="min-h-screen bg-black">
       <PageHeader />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -63,7 +63,7 @@ const Fixtures = () => {
 
         {renderContent()}
       </motion.div>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

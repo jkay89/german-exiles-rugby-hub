@@ -1,9 +1,9 @@
-
 import { motion } from "framer-motion";
 import { Trophy, Users, Globe, Handshake, Target, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const AboutUs = () => {
   const { t } = useLanguage();
@@ -75,7 +75,7 @@ const AboutUs = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+    <PageWithPositionedElements page="about" className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
       {/* Animated background patterns */}
       <div className="absolute inset-0 opacity-5">
         <motion.div
@@ -205,7 +205,7 @@ const AboutUs = () => {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

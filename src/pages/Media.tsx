@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
@@ -6,6 +5,7 @@ import { Images, Folder } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MediaFolder, fetchMediaFolders } from "@/utils/mediaUtils";
 import { format } from "date-fns";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const Media = () => {
   const { t } = useLanguage();
@@ -29,7 +29,7 @@ const Media = () => {
   }, []);
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="media">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -91,7 +91,7 @@ const Media = () => {
           </div>
         )}
       </motion.div>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

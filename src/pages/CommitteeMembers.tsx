@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 import { fetchCommitteeMembers, CommitteeMember } from "@/utils/committeeUtils";
 import { Loader2, Mail, Phone } from "lucide-react";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const CommitteeMembers = () => {
   const { t } = useLanguage();
@@ -27,7 +28,7 @@ const CommitteeMembers = () => {
   }, []);
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="committee-members">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -82,7 +83,7 @@ const CommitteeMembers = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

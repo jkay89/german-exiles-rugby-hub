@@ -1,7 +1,7 @@
-
 import { motion } from "framer-motion";
 import { Flag, Trophy, Users, ArrowUp } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const NRLD = () => {
   const { t } = useLanguage();
@@ -30,7 +30,7 @@ const NRLD = () => {
   ];
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="nrld">
       <div className="relative">
         <div className="absolute inset-0 opacity-5">
           <img
@@ -83,7 +83,7 @@ const NRLD = () => {
           </motion.div>
         </div>
       </div>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 
