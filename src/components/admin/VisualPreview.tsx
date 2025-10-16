@@ -77,7 +77,7 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
     setElements(prev =>
       prev.map(el =>
         el.id === dragging
-          ? { ...el, position_x: Math.max(0, newX), position_y: Math.max(0, newY) }
+          ? { ...el, position_x: Math.max(0, newX), position_y: Math.max(64, newY) }
           : el
       )
     );
@@ -152,7 +152,7 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
           is_published: true,
           is_positioned: true,
           position_x: 100,
-          position_y: 100,
+          position_y: 150,
           position_width: 300,
           position_height: type === 'image' ? 200 : 169,
           position_z_index: elements.length + 1,
