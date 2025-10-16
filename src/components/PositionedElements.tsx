@@ -66,7 +66,7 @@ export const PositionedElements = ({ page }: PositionedElementsProps) => {
   if (elements.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 40 }}>
+    <>
       {elements.map((element) => (
         <div
           key={element.id}
@@ -83,19 +83,19 @@ export const PositionedElements = ({ page }: PositionedElementsProps) => {
             <img
               src={element.published_value || element.content_value}
               alt={element.section_label}
-              className="w-full h-full object-cover rounded shadow-lg"
+              className="w-full h-full object-contain rounded shadow-lg"
               draggable={false}
             />
           ) : element.content_type === 'video' ? (
             <video
               src={element.published_value || element.content_value}
-              className="w-full h-full object-cover rounded shadow-lg"
+              className="w-full h-full object-contain rounded shadow-lg"
               controls
               playsInline
             />
           ) : null}
         </div>
       ))}
-    </div>
+    </>
   );
 };

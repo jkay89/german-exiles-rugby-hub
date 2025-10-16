@@ -13,7 +13,7 @@ export const PageWithPositionedElements = ({
   className = "pt-16 min-h-screen bg-black" 
 }: PageWithPositionedElementsProps) => {
   return (
-    <div className={className}>
+    <div className={`relative ${className}`}>
       <PositionedElements page={page} />
       {children}
     </div>
