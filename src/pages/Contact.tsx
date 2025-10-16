@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { PositionedElements } from "@/components/PositionedElements";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -17,6 +18,7 @@ const Contact = () => {
 
   return (
     <div className="pt-16 min-h-screen bg-black">
+      <PositionedElements page="contact" />
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

@@ -12,6 +12,12 @@ export interface SiteContent {
   display_order: number;
   created_at: string;
   updated_at: string;
+  position_x?: number | null;
+  position_y?: number | null;
+  position_width?: number | null;
+  position_height?: number | null;
+  position_z_index?: number | null;
+  is_positioned?: boolean;
 }
 
 export interface SitePage {

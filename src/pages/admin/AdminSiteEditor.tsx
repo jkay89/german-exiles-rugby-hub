@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Eye, RefreshCw } from "lucide-react";
+import { ArrowLeft, Save, Eye, RefreshCw, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { AddSectionDialog } from "@/components/admin/AddSectionDialog";
+import { VisualPreview } from "@/components/admin/VisualPreview";
 import {
   DndContext,
   closestCenter,
@@ -43,6 +46,7 @@ const AdminSiteEditor = () => {
   const [changes, setChanges] = useState<Record<string, string>>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState<string | null>(null);
+  const [visualMode, setVisualMode] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -284,22 +288,47 @@ const AdminSiteEditor = () => {
           {/* Preview Panel */}
           <Card>
             <CardHeader>
-              <CardTitle>Live Preview</CardTitle>
-              <CardDescription>
-                See how your changes will look on the live site
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Preview</CardTitle>
+                  <CardDescription>
+                    {visualMode 
+                      ? "Drag images/videos to position them exactly where you want"
+                      : "See how changes will look on the live site"}
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="visual-mode" className="text-sm">
+                    Visual Editor
+                  </Label>
+                  <Switch
+                    id="visual-mode"
+                    checked={visualMode}
+                    onCheckedChange={setVisualMode}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="border rounded-lg overflow-hidden bg-background">
-                <iframe
-                  src={`/${activeTab === 'home' ? '' : activeTab}`}
-                  className="w-full h-[600px]"
-                  title="Site Preview"
+              {visualMode ? (
+                <VisualPreview
+                  page={activeTab}
+                  onElementsChange={() => loadPageContent(activeTab)}
                 />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Preview shows published content. Save and publish to see your changes.
-              </p>
+              ) : (
+                <>
+                  <div className="border rounded-lg overflow-hidden bg-background">
+                    <iframe
+                      src={`/${activeTab === 'home' ? '' : activeTab}`}
+                      className="w-full h-[600px]"
+                      title="Site Preview"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Preview shows published content. Save and publish to see your changes.
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>

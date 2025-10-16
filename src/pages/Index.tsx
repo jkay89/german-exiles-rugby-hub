@@ -5,6 +5,7 @@ import MissionSection from "@/components/home/MissionSection";
 import VideoSection from "@/components/home/VideoSection";
 import FeatureGrid from "@/components/home/FeatureGrid";
 import SponsorCarousel from "@/components/home/SponsorCarousel";
+import { PositionedElements } from "@/components/PositionedElements";
 import { sponsorData } from "@/data/sponsorData";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -88,6 +89,7 @@ const Index = () => {
 
   return (
     <div className="pt-16 min-h-screen bg-black">
+      <PositionedElements page="home" />
       <HeroSection isLoaded={isLoaded} />
       <MissionSection />
       <VideoSection />

@@ -674,8 +674,14 @@ export type Database = {
           created_at: string | null
           display_order: number | null
           id: string
+          is_positioned: boolean | null
           is_published: boolean | null
           page: string
+          position_height: number | null
+          position_width: number | null
+          position_x: number | null
+          position_y: number | null
+          position_z_index: number | null
           published_value: string | null
           section_key: string
           section_label: string
@@ -687,8 +693,14 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           id?: string
+          is_positioned?: boolean | null
           is_published?: boolean | null
           page: string
+          position_height?: number | null
+          position_width?: number | null
+          position_x?: number | null
+          position_y?: number | null
+          position_z_index?: number | null
           published_value?: string | null
           section_key: string
           section_label: string
@@ -700,8 +712,14 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           id?: string
+          is_positioned?: boolean | null
           is_published?: boolean | null
           page?: string
+          position_height?: number | null
+          position_width?: number | null
+          position_x?: number | null
+          position_y?: number | null
+          position_z_index?: number | null
           published_value?: string | null
           section_key?: string
           section_label?: string

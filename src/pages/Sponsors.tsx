@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import SponsorHeader from "@/components/sponsors/SponsorHeader";
 import PlatinumSponsors from "@/components/sponsors/PlatinumSponsors";
@@ -7,6 +6,7 @@ import SilverSponsors from "@/components/sponsors/SilverSponsors";
 import MediaPartner from "@/components/sponsors/MediaPartner";
 import AffiliateSponsors from "@/components/sponsors/AffiliateSponsors";
 import BecomeSponsor from "@/components/sponsors/BecomeSponsor";
+import { PositionedElements } from "@/components/PositionedElements";
 import { sponsorData } from "@/data/sponsorData";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -22,6 +22,7 @@ const Sponsors = () => {
   
   return (
     <div className="pt-16 min-h-screen bg-black">
+      <PositionedElements page="sponsors" />
       <SponsorHeader />
       <PlatinumSponsors />
       <GoldSponsors />
