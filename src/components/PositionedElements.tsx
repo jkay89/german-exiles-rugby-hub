@@ -66,7 +66,7 @@ export const PositionedElements = ({ page }: PositionedElementsProps) => {
   if (elements.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 40, paddingTop: '64px' }}>
+    <div className="fixed top-16 left-0 right-0 bottom-0 pointer-events-none" style={{ zIndex: 40 }}>
       {elements.map((element) => (
         <div
           key={element.id}
