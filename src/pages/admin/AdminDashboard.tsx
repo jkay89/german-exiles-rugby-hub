@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield, CloudUpload } from "lucide-react";
+import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield, CloudUpload, Layout } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -38,6 +38,21 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Layout className="h-5 w-5 text-german-gold" />
+                Site Editor
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Visual site editor with live preview - edit content, images, and text across all pages.</p>
+              <Link to="/admin/site-editor">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Open Editor</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
           <Card className="bg-gray-900 border-gray-800 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

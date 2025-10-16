@@ -667,6 +667,84 @@ export type Database = {
           },
         ]
       }
+      site_content: {
+        Row: {
+          content_type: string
+          content_value: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          page: string
+          published_value: string | null
+          section_key: string
+          section_label: string
+          updated_at: string | null
+        }
+        Insert: {
+          content_type: string
+          content_value?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          page: string
+          published_value?: string | null
+          section_key: string
+          section_label: string
+          updated_at?: string | null
+        }
+        Update: {
+          content_type?: string
+          content_value?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          page?: string
+          published_value?: string | null
+          section_key?: string
+          section_label?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_pages: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          meta_description: string | null
+          page_key: string
+          page_path: string
+          page_title: string
+          template: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          page_key: string
+          page_path: string
+          page_title: string
+          template?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          page_key?: string
+          page_path?: string
+          page_title?: string
+          template?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sponsors: {
         Row: {
           created_at: string
