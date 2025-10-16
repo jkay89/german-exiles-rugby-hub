@@ -226,7 +226,12 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+        {/* Nav bar placeholder to show where it will be on live site */}
+        <div className="absolute top-0 left-0 right-0 h-16 bg-black/50 border-b-2 border-primary/50 pointer-events-none z-[100] flex items-center justify-center">
+          <span className="text-xs text-muted-foreground">Navigation Bar Area (64px)</span>
+        </div>
+        
+        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm" style={{ paddingTop: '64px' }}>
           {elements.length === 0 ? (
             <div className="text-center">
               <Move className="h-8 w-8 mx-auto mb-2 opacity-50" />
