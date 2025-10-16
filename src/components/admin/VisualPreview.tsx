@@ -95,7 +95,7 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
     setElements(prev =>
       prev.map(el =>
         el.id === dragging
-          ? { ...el, position_x: Math.max(0, newX), position_y: Math.max(64, newY) }
+          ? { ...el, position_x: Math.round(Math.max(0, newX)), position_y: Math.round(Math.max(64, newY)) }
           : el
       )
     );
@@ -109,8 +109,8 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
       await supabase
         .from('site_content')
         .update({
-          position_x: element.position_x,
-          position_y: element.position_y,
+          position_x: Math.round(element.position_x),
+          position_y: Math.round(element.position_y),
         })
         .eq('id', element.id);
 
@@ -121,18 +121,21 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
   };
 
   const handleResize = async (elementId: string, width: number, height: number) => {
+    const roundedWidth = Math.round(width);
+    const roundedHeight = Math.round(height);
+    
     await supabase
       .from('site_content')
       .update({
-        position_width: width,
-        position_height: height,
+        position_width: roundedWidth,
+        position_height: roundedHeight,
       })
       .eq('id', elementId);
 
     setElements(prev =>
       prev.map(el =>
         el.id === elementId
-          ? { ...el, position_width: width, position_height: height }
+          ? { ...el, position_width: roundedWidth, position_height: roundedHeight }
           : el
       )
     );
