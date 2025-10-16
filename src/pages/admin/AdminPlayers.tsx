@@ -221,6 +221,7 @@ const AdminPlayers = () => {
               <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-8">
                 <h2 className="text-xl font-bold text-white mb-4">Edit Player</h2>
                 <PlayerForm 
+                  key={editingPlayer.id}
                   isEditing={true} 
                   onSubmit={(e) => handleUpdatePlayer(e, editingPlayer)} 
                   onCancel={() => setEditingPlayer(null)}
