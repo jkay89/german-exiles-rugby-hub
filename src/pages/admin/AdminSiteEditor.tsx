@@ -176,7 +176,7 @@ const AdminSiteEditor = () => {
   const hasUnsavedChanges = Object.keys(changes).length > 0;
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6 pt-24">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
