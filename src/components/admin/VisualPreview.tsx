@@ -22,7 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { FlowElement } from "./FlowElement";
 
-interface FlowElement {
+interface FlowElementData {
   id: string;
   section_key: string;
   section_label: string;
@@ -39,7 +39,7 @@ interface VisualPreviewProps {
 }
 
 export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) => {
-  const [elements, setElements] = useState<FlowElement[]>([]);
+  const [elements, setElements] = useState<FlowElementData[]>([]);
   const [allElements, setAllElements] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -182,7 +182,7 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
 
       if (error) throw error;
 
-      setElements(prev => [...prev, data as FlowElement]);
+      setElements(prev => [...prev, data as FlowElementData]);
       toast.success(`${type === 'image' ? 'Image' : 'Video'} added`);
       onElementsChange();
     } catch (error) {
