@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { PlayerSponsorsDisplay } from "@/components/player/PlayerSponsorsDisplay";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const HeritageTeam = () => {
   const { t } = useLanguage();
@@ -102,7 +103,10 @@ const HeritageTeam = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden">
+    <PageWithPositionedElements 
+      page="heritage-team"
+      className="pt-16 min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
+    >
       <motion.section
         initial="hidden"
         animate="visible"
@@ -234,7 +238,7 @@ const HeritageTeam = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

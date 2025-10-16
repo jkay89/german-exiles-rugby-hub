@@ -6,6 +6,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PlayerSponsorsDisplay } from "@/components/player/PlayerSponsorsDisplay";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 interface PlayerProfile {
   id: string;
@@ -94,7 +95,7 @@ const CommunityTeam = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="community-team">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -174,7 +175,7 @@ const CommunityTeam = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

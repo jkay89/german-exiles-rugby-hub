@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { fetchPlayersByTeam, Player } from "@/utils/playerUtils";
 import { Loader2 } from "lucide-react";
 import { PlayerSponsorsDisplay } from "@/components/player/PlayerSponsorsDisplay";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const Exiles9s = () => {
   const { t } = useLanguage();
@@ -81,7 +82,7 @@ const Exiles9s = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="exiles-9s">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -159,7 +160,7 @@ const Exiles9s = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 

@@ -235,13 +235,29 @@ const AdminSiteEditor = () => {
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="home">Home</TabsTrigger>
-                  <TabsTrigger value="about">About</TabsTrigger>
-                  <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
-                  <TabsTrigger value="contact">Contact</TabsTrigger>
-                  <TabsTrigger value="news">News</TabsTrigger>
-                </TabsList>
+                <div className="space-y-2">
+                  <TabsList className="grid w-full grid-cols-6">
+                    <TabsTrigger value="home">Home</TabsTrigger>
+                    <TabsTrigger value="about">About</TabsTrigger>
+                    <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
+                    <TabsTrigger value="contact">Contact</TabsTrigger>
+                    <TabsTrigger value="news">News</TabsTrigger>
+                    <TabsTrigger value="fixtures">Fixtures</TabsTrigger>
+                  </TabsList>
+                  <TabsList className="grid w-full grid-cols-6">
+                    <TabsTrigger value="heritage-team">Heritage</TabsTrigger>
+                    <TabsTrigger value="community-team">Community</TabsTrigger>
+                    <TabsTrigger value="exiles-9s">Exiles 9s</TabsTrigger>
+                    <TabsTrigger value="coaching-team">Coaching</TabsTrigger>
+                    <TabsTrigger value="committee-members">Committee</TabsTrigger>
+                    <TabsTrigger value="documents">Documents</TabsTrigger>
+                  </TabsList>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="nrld">NRLD</TabsTrigger>
+                    <TabsTrigger value="media">Media</TabsTrigger>
+                    <TabsTrigger value="lottery">Lottery</TabsTrigger>
+                  </TabsList>
+                </div>
 
                 <TabsContent value={activeTab} className="space-y-4 mt-4">
                   <div className="flex justify-end">

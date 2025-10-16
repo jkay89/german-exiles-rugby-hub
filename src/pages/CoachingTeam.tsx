@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 import { fetchCoachingStaff, CoachingStaffMember } from "@/utils/coachingStaffUtils";
 import { Loader2, Mail, Phone } from "lucide-react";
+import { PageWithPositionedElements } from "@/components/PageWithPositionedElements";
 
 const CoachingTeam = () => {
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ const CoachingTeam = () => {
   }, []);
 
   return (
-    <div className="pt-16 min-h-screen bg-black">
+    <PageWithPositionedElements page="coaching-team">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -86,7 +87,7 @@ const CoachingTeam = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageWithPositionedElements>
   );
 };
 
