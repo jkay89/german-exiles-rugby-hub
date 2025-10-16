@@ -35,12 +35,18 @@ serve(async (req) => {
     
     console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}, resourceType: ${resourceType}`);
 
+    // Hard limit to prevent memory issues - reject files over 10MB upfront
+    const maxFileSize = 10 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      throw new Error(`File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB. Please compress or resize the image before uploading.`);
+    }
+
     // Convert file to array buffer
     let arrayBuffer = await file.arrayBuffer();
     let processedArrayBuffer = arrayBuffer;
     
-    // Only resize images over 5MB
-    const targetSize = 5 * 1024 * 1024;
+    // Resize images over 2MB to prevent memory issues
+    const targetSize = 2 * 1024 * 1024;
     if (isImage && arrayBuffer.byteLength > targetSize) {
       console.log(`File is ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB, resizing...`);
       
@@ -48,8 +54,8 @@ serve(async (req) => {
         // Decode image
         const image = await Image.decode(new Uint8Array(arrayBuffer));
         
-        // Calculate new dimensions (max 1500px on longest side for large files)
-        const maxDimension = 1500;
+        // More aggressive size reduction for large files
+        const maxDimension = arrayBuffer.byteLength > 5 * 1024 * 1024 ? 1200 : 1500;
         let newWidth = image.width;
         let newHeight = image.height;
         
@@ -68,21 +74,22 @@ serve(async (req) => {
         // Resize image
         const resized = image.resize(newWidth, newHeight);
         
-        // Encode as JPEG with 75% quality for aggressive compression
-        const encoded = await resized.encodeJPEG(75);
+        // More aggressive compression for large files
+        const quality = arrayBuffer.byteLength > 5 * 1024 * 1024 ? 65 : 75;
+        const encoded = await resized.encodeJPEG(quality);
         processedArrayBuffer = encoded.buffer;
         
         console.log(`Resized from ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB to ${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB`);
         
         // If still too large after compression, reject it
-        if (processedArrayBuffer.byteLength > 10 * 1024 * 1024) {
-          throw new Error(`File too large even after compression (${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB) - please resize manually`);
+        if (processedArrayBuffer.byteLength > 8 * 1024 * 1024) {
+          throw new Error(`File still too large after compression (${(processedArrayBuffer.byteLength / 1024 / 1024).toFixed(2)}MB). Please use a smaller image.`);
         }
       } catch (resizeError) {
         console.error(`Failed to resize:`, resizeError);
-        // If original is over 10MB, reject it
-        if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
-          throw new Error("File too large and resize failed");
+        // If resize fails and file is large, reject it
+        if (arrayBuffer.byteLength > 5 * 1024 * 1024) {
+          throw new Error(`Cannot process file: ${resizeError.message || 'Memory limit exceeded'}. Please use a smaller image (under 5MB).`);
         }
         processedArrayBuffer = arrayBuffer;
       }
