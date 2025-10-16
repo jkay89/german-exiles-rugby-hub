@@ -4,15 +4,34 @@ import { ArrowLeft, Save, Eye, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
 import { ContentEditor } from "@/components/admin/ContentEditor";
+import { AddSectionDialog } from "@/components/admin/AddSectionDialog";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {
   fetchPageContent,
   updateContent,
   publishAllPageContent,
+  deleteContentSection,
   SiteContent
 } from "@/utils/siteContentUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminSiteEditor = () => {
   const navigate = useNavigate();
@@ -22,6 +41,15 @@ const AdminSiteEditor = () => {
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [changes, setChanges] = useState<Record<string, string>>({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -94,6 +122,53 @@ const AdminSiteEditor = () => {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = content.findIndex((item) => item.id === active.id);
+      const newIndex = content.findIndex((item) => item.id === over.id);
+
+      const newOrder = arrayMove(content, oldIndex, newIndex);
+      setContent(newOrder);
+
+      // Update display_order in database
+      try {
+        for (let i = 0; i < newOrder.length; i++) {
+          await supabase
+            .from('site_content')
+            .update({ display_order: i })
+            .eq('id', newOrder[i].id);
+        }
+        toast.success("Section order updated");
+      } catch (error) {
+        console.error("Error updating order:", error);
+        toast.error("Failed to update section order");
+      }
+    }
+  };
+
+  const handleDeleteSection = (id: string) => {
+    setSectionToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!sectionToDelete) return;
+
+    try {
+      await deleteContentSection(sectionToDelete);
+      toast.success("Section deleted");
+      loadPageContent(activeTab);
+    } catch (error) {
+      console.error("Error deleting section:", error);
+      toast.error("Failed to delete section");
+    } finally {
+      setDeleteDialogOpen(false);
+      setSectionToDelete(null);
+    }
+  };
+
   const hasUnsavedChanges = Object.keys(changes).length > 0;
 
   return (
@@ -156,14 +231,22 @@ const AdminSiteEditor = () => {
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="home">Home</TabsTrigger>
                   <TabsTrigger value="about">About</TabsTrigger>
                   <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
                   <TabsTrigger value="contact">Contact</TabsTrigger>
+                  <TabsTrigger value="news">News</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab} className="space-y-4 mt-4">
+                  <div className="flex justify-end">
+                    <AddSectionDialog
+                      page={activeTab}
+                      onSectionAdded={() => loadPageContent(activeTab)}
+                    />
+                  </div>
+
                   {loading ? (
                     <div className="text-center py-8 text-muted-foreground">
                       Loading content...
@@ -173,13 +256,25 @@ const AdminSiteEditor = () => {
                       No editable sections found for this page
                     </div>
                   ) : (
-                    content.map((item) => (
-                      <ContentEditor
-                        key={item.id}
-                        content={item}
-                        onUpdate={handleContentUpdate}
-                      />
-                    ))
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={content.map(c => c.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {content.map((item) => (
+                          <ContentEditor
+                            key={item.id}
+                            content={item}
+                            onUpdate={handleContentUpdate}
+                            onDelete={handleDeleteSection}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                   )}
                 </TabsContent>
               </Tabs>
@@ -208,6 +303,21 @@ const AdminSiteEditor = () => {
             </CardContent>
           </Card>
         </div>
+
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Section</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this section? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

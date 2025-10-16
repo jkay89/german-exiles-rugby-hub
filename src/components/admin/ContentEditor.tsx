@@ -1,21 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SiteContent, uploadContentImage } from "@/utils/siteContentUtils";
-import { Upload } from "lucide-react";
+import { Upload, GripVertical, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { RichTextEditor } from "./RichTextEditor";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface ContentEditorProps {
   content: SiteContent;
   onUpdate: (id: string, value: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export const ContentEditor = ({ content, onUpdate }: ContentEditorProps) => {
+export const ContentEditor = ({ content, onUpdate, onDelete }: ContentEditorProps) => {
   const [value, setValue] = useState(content.content_value || '');
   const [uploading, setUploading] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: content.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  useEffect(() => {
+    setValue(content.content_value || '');
+  }, [content.content_value]);
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
@@ -42,12 +65,37 @@ export const ContentEditor = ({ content, onUpdate }: ContentEditorProps) => {
   const hasChanges = value !== content.published_value;
 
   return (
-    <div className="space-y-3 p-4 border rounded-lg bg-card">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="space-y-3 p-4 border rounded-lg bg-card relative group"
+    >
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">{content.section_label}</Label>
-        {hasChanges && (
-          <span className="text-xs text-amber-500 font-medium">Unpublished changes</span>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            className="cursor-grab active:cursor-grabbing opacity-50 hover:opacity-100"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <Label className="text-sm font-medium">{content.section_label}</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          {hasChanges && (
+            <span className="text-xs text-amber-500 font-medium">Unpublished</span>
+          )}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100"
+              onClick={() => onDelete(content.id)}
+            >
+              <Trash2 className="h-3 w-3 text-destructive" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {content.content_type === 'text' && (
@@ -68,11 +116,10 @@ export const ContentEditor = ({ content, onUpdate }: ContentEditorProps) => {
       )}
 
       {content.content_type === 'richtext' && (
-        <Textarea
+        <RichTextEditor
           value={value}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={handleChange}
           placeholder={`Enter ${content.section_label.toLowerCase()}`}
-          rows={6}
         />
       )}
 

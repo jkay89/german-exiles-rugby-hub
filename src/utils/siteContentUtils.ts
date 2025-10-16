@@ -171,6 +171,24 @@ export const deleteContentSection = async (id: string): Promise<boolean> => {
   return true;
 };
 
+// Update section order
+export const updateSectionOrder = async (
+  sectionId: string,
+  newOrder: number
+): Promise<boolean> => {
+  const { error } = await supabase
+    .from('site_content')
+    .update({ display_order: newOrder })
+    .eq('id', sectionId);
+
+  if (error) {
+    console.error('Error updating section order:', error);
+    throw error;
+  }
+
+  return true;
+};
+
 // Upload image for content
 export const uploadContentImage = async (file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();

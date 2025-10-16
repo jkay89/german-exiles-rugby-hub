@@ -149,3 +149,40 @@
     animation-delay: calc(var(--stagger) * 150ms);
   }
 }
+
+/* Rich Text Editor Styles */
+.quill-wrapper .ql-toolbar {
+  @apply border border-border rounded-t-md bg-card;
+}
+
+.quill-wrapper .ql-container {
+  @apply border border-border rounded-b-md bg-background;
+  min-height: 200px;
+}
+
+.quill-wrapper .ql-editor {
+  @apply text-foreground;
+  min-height: 200px;
+}
+
+.quill-wrapper .ql-editor.ql-blank::before {
+  @apply text-muted-foreground italic;
+}
+
+.quill-wrapper .ql-snow .ql-stroke {
+  @apply stroke-foreground;
+}
+
+.quill-wrapper .ql-snow .ql-fill {
+  @apply fill-foreground;
+}
+
+.quill-wrapper .ql-snow .ql-picker-label {
+  @apply text-foreground;
+}
+
+.quill-wrapper .ql-toolbar button:hover,
+.quill-wrapper .ql-toolbar button.ql-active {
+  @apply bg-accent;
+}
+
