@@ -297,13 +297,13 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
               <img
                 src={element.content_value}
                 alt={element.section_label}
-                className="w-full h-full object-cover rounded border-2 border-border"
+                className="w-full h-full object-contain rounded border-2 border-border"
                 draggable={false}
               />
             ) : (
               <video
                 src={element.content_value}
-                className="w-full h-full object-cover rounded border-2 border-border"
+                className="w-full h-full object-contain rounded border-2 border-border"
                 controls
               />
             )}
@@ -330,17 +330,19 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
                   const startY = e.clientY;
                   const startWidth = element.position_width;
                   const startHeight = element.position_height;
+                  let finalWidth = startWidth;
+                  let finalHeight = startHeight;
 
                   const handleMouseMove = (moveEvent: MouseEvent) => {
                     const deltaX = moveEvent.clientX - startX;
                     const deltaY = moveEvent.clientY - startY;
-                    const newWidth = Math.max(100, startWidth + deltaX);
-                    const newHeight = Math.max(100, startHeight + deltaY);
+                    finalWidth = Math.max(100, startWidth + deltaX);
+                    finalHeight = Math.max(100, startHeight + deltaY);
 
                     setElements(prev =>
                       prev.map(el =>
                         el.id === element.id
-                          ? { ...el, position_width: newWidth, position_height: newHeight }
+                          ? { ...el, position_width: finalWidth, position_height: finalHeight }
                           : el
                       )
                     );
@@ -349,7 +351,7 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
                   const handleMouseUp = () => {
                     document.removeEventListener('mousemove', handleMouseMove);
                     document.removeEventListener('mouseup', handleMouseUp);
-                    handleResize(element.id, element.position_width, element.position_height);
+                    handleResize(element.id, finalWidth, finalHeight);
                   };
 
                   document.addEventListener('mousemove', handleMouseMove);
