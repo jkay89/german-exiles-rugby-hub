@@ -242,46 +242,48 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
       <div
         ref={containerRef}
         className="relative border-2 border-dashed rounded-lg bg-background overflow-auto"
-        style={{ minHeight: '600px', height: '600px' }}
+        style={{ minHeight: '800px', height: '800px' }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        {/* Background: Show all page elements as reference */}
-        <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
-          <div className="min-h-screen bg-background">
-            {allElements.map((el) => (
-              <div key={el.id} className="p-4 border-b border-border/20">
-                <div className="text-xs text-muted-foreground mb-1">{el.section_label}</div>
-                {el.content_type === 'text' && (
-                  <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: el.published_value || el.content_value }} />
-                )}
-                {el.content_type === 'image' && el.content_value && (
-                  <img src={el.content_value} alt={el.section_label} className="max-w-full h-auto" />
-                )}
-                {el.content_type === 'video' && el.content_value && (
-                  <video src={el.content_value} className="max-w-full h-auto" controls />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Nav bar placeholder to show where it will be on live site */}
-        <div className="absolute top-0 left-0 right-0 h-16 bg-black/80 border-b-2 border-primary/50 pointer-events-none z-[100] flex items-center justify-center">
-          <span className="text-xs text-white/70">Navigation Bar Area (64px)</span>
-        </div>
-        
-        {elements.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm pointer-events-none">
-            <div className="text-center bg-background/90 p-4 rounded-lg">
-              <Move className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Upload images or videos and drag them to position over the page preview</p>
+        <div className="relative mx-auto" style={{ width: '1440px', minHeight: '800px' }}>
+          {/* Background: Show all page elements as reference */}
+          <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
+            <div className="min-h-screen bg-background">
+              {allElements.map((el) => (
+                <div key={el.id} className="p-4 border-b border-border/20">
+                  <div className="text-xs text-muted-foreground mb-1">{el.section_label}</div>
+                  {el.content_type === 'text' && (
+                    <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: el.published_value || el.content_value }} />
+                  )}
+                  {el.content_type === 'image' && el.content_value && (
+                    <img src={el.content_value} alt={el.section_label} className="max-w-full h-auto" />
+                  )}
+                  {el.content_type === 'video' && el.content_value && (
+                    <video src={el.content_value} className="max-w-full h-auto" controls />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-        )}
 
-        {elements.map((element) => (
+          {/* Nav bar placeholder to show where it will be on live site */}
+          <div className="absolute top-0 left-0 right-0 h-16 bg-black/80 border-b-2 border-primary/50 pointer-events-none z-[100] flex items-center justify-center">
+            <span className="text-xs text-white/70">Desktop Preview (1440px wide) - Navigation Bar Area (64px)</span>
+          </div>
+          
+          {elements.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm pointer-events-none">
+              <div className="text-center bg-background/90 p-4 rounded-lg">
+                <Move className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Upload images or videos and drag them to position over the page preview</p>
+                <p className="text-xs mt-2">Preview is 1440px wide (desktop size)</p>
+              </div>
+            </div>
+          )}
+
+          {elements.map((element) => (
           <div
             key={element.id}
             className={`absolute cursor-move group ${
@@ -363,11 +365,12 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
               />
             )}
           </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground mt-2">
-        Click to select, drag to move, use bottom-right corner to resize
+        Desktop preview (1440px wide) - Position elements where you want them to appear on desktop screens. Scroll horizontally to see the full width.
       </p>
     </Card>
   );
