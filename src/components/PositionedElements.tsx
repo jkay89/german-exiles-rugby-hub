@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-interface PositionedElement {
+interface FlowElement {
   id: string;
+  section_key: string;
+  section_label: string;
   content_type: string;
   content_value: string;
   published_value: string;
-  position_x: number;
-  position_y: number;
   position_width: number;
   position_height: number;
-  position_z_index: number;
-  section_label: string;
+  display_order: number;
 }
 
 interface PositionedElementsProps {
@@ -19,21 +18,20 @@ interface PositionedElementsProps {
 }
 
 export const PositionedElements = ({ page }: PositionedElementsProps) => {
-  const [elements, setElements] = useState<PositionedElement[]>([]);
+  const [elements, setElements] = useState<FlowElement[]>([]);
 
   useEffect(() => {
     loadElements();
 
-    // Subscribe to realtime changes
     const channel = supabase
-      .channel('positioned-elements-changes')
+      .channel(`site_content_flow_${page}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'site_content',
-          filter: `page=eq.${page},is_positioned=eq.true`,
+          filter: `page=eq.${page}`,
         },
         () => {
           loadElements();
@@ -53,10 +51,10 @@ export const PositionedElements = ({ page }: PositionedElementsProps) => {
       .eq('page', page)
       .eq('is_positioned', true)
       .eq('is_published', true)
-      .order('position_z_index');
+      .order('display_order');
 
     if (error) {
-      console.error("Error loading positioned elements:", error);
+      console.error("Error loading flow elements:", error);
       return;
     }
 
@@ -66,36 +64,33 @@ export const PositionedElements = ({ page }: PositionedElementsProps) => {
   if (elements.length === 0) return null;
 
   return (
-    <>
+    <div className="w-full space-y-6 py-8">
       {elements.map((element) => (
         <div
           key={element.id}
-          className="absolute pointer-events-auto"
+          className="mx-auto"
           style={{
-            left: `${element.position_x}px`,
-            top: `${element.position_y}px`,
             width: `${element.position_width}px`,
-            height: `${element.position_height}px`,
-            zIndex: element.position_z_index,
+            minHeight: `${element.position_height}px`,
+            maxWidth: '100%',
           }}
         >
           {element.content_type === 'image' ? (
             <img
               src={element.published_value || element.content_value}
               alt={element.section_label}
-              className="w-full h-full object-contain rounded shadow-lg"
-              draggable={false}
+              className="w-full h-full object-contain"
             />
           ) : element.content_type === 'video' ? (
             <video
               src={element.published_value || element.content_value}
-              className="w-full h-full object-contain rounded shadow-lg"
+              className="w-full h-full object-contain"
               controls
               playsInline
             />
           ) : null}
         </div>
       ))}
-    </>
+    </div>
   );
 };
