@@ -224,8 +224,55 @@ const AdminSiteEditor = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Editor Panel */}
+        <div className="space-y-6">
+          {/* Preview Panel - Now at top */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Preview</CardTitle>
+                  <CardDescription>
+                    {visualMode 
+                      ? "Drag images/videos to position them exactly where you want"
+                      : "See how changes will look on the live site"}
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="visual-mode" className="text-sm">
+                    Visual Editor
+                  </Label>
+                  <Switch
+                    id="visual-mode"
+                    checked={visualMode}
+                    onCheckedChange={setVisualMode}
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {visualMode ? (
+                <VisualPreview
+                  page={activeTab}
+                  onElementsChange={() => loadPageContent(activeTab)}
+                />
+              ) : (
+                <>
+                  <div className="border rounded-lg overflow-hidden bg-background">
+                    <iframe
+                      src={`/${activeTab === 'home' ? '' : activeTab}`}
+                      className="w-full h-[600px]"
+                      title="Site Preview"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Preview shows published content. Save and publish to see your changes.
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Editor Panel - Now at bottom */}
           <Card>
             <CardHeader>
               <CardTitle>Content Editor</CardTitle>
@@ -298,53 +345,6 @@ const AdminSiteEditor = () => {
                   )}
                 </TabsContent>
               </Tabs>
-            </CardContent>
-          </Card>
-
-          {/* Preview Panel */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Preview</CardTitle>
-                  <CardDescription>
-                    {visualMode 
-                      ? "Drag images/videos to position them exactly where you want"
-                      : "See how changes will look on the live site"}
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="visual-mode" className="text-sm">
-                    Visual Editor
-                  </Label>
-                  <Switch
-                    id="visual-mode"
-                    checked={visualMode}
-                    onCheckedChange={setVisualMode}
-                  />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {visualMode ? (
-                <VisualPreview
-                  page={activeTab}
-                  onElementsChange={() => loadPageContent(activeTab)}
-                />
-              ) : (
-                <>
-                  <div className="border rounded-lg overflow-hidden bg-background">
-                    <iframe
-                      src={`/${activeTab === 'home' ? '' : activeTab}`}
-                      className="w-full h-[600px]"
-                      title="Site Preview"
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Preview shows published content. Save and publish to see your changes.
-                  </p>
-                </>
-              )}
             </CardContent>
           </Card>
         </div>
