@@ -13,8 +13,11 @@ export const PageWithPositionedElements = ({
   className = "pt-16 min-h-screen bg-black" 
 }: PageWithPositionedElementsProps) => {
   return (
-    <div className={className}>
-      <PositionedElements page={page} />
+    <div className={`relative ${className}`}>
+      {/* 1440px max-width container for consistent positioning with visual editor */}
+      <div className="relative mx-auto" style={{ maxWidth: '1440px' }}>
+        <PositionedElements page={page} />
+      </div>
       {children}
     </div>
   );

@@ -1,36 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GripVertical, Trash2, Upload, Video } from "lucide-react";
+import { Maximize2, Move, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadContentImage } from "@/utils/siteContentUtils";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { FlowElement } from "./FlowElement";
 
-interface FlowElementData {
+interface PositionedElement {
   id: string;
   section_key: string;
   section_label: string;
   content_type: string;
   content_value: string;
+  position_x: number;
+  position_y: number;
   position_width: number;
   position_height: number;
-  display_order: number;
+  position_z_index: number;
 }
 
 interface VisualPreviewProps {
@@ -39,32 +25,29 @@ interface VisualPreviewProps {
 }
 
 export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) => {
-  const [elements, setElements] = useState<FlowElementData[]>([]);
+  const [elements, setElements] = useState<PositionedElement[]>([]);
   const [allElements, setAllElements] = useState<any[]>([]);
+  const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  const [dragging, setDragging] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [uploading, setUploading] = useState(false);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadFlowElements();
+    loadPositionedElements();
     loadAllElements();
   }, [page]);
 
-  const loadFlowElements = async () => {
+  const loadPositionedElements = async () => {
     const { data, error } = await supabase
       .from('site_content')
       .select('*')
       .eq('page', page)
       .eq('is_positioned', true)
-      .order('display_order');
+      .order('position_z_index');
 
     if (error) {
-      console.error("Error loading flow elements:", error);
+      console.error("Error loading positioned elements:", error);
       return;
     }
 
@@ -87,48 +70,60 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
     setAllElements(data || []);
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleMouseDown = (e: React.MouseEvent, elementId: string) => {
+    if (e.button !== 0) return; // Only left click
+    
+    const element = elements.find(el => el.id === elementId);
+    if (!element) return;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = elements.findIndex((el) => el.id === active.id);
-      const newIndex = elements.findIndex((el) => el.id === over.id);
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setDragging(elementId);
+    setSelectedElement(elementId);
+  };
 
-      const reorderedElements = arrayMove(elements, oldIndex, newIndex);
-      setElements(reorderedElements);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragging || !containerRef.current) return;
 
-      // Update display_order for all affected elements
-      const updates = reorderedElements.map((el, index) => ({
-        id: el.id,
-        display_order: index,
-      }));
+    const container = containerRef.current.getBoundingClientRect();
+    const newX = e.clientX - container.left - dragOffset.x;
+    const newY = e.clientY - container.top - dragOffset.y;
 
-      for (const update of updates) {
-        await supabase
-          .from('site_content')
-          .update({ display_order: update.display_order })
-          .eq('id', update.id);
-      }
+    setElements(prev =>
+      prev.map(el =>
+        el.id === dragging
+          ? { ...el, position_x: Math.round(Math.max(0, newX)), position_y: Math.round(Math.max(64, newY)) }
+          : el
+      )
+    );
+  };
 
-      toast.success("Order updated");
-      onElementsChange();
+  const handleMouseUp = async () => {
+    if (!dragging) return;
+
+    const element = elements.find(el => el.id === dragging);
+    if (element) {
+      await supabase
+        .from('site_content')
+        .update({
+          position_x: Math.round(element.position_x),
+          position_y: Math.round(element.position_y),
+        })
+        .eq('id', element.id);
+
+      toast.success("Position updated");
     }
+
+    setDragging(null);
   };
 
   const handleResize = async (elementId: string, width: number, height: number) => {
     const roundedWidth = Math.round(width);
     const roundedHeight = Math.round(height);
     
-    // Update local state immediately for smooth resizing
-    setElements(prev =>
-      prev.map(el =>
-        el.id === elementId
-          ? { ...el, position_width: roundedWidth, position_height: roundedHeight }
-          : el
-      )
-    );
-
-    // Debounced database update
     await supabase
       .from('site_content')
       .update({
@@ -137,6 +132,15 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
       })
       .eq('id', elementId);
 
+    setElements(prev =>
+      prev.map(el =>
+        el.id === elementId
+          ? { ...el, position_width: roundedWidth, position_height: roundedHeight }
+          : el
+      )
+    );
+
+    toast.success("Size updated");
     onElementsChange();
   };
 
@@ -156,16 +160,11 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
     try {
       const url = await uploadContentImage(file);
       
-      // Get max display_order
-      const maxOrder = elements.length > 0 
-        ? Math.max(...elements.map(el => el.display_order || 0))
-        : 0;
-      
-      // Create new flow element
+      // Create new positioned element
       const { data, error } = await supabase
         .from('site_content')
         .insert({
-          section_key: `flow_${type}_${Date.now()}`,
+          section_key: `positioned_${type}_${Date.now()}`,
           section_label: `${type === 'image' ? 'Image' : 'Video'} Element`,
           page,
           content_type: type,
@@ -173,16 +172,19 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
           published_value: url,
           is_published: true,
           is_positioned: true,
-          position_width: 800,
-          position_height: type === 'image' ? 450 : 450,
-          display_order: maxOrder + 1,
+          position_x: 100,
+          position_y: 150,
+          position_width: 300,
+          position_height: type === 'image' ? 200 : 169,
+          position_z_index: elements.length + 1,
+          display_order: 999,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      setElements(prev => [...prev, data as FlowElementData]);
+      setElements(prev => [...prev, data as PositionedElement]);
       toast.success(`${type === 'image' ? 'Image' : 'Video'} added`);
       onElementsChange();
     } catch (error) {
@@ -237,58 +239,145 @@ export const VisualPreview = ({ page, onElementsChange }: VisualPreviewProps) =>
         />
       </div>
 
-      <div className="border-2 border-dashed rounded-lg bg-background p-4">
-        {/* Background reference content */}
-        <div className="mb-4 p-4 bg-muted/30 rounded border border-border/50">
-          <p className="text-xs text-muted-foreground mb-2">Page Content Preview (Read-only)</p>
-          <div className="space-y-2 opacity-40">
-            {allElements.filter(el => !el.is_positioned).map((el) => (
-              <div key={el.id} className="p-2 border border-border/20 rounded text-xs">
-                {el.section_label}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Flow elements editor */}
-        <div className="relative min-h-[400px]">
-          {elements.length === 0 ? (
-            <div className="text-center text-muted-foreground py-20">
-              <Upload className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Upload images or videos</p>
-              <p className="text-xs mt-2">Elements will stack vertically and can be reordered by dragging</p>
+      <div
+        ref={containerRef}
+        className="relative border-2 border-dashed rounded-lg bg-background overflow-auto"
+        style={{ minHeight: '800px', height: '800px' }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div className="relative mx-auto" style={{ width: '1440px', minHeight: '800px' }}>
+          {/* Background: Show all page elements as reference */}
+          <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
+            <div className="min-h-screen bg-background">
+              {allElements.map((el) => (
+                <div key={el.id} className="p-4 border-b border-border/20">
+                  <div className="text-xs text-muted-foreground mb-1">{el.section_label}</div>
+                  {el.content_type === 'text' && (
+                    <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: el.published_value || el.content_value }} />
+                  )}
+                  {el.content_type === 'image' && el.content_value && (
+                    <img src={el.content_value} alt={el.section_label} className="max-w-full h-auto" />
+                  )}
+                  {el.content_type === 'video' && el.content_value && (
+                    <video src={el.content_value} className="max-w-full h-auto" controls />
+                  )}
+                </div>
+              ))}
             </div>
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={elements.map(el => el.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {elements.map((element) => (
-                  <FlowElement
-                    key={element.id}
-                    id={element.id}
-                    section_label={element.section_label}
-                    content_type={element.content_type}
-                    content_value={element.content_value}
-                    position_width={element.position_width}
-                    position_height={element.position_height}
-                    onDelete={handleDelete}
-                    onResize={handleResize}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
+          </div>
+
+          {/* Nav bar placeholder to show where it will be on live site */}
+          <div className="absolute top-0 left-0 right-0 h-16 bg-black/80 border-b-2 border-primary/50 pointer-events-none z-[100] flex items-center justify-center">
+            <span className="text-xs text-white/70">Desktop Preview (1440px wide) - Navigation Bar Area (64px)</span>
+          </div>
+          
+          {elements.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm pointer-events-none">
+              <div className="text-center bg-background/90 p-4 rounded-lg">
+                <Move className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Upload images or videos and drag them to position over the page preview</p>
+                <p className="text-xs mt-2">Preview is 1440px wide (desktop size)</p>
+              </div>
+            </div>
           )}
+
+          {elements.map((element) => (
+          <div
+            key={element.id}
+            className={`absolute cursor-move group border-2 ${
+              selectedElement === element.id 
+                ? 'ring-2 ring-primary border-primary' 
+                : 'border-yellow-500/50 hover:border-yellow-500'
+            }`}
+            style={{
+              left: `${element.position_x}px`,
+              top: `${element.position_y}px`,
+              width: `${element.position_width}px`,
+              height: `${element.position_height}px`,
+              zIndex: element.position_z_index,
+            }}
+            onMouseDown={(e) => handleMouseDown(e, element.id)}
+          >
+            {/* Show label for visibility */}
+            <div className="absolute top-0 left-0 bg-yellow-500/90 text-black text-xs px-1 py-0.5 rounded-br pointer-events-none z-10">
+              {element.section_label}
+            </div>
+            
+            {element.content_type === 'image' ? (
+              <img
+                src={element.content_value}
+                alt={element.section_label}
+                className="w-full h-full object-contain rounded"
+                draggable={false}
+              />
+            ) : (
+              <video
+                src={element.content_value}
+                className="w-full h-full object-contain rounded"
+                controls
+              />
+            )}
+
+            {selectedElement === element.id && (
+              <div className="absolute top-0 right-0 flex gap-1 p-1 bg-background border rounded-bl">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => handleDelete(element.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+
+            {selectedElement === element.id && (
+              <div
+                className="absolute bottom-0 right-0 w-4 h-4 bg-primary cursor-se-resize"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const startWidth = element.position_width;
+                  const startHeight = element.position_height;
+                  let finalWidth = startWidth;
+                  let finalHeight = startHeight;
+
+                  const handleMouseMove = (moveEvent: MouseEvent) => {
+                    const deltaX = moveEvent.clientX - startX;
+                    const deltaY = moveEvent.clientY - startY;
+                    finalWidth = Math.max(100, startWidth + deltaX);
+                    finalHeight = Math.max(100, startHeight + deltaY);
+
+                    setElements(prev =>
+                      prev.map(el =>
+                        el.id === element.id
+                          ? { ...el, position_width: finalWidth, position_height: finalHeight }
+                          : el
+                      )
+                    );
+                  };
+
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    handleResize(element.id, finalWidth, finalHeight);
+                  };
+
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                }}
+              />
+            )}
+          </div>
+          ))}
         </div>
       </div>
 
       <p className="text-xs text-muted-foreground mt-2">
-        Elements stack vertically and push content below when resized. Drag the grip icon to reorder elements.
+        Desktop preview (1440px wide) - Position elements where you want them to appear on desktop screens. Scroll horizontally to see the full width.
       </p>
     </Card>
   );

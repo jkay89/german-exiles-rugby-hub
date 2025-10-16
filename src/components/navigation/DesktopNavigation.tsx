@@ -26,8 +26,9 @@ export const DesktopNavigation = () => {
           // Insert Teams dropdown after About Us
           if (index === 1) {
             return (
-              <div key={`group-${link.href}`} className="contents">
+              <>
                 <Link
+                  key={link.href}
                   to={link.href}
                   className={`${
                     isActive(link.href)
@@ -65,9 +66,12 @@ export const DesktopNavigation = () => {
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </>
             );
           }
+          
+          // Skip rendering About Us again since it's handled above
+          if (index === 1) return null;
 
           // Handle external links differently
           if (link.external) {
