@@ -123,7 +123,9 @@ export const LatestResultCard = () => {
             
             <div className="flex items-center justify-between">
               <div className="text-2xl font-bold">
-                {latestResult.team_score} - {latestResult.opponent_score}
+                {latestResult.is_home 
+                  ? `${latestResult.team_score} - ${latestResult.opponent_score}` 
+                  : `${latestResult.opponent_score} - ${latestResult.team_score}`}
               </div>
               <div className={`px-3 py-1 rounded-full text-sm font-bold ${getResultClass(latestResult)}`}>
                 {getResultText(latestResult)}
