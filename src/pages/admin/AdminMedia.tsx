@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client-extensions";
 import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import { MediaFolder, MediaItem, fetchMediaFolders } from "@/utils/mediaUtils";
 import { BulkUrlUpload } from "@/components/admin/BulkUrlUpload";
+import { BulkZipUpload } from "@/components/admin/BulkZipUpload";
 import { format } from "date-fns";
 import { Folder, Images, Plus, Trash2, Upload, Edit, X, Link as LinkIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -422,10 +423,14 @@ const AdminMedia = () => {
                 </div>
 
                 <Tabs defaultValue="local" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsList className="grid w-full grid-cols-3 mb-4">
                     <TabsTrigger value="local">
                       <Upload className="h-4 w-4 mr-2" />
                       Local Upload
+                    </TabsTrigger>
+                    <TabsTrigger value="zip">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Zip Upload
                     </TabsTrigger>
                     <TabsTrigger value="url">
                       <LinkIcon className="h-4 w-4 mr-2" />
@@ -460,6 +465,13 @@ const AdminMedia = () => {
                         </Button>
                       </label>
                     </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="zip">
+                    <BulkZipUpload 
+                      folderId={selectedFolder.id} 
+                      onUploadComplete={handleBulkUrlUpload}
+                    />
                   </TabsContent>
                   
                   <TabsContent value="url">
