@@ -463,6 +463,39 @@ export type Database = {
         }
         Relationships: []
       }
+      oauth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          provider: string
+          refresh_token: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider?: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_sponsors: {
         Row: {
           created_at: string
@@ -855,10 +888,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_first_admin: {
-        Args: { _user_email: string }
-        Returns: boolean
-      }
+      create_first_admin: { Args: { _user_email: string }; Returns: boolean }
       create_first_website_overlord: {
         Args: { _user_email: string }
         Returns: boolean
@@ -874,26 +904,11 @@ export type Database = {
         Args: { promo_name: string }
         Returns: undefined
       }
-      is_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      is_lottery_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      is_user_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      is_website_overlord: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
-      promote_to_admin: {
-        Args: { _user_email: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id?: string }; Returns: boolean }
+      is_lottery_admin: { Args: { _user_id?: string }; Returns: boolean }
+      is_user_admin: { Args: { _user_id?: string }; Returns: boolean }
+      is_website_overlord: { Args: { _user_id?: string }; Returns: boolean }
+      promote_to_admin: { Args: { _user_email: string }; Returns: boolean }
       promote_user: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -901,10 +916,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      trigger_automatic_draw: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      trigger_automatic_draw: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "website_overlord" | "admin" | "user" | "lottery_admin"
