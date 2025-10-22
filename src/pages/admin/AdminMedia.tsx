@@ -20,8 +20,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client-extensions";
 import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 import { MediaFolder, MediaItem, fetchMediaFolders } from "@/utils/mediaUtils";
+import { BulkUrlUpload } from "@/components/admin/BulkUrlUpload";
 import { format } from "date-fns";
-import { Folder, Images, Plus, Trash2, Upload, Edit, X } from "lucide-react";
+import { Folder, Images, Plus, Trash2, Upload, Edit, X, Link as LinkIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminMedia = () => {
   const { isAuthenticated } = useAdmin();
@@ -201,34 +203,51 @@ const AdminMedia = () => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
+        console.log(`Starting upload for: ${file.name}, size: ${file.size}, type: ${file.type}`);
+        
         // Upload to Cloudinary
-        const result = await uploadToCloudinary(file, 'media');
-        const fileUrl = result.url;
-        
-        // Determine file type (image or video)
-        const fileType = file.type.startsWith('image/') ? 'image' : 
-                        file.type.startsWith('video/') ? 'video' : 'other';
-        
-        // Create media item entry
-        const { error: itemError } = await supabase.rest
-          .from('media_items')
-          .insert([{
-            folder_id: folder.id,
-            url: fileUrl,
-            type: fileType,
-            title: file.name
-          }]);
-        
-        if (itemError) throw itemError;
-        
-        // Update folder thumbnail if needed and this is an image
-        if (!thumbnailUpdated && !folder.thumbnail_url && fileType === 'image') {
-          const { error: thumbError } = await supabase.rest
-            .from('media_folders')
-            .update({ thumbnail_url: fileUrl })
-            .eq('id', folder.id);
+        try {
+          const result = await uploadToCloudinary(file, 'media');
+          const fileUrl = result.url;
           
-          if (!thumbError) thumbnailUpdated = true;
+          console.log(`Upload successful: ${fileUrl}`);
+          
+          // Determine file type (image or video)
+          const fileType = file.type.startsWith('image/') ? 'image' : 
+                          file.type.startsWith('video/') ? 'video' : 'other';
+          
+          // Create media item entry
+          const { error: itemError } = await supabase.rest
+            .from('media_items')
+            .insert([{
+              folder_id: folder.id,
+              url: fileUrl,
+              type: fileType,
+              title: file.name
+            }]);
+          
+          if (itemError) {
+            console.error(`Database insert error for ${file.name}:`, itemError);
+            throw itemError;
+          }
+          
+          // Update folder thumbnail if needed and this is an image
+          if (!thumbnailUpdated && !folder.thumbnail_url && fileType === 'image') {
+            const { error: thumbError } = await supabase.rest
+              .from('media_folders')
+              .update({ thumbnail_url: fileUrl })
+              .eq('id', folder.id);
+            
+            if (!thumbError) thumbnailUpdated = true;
+          }
+        } catch (uploadError: any) {
+          console.error(`Upload error for ${file.name}:`, uploadError);
+          toast({
+            title: `Failed to upload ${file.name}`,
+            description: uploadError.message || "Upload failed",
+            variant: "destructive",
+          });
+          // Continue with next file instead of stopping
         }
         
         // Update progress
@@ -237,7 +256,7 @@ const AdminMedia = () => {
       
       toast({
         title: "Upload complete",
-        description: `${files.length} files uploaded successfully`,
+        description: `Files uploaded successfully`,
       });
       
       loadMediaItems(folder.id);
@@ -247,6 +266,7 @@ const AdminMedia = () => {
       }
       
     } catch (error: any) {
+      console.error("General upload error:", error);
       toast({
         title: "Error uploading files",
         description: error.message,
@@ -255,6 +275,13 @@ const AdminMedia = () => {
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
+    }
+  };
+
+  const handleBulkUrlUpload = () => {
+    if (selectedFolder) {
+      loadMediaItems(selectedFolder.id);
+      loadFolders();
     }
   };
 
@@ -382,7 +409,7 @@ const AdminMedia = () => {
 
           {/* Main Content Area */}
           <div className="md:col-span-3">
-            {selectedFolder ? (
+          {selectedFolder ? (
               <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
                 <div className="flex justify-between items-center mb-4">
                   <div>
@@ -392,43 +419,65 @@ const AdminMedia = () => {
                       {selectedFolder.description && ` - ${selectedFolder.description}`}
                     </p>
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      id="fileUpload"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                          handleFileUpload(selectedFolder, e.target.files);
-                          // Reset the input
-                          e.target.value = '';
-                        }
-                      }}
-                    />
-                    <label htmlFor="fileUpload">
-                      <Button 
-                        variant="outline" 
-                        className="cursor-pointer" 
-                        disabled={isUploading}
-                        onClick={() => document.getElementById('fileUpload')?.click()}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        {isUploading ? `Uploading ${uploadProgress}%` : "Upload Media"}
-                      </Button>
-                    </label>
-                  </div>
                 </div>
 
+                <Tabs defaultValue="local" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="local">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Local Upload
+                    </TabsTrigger>
+                    <TabsTrigger value="url">
+                      <LinkIcon className="h-4 w-4 mr-2" />
+                      URL Upload
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="local">
+                    <div className="flex justify-end mb-4">
+                      <input
+                        type="file"
+                        id="fileUpload"
+                        multiple
+                        accept="image/*,video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            handleFileUpload(selectedFolder, e.target.files);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <label htmlFor="fileUpload">
+                        <Button 
+                          variant="outline" 
+                          className="cursor-pointer" 
+                          disabled={isUploading}
+                          onClick={() => document.getElementById('fileUpload')?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          {isUploading ? `Uploading ${uploadProgress}%` : "Upload from Computer"}
+                        </Button>
+                      </label>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="url">
+                    <BulkUrlUpload 
+                      folderId={selectedFolder.id} 
+                      onUploadComplete={handleBulkUrlUpload}
+                    />
+                  </TabsContent>
+                </Tabs>
+
                 {mediaItems.length === 0 ? (
-                  <div className="text-center py-12">
+                  <div className="text-center py-12 mt-4">
                     <Images className="h-12 w-12 text-gray-600 mx-auto mb-3" />
                     <p className="text-gray-400">No media items in this folder</p>
                     <p className="text-gray-500 text-sm mt-2">Upload images or videos to get started</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                     {mediaItems.map((item) => (
                       <Card key={item.id} className="bg-gray-800 border-gray-700 overflow-hidden group relative">
                         <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
