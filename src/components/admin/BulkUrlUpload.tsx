@@ -24,25 +24,38 @@ export const BulkUrlUpload = ({ onUploadComplete, folderId }: BulkUrlUploadProps
   const [uploadStatuses, setUploadStatuses] = useState<UploadStatus[]>([]);
   const [progress, setProgress] = useState(0);
 
+  const isValidImageUrl = (url: string): boolean => {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+    const urlLower = url.toLowerCase();
+    return imageExtensions.some(ext => urlLower.includes(ext));
+  };
+
   const convertToDirectUrl = (url: string): string => {
     url = url.trim();
     
-    // Google Drive conversion
+    // Google Drive conversion - only for individual files
     if (url.includes('drive.google.com')) {
+      // Check if it's a folder link
+      if (url.includes('/folders/') || url.includes('folder')) {
+        throw new Error('Folder links not supported. Please provide individual file URLs.');
+      }
       const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
         return `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
       }
     }
     
-    // Dropbox conversion
+    // Dropbox conversion - only for individual files
     if (url.includes('dropbox.com')) {
-      return url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
+      // Check if it's a folder link
+      if (url.includes('/sh/') || !url.includes('/s/')) {
+        throw new Error('Folder links not supported. Please provide individual file URLs (right-click file → Copy link).');
+      }
+      return url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '?dl=1').replace('?dl=1', '');
     }
     
     // OneDrive conversion
     if (url.includes('1drv.ms') || url.includes('onedrive.live.com')) {
-      // OneDrive requires download parameter
       return url.includes('download=1') ? url : `${url}${url.includes('?') ? '&' : '?'}download=1`;
     }
     
@@ -67,10 +80,17 @@ export const BulkUrlUpload = ({ onUploadComplete, folderId }: BulkUrlUploadProps
     const { supabase } = await import("@/integrations/supabase/client");
 
     for (let i = 0; i < urlList.length; i++) {
-      const originalUrl = urlList[i];
-      const directUrl = convertToDirectUrl(originalUrl);
+      const originalUrl = urlList[i].trim();
       
       try {
+        // Validate URL points to an image
+        if (!isValidImageUrl(originalUrl) && !originalUrl.includes('drive.google.com') && !originalUrl.includes('dropbox.com')) {
+          throw new Error('URL must point to an image file (.jpg, .png, etc.)');
+        }
+
+        // Convert to direct download URL
+        const directUrl = convertToDirectUrl(originalUrl);
+        
         // Call Supabase edge function
         const { data: uploadData, error: uploadError } = await supabase.functions.invoke(
           "upload-from-url",
@@ -140,13 +160,14 @@ export const BulkUrlUpload = ({ onUploadComplete, folderId }: BulkUrlUploadProps
 
         <Alert className="bg-gray-900 border-gray-700">
           <AlertDescription className="text-gray-400 text-sm">
-            <strong className="text-white">Supported sources:</strong>
+            <strong className="text-white">⚠️ Important: Individual file URLs only</strong>
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Google Drive: Share link or file URL</li>
-              <li>Dropbox: Shared file link</li>
-              <li>OneDrive: Shared file link</li>
-              <li>Direct URLs: Any publicly accessible file URL</li>
+              <li><strong>Google Drive:</strong> Open file → Right-click → "Get link" → Make sure it's a single file link (contains /d/FILE_ID)</li>
+              <li><strong>Dropbox:</strong> Right-click file → "Copy link" (NOT folder share link)</li>
+              <li><strong>OneDrive:</strong> Individual file share link only</li>
+              <li><strong>Direct URLs:</strong> Must end with image extension (.jpg, .png, etc.)</li>
             </ul>
+            <p className="mt-2 text-yellow-400">❌ Folder/album links will NOT work. You need individual file URLs, one per line.</p>
           </AlertDescription>
         </Alert>
 

@@ -43,6 +43,19 @@ serve(async (req) => {
     }
 
     const fileBlob = await fileResponse.blob();
+    
+    // Check if content is actually an image or video, not HTML
+    const contentType = fileBlob.type;
+    console.log(`Downloaded content type: ${contentType}, size: ${fileBlob.size}`);
+    
+    if (contentType.includes('text/html') || contentType.includes('text/plain')) {
+      throw new Error('URL returned a web page instead of a file. Make sure you are using a direct file download link, not a folder or preview link.');
+    }
+    
+    if (!contentType.startsWith('image/') && !contentType.startsWith('video/')) {
+      throw new Error(`Invalid file type: ${contentType}. Only images and videos are supported. Make sure the URL points directly to a media file.`);
+    }
+    
     const arrayBuffer = await fileBlob.arrayBuffer();
     
     // Get filename from URL or use timestamp
