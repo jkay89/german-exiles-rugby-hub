@@ -38,6 +38,7 @@ const AdminMedia = () => {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -197,27 +198,33 @@ const AdminMedia = () => {
     setIsUploading(true);
     setUploadProgress(0);
     
+    const successfulUploads: string[] = [];
+    const failedUploads: string[] = [];
+    
     try {
-      // Update thumbnail if the folder doesn't have one yet
       let thumbnailUpdated = false;
       
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
-        console.log(`Starting upload for: ${file.name}, size: ${file.size}, type: ${file.type}`);
-        
-        // Upload to Cloudinary
         try {
-          const result = await uploadToCloudinary(file, 'media');
-          const fileUrl = result.url;
+          console.log(`Starting upload ${i + 1}/${files.length}: ${file.name}`);
           
+          // Upload to Cloudinary with better error handling
+          const result = await uploadToCloudinary(file, 'media');
+          
+          if (!result || !result.url) {
+            throw new Error('Upload did not return a valid URL');
+          }
+          
+          const fileUrl = result.url;
           console.log(`Upload successful: ${fileUrl}`);
           
-          // Determine file type (image or video)
+          // Determine file type
           const fileType = file.type.startsWith('image/') ? 'image' : 
                           file.type.startsWith('video/') ? 'video' : 'other';
           
-          // Create media item entry
+          // Create media item entry with retry logic
           const { error: itemError } = await supabase.rest
             .from('media_items')
             .insert([{
@@ -229,10 +236,12 @@ const AdminMedia = () => {
           
           if (itemError) {
             console.error(`Database insert error for ${file.name}:`, itemError);
-            throw itemError;
+            throw new Error(`Database error: ${itemError.message}`);
           }
           
-          // Update folder thumbnail if needed and this is an image
+          successfulUploads.push(file.name);
+          
+          // Auto-set thumbnail if needed
           if (!thumbnailUpdated && !folder.thumbnail_url && fileType === 'image') {
             const { error: thumbError } = await supabase.rest
               .from('media_folders')
@@ -241,30 +250,30 @@ const AdminMedia = () => {
             
             if (!thumbError) thumbnailUpdated = true;
           }
+          
         } catch (uploadError: any) {
-          console.error(`Upload error for ${file.name}:`, uploadError);
+          console.error(`Upload failed for ${file.name}:`, uploadError);
+          failedUploads.push(file.name);
           toast({
-            title: `Failed to upload ${file.name}`,
+            title: `Failed: ${file.name}`,
             description: uploadError.message || "Upload failed",
             variant: "destructive",
           });
-          // Continue with next file instead of stopping
         }
         
-        // Update progress
         setUploadProgress(Math.round(((i + 1) / files.length) * 100));
       }
       
-      toast({
-        title: "Upload complete",
-        description: `Files uploaded successfully`,
-      });
+      // Show summary
+      if (successfulUploads.length > 0) {
+        toast({
+          title: "Upload complete",
+          description: `${successfulUploads.length} file(s) uploaded successfully${failedUploads.length > 0 ? `, ${failedUploads.length} failed` : ''}`,
+        });
+      }
       
       loadMediaItems(folder.id);
-      
-      if (thumbnailUpdated) {
-        loadFolders();
-      }
+      if (thumbnailUpdated) loadFolders();
       
     } catch (error: any) {
       console.error("General upload error:", error);
@@ -276,6 +285,68 @@ const AdminMedia = () => {
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
+    }
+  };
+
+  const handleSetThumbnail = async (imageUrl: string) => {
+    if (!selectedFolder) return;
+    
+    try {
+      const { error } = await supabase.rest
+        .from('media_folders')
+        .update({ thumbnail_url: imageUrl })
+        .eq('id', selectedFolder.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Thumbnail updated",
+        description: "Folder thumbnail has been updated",
+      });
+      
+      setSelectedFolder({ ...selectedFolder, thumbnail_url: imageUrl });
+      loadFolders();
+    } catch (error: any) {
+      toast({
+        title: "Error updating thumbnail",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditFolder = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingFolder) return;
+    
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const { error } = await supabase.rest
+        .from('media_folders')
+        .update({
+          title: formData.get('title') as string,
+          description: formData.get('description') as string,
+          date: formData.get('date') as string,
+        })
+        .eq('id', editingFolder.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Folder updated",
+        description: "Media folder has been updated successfully",
+      });
+      
+      loadFolders();
+      setEditingFolder(null);
+      
+    } catch (error: any) {
+      toast({
+        title: "Error updating folder",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -413,13 +484,21 @@ const AdminMedia = () => {
           {selectedFolder ? (
               <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <div>
+                  <div className="flex-1">
                     <h2 className="text-xl font-bold text-white">{selectedFolder.title}</h2>
                     <p className="text-gray-400 text-sm">
                       {format(new Date(selectedFolder.date), "MMMM dd, yyyy")}
                       {selectedFolder.description && ` - ${selectedFolder.description}`}
                     </p>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingFolder(selectedFolder)}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
                 </div>
 
                 <Tabs defaultValue="local" className="w-full">
@@ -490,40 +569,59 @@ const AdminMedia = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                    {mediaItems.map((item) => (
-                      <Card key={item.id} className="bg-gray-800 border-gray-700 overflow-hidden group relative">
-                        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="h-7 w-7 p-0"
-                            onClick={() => setItemToDelete(item.id)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        {item.type === 'image' ? (
-                          <div className="aspect-square bg-gray-700">
-                            <img
-                              src={item.url}
-                              alt={item.title || "Media item"}
-                              className="w-full h-full object-cover"
-                            />
+                    {mediaItems.map((item) => {
+                      const isThumbnail = selectedFolder.thumbnail_url === item.url;
+                      return (
+                        <Card key={item.id} className={`bg-gray-800 overflow-hidden group relative ${isThumbnail ? 'ring-2 ring-german-gold' : 'border-gray-700'}`}>
+                          <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {item.type === 'image' && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="h-7 px-2"
+                                onClick={() => handleSetThumbnail(item.url)}
+                                title="Set as folder thumbnail"
+                              >
+                                <Folder className="h-3 w-3" />
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 w-7 p-0"
+                              onClick={() => setItemToDelete(item.id)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
-                        ) : (
-                          <div className="aspect-square bg-gray-700 flex items-center justify-center">
-                            <video
-                              src={item.url}
-                              className="w-full h-full object-cover"
-                            />
-                            <Play className="h-12 w-12 text-white absolute" />
-                          </div>
-                        )}
-                        <CardContent className="p-2">
-                          <p className="text-xs text-gray-400 truncate">{item.title}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          {isThumbnail && (
+                            <div className="absolute top-2 left-2 z-10 bg-german-gold text-black text-xs px-2 py-1 rounded-sm font-bold">
+                              THUMBNAIL
+                            </div>
+                          )}
+                          {item.type === 'image' ? (
+                            <div className="aspect-square bg-gray-700">
+                              <img
+                                src={item.url}
+                                alt={item.title || "Media item"}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="aspect-square bg-gray-700 flex items-center justify-center relative">
+                              <video
+                                src={item.url}
+                                className="w-full h-full object-cover"
+                              />
+                              <Play className="h-12 w-12 text-white absolute" />
+                            </div>
+                          )}
+                          <CardContent className="p-2">
+                            <p className="text-xs text-gray-400 truncate">{item.title}</p>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -581,6 +679,72 @@ const AdminMedia = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Folder Dialog */}
+      <Dialog open={!!editingFolder} onOpenChange={(open) => !open && setEditingFolder(null)}>
+        <DialogContent className="bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Edit Media Folder</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditFolder}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">Title</Label>
+                <Input 
+                  id="edit-title" 
+                  name="title" 
+                  defaultValue={editingFolder?.title}
+                  className="bg-gray-800 border-gray-700 text-white" 
+                  required 
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-description">Description</Label>
+                <Input 
+                  id="edit-description" 
+                  name="description" 
+                  defaultValue={editingFolder?.description || ''}
+                  className="bg-gray-800 border-gray-700 text-white" 
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-date">Date</Label>
+                <Input 
+                  id="edit-date" 
+                  name="date" 
+                  type="date" 
+                  defaultValue={editingFolder?.date}
+                  className="bg-gray-800 border-gray-700 text-white" 
+                  required 
+                />
+              </div>
+              {editingFolder?.thumbnail_url && (
+                <div>
+                  <Label>Current Thumbnail</Label>
+                  <div className="mt-2 relative w-32 h-32 rounded border border-gray-700">
+                    <img 
+                      src={editingFolder.thumbnail_url} 
+                      alt="Folder thumbnail" 
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Tip: You can change the thumbnail by clicking the folder icon on any image in the folder
+                  </p>
+                </div>
+              )}
+            </div>
+            <DialogFooter className="mt-4">
+              <Button type="button" variant="outline" onClick={() => setEditingFolder(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-german-red hover:bg-german-gold">
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
