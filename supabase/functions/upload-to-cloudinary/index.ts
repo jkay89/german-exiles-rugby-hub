@@ -35,10 +35,12 @@ serve(async (req) => {
     
     console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}, resourceType: ${resourceType}`);
 
-    // Hard limit to prevent memory issues - reject files over 10MB upfront
-    const maxFileSize = 10 * 1024 * 1024;
-    if (file.size > maxFileSize) {
-      throw new Error(`File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB. Please compress or resize the image before uploading.`);
+    // Hard limit for non-image files (images will be compressed)
+    if (!isImage) {
+      const maxFileSize = 10 * 1024 * 1024;
+      if (file.size > maxFileSize) {
+        throw new Error(`File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB for non-image files.`);
+      }
     }
 
     // Convert file to array buffer
