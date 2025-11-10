@@ -199,7 +199,7 @@ const AdminMedia = () => {
     setUploadProgress(0);
     
     const successfulUploads: string[] = [];
-    const failedUploads: string[] = [];
+    const failedUploads: Array<{ name: string; error: string }> = [];
     
     try {
       let thumbnailUpdated = false;
@@ -208,23 +208,36 @@ const AdminMedia = () => {
         const file = files[i];
         
         try {
-          console.log(`Starting upload ${i + 1}/${files.length}: ${file.name}`);
+          console.log(`[Upload ${i + 1}/${files.length}] Starting: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
           
-          // Upload to Cloudinary with better error handling
-          const result = await uploadToCloudinary(file, 'media');
+          // Upload to Cloudinary with detailed error logging
+          let result;
+          try {
+            result = await uploadToCloudinary(file, 'media');
+          } catch (cloudinaryError: any) {
+            console.error(`[Cloudinary Error] ${file.name}:`, {
+              message: cloudinaryError.message,
+              stack: cloudinaryError.stack,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type
+            });
+            throw new Error(`Upload service error: ${cloudinaryError.message}`);
+          }
           
           if (!result || !result.url) {
-            throw new Error('Upload did not return a valid URL');
+            throw new Error('Upload service did not return a valid URL');
           }
           
           const fileUrl = result.url;
-          console.log(`Upload successful: ${fileUrl}`);
+          console.log(`[Upload Success] ${file.name} -> ${fileUrl}`);
           
           // Determine file type
           const fileType = file.type.startsWith('image/') ? 'image' : 
                           file.type.startsWith('video/') ? 'video' : 'other';
           
-          // Create media item entry with retry logic
+          // Create media item entry
+          console.log(`[Database Insert] Creating media_items record for ${file.name}`);
           const { error: itemError } = await supabase.rest
             .from('media_items')
             .insert([{
@@ -235,10 +248,16 @@ const AdminMedia = () => {
             }]);
           
           if (itemError) {
-            console.error(`Database insert error for ${file.name}:`, itemError);
+            console.error(`[Database Error] ${file.name}:`, {
+              code: itemError.code,
+              message: itemError.message,
+              details: itemError.details,
+              hint: itemError.hint
+            });
             throw new Error(`Database error: ${itemError.message}`);
           }
           
+          console.log(`[Complete] ${file.name} uploaded and saved successfully`);
           successfulUploads.push(file.name);
           
           // Auto-set thumbnail if needed
@@ -248,23 +267,22 @@ const AdminMedia = () => {
               .update({ thumbnail_url: fileUrl })
               .eq('id', folder.id);
             
-            if (!thumbError) thumbnailUpdated = true;
+            if (!thumbError) {
+              thumbnailUpdated = true;
+              console.log(`[Thumbnail] Auto-set thumbnail for folder: ${folder.title}`);
+            }
           }
           
         } catch (uploadError: any) {
-          console.error(`Upload failed for ${file.name}:`, uploadError);
-          failedUploads.push(file.name);
-          toast({
-            title: `Failed: ${file.name}`,
-            description: uploadError.message || "Upload failed",
-            variant: "destructive",
-          });
+          const errorMessage = uploadError.message || "Unknown error";
+          console.error(`[Failed] ${file.name}:`, errorMessage);
+          failedUploads.push({ name: file.name, error: errorMessage });
         }
         
         setUploadProgress(Math.round(((i + 1) / files.length) * 100));
       }
       
-      // Show summary
+      // Show summary with detailed error info
       if (successfulUploads.length > 0) {
         toast({
           title: "Upload complete",
@@ -272,11 +290,23 @@ const AdminMedia = () => {
         });
       }
       
+      if (failedUploads.length > 0) {
+        console.error('[Upload Summary] Failed uploads:', failedUploads);
+        failedUploads.forEach(failure => {
+          toast({
+            title: `Failed: ${failure.name}`,
+            description: failure.error,
+            variant: "destructive",
+            duration: 5000,
+          });
+        });
+      }
+      
       loadMediaItems(folder.id);
       if (thumbnailUpdated) loadFolders();
       
     } catch (error: any) {
-      console.error("General upload error:", error);
+      console.error("[General Upload Error]", error);
       toast({
         title: "Error uploading files",
         description: error.message,
