@@ -20,6 +20,7 @@ import Fixtures from "./pages/Fixtures";
 import NRLD from "./pages/NRLD";
 import Sponsors from "./pages/Sponsors";
 import Contact from "./pages/Contact";
+import FAQs from "./pages/FAQs";
 import News from "./pages/News";
 import NewsArticle from "./pages/NewsArticle";
 import Media from "./pages/Media";
@@ -44,6 +45,7 @@ import AdminDocuments from "./pages/admin/AdminDocuments";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCoaching from "./pages/admin/AdminCoaching";
+import AdminFAQs from "./pages/admin/AdminFAQs";
 import CloudinaryMigration from "./pages/admin/CloudinaryMigration";
 import MediaCompression from "./pages/admin/MediaCompression";
 import AdminSiteEditor from "./pages/admin/AdminSiteEditor";
@@ -94,6 +96,7 @@ const App = () => (
                 <Route path="/nrld" element={<NRLD />} />
                 <Route path="/sponsors" element={<Sponsors />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/faqs" element={<FAQs />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsArticle />} />
                 <Route path="/media" element={<Media />} />
@@ -118,6 +121,7 @@ const App = () => (
                 <Route path="/admin/documents" element={<AdminDocuments />} />
                 <Route path="/admin/lottery" element={<AdminLottery />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/faqs" element={<AdminFAQs />} />
                 <Route path="/admin/site-editor" element={<AdminSiteEditor />} />
                 <Route path="/admin/cloudinary-migration" element={<CloudinaryMigration />} />
                 <Route path="/admin/media-compression" element={<MediaCompression />} />

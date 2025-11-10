@@ -15,6 +15,7 @@ export const useNavigationLinks = () => {
     { href: "/nrld", label: t("nrld") },
     { href: "/sponsors", label: t("sponsors") },
     { href: "/contact", label: t("contact") },
+    { href: "/faqs", label: t("faqs") },
     { href: "https://www.youtube.com/c/DavidGrayTV", label: t("live_stream"), external: true },
   ];
 
