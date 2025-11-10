@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { compressImage } from "./imageCompression";
 
 export interface CloudinaryUploadResult {
   url: string;
@@ -21,8 +22,20 @@ export const uploadToCloudinary = async (
   try {
     console.log(`[Cloudinary] Preparing upload for ${file.name} (${file.type}, ${(file.size / 1024 / 1024).toFixed(2)}MB)`);
     
+    // Compress image files on client side before upload
+    let fileToUpload = file;
+    if (file.type.startsWith('image/') && file.size > 2 * 1024 * 1024) {
+      try {
+        console.log(`[Cloudinary] Compressing image...`);
+        fileToUpload = await compressImage(file, 2, 1920);
+        console.log(`[Cloudinary] Compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+      } catch (compressionError) {
+        console.warn('[Cloudinary] Compression failed, uploading original:', compressionError);
+      }
+    }
+    
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileToUpload);
     formData.append("folder", folder);
 
     console.log(`[Cloudinary] Invoking edge function...`);
