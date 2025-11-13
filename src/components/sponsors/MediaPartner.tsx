@@ -2,14 +2,24 @@
 import SponsorTierHeader from "./SponsorTierHeader";
 import SponsorCard from "./SponsorCard";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { sponsorData } from "@/data/sponsorData";
 
-const MediaPartner = () => {
+interface Sponsor {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website_url: string | null;
+  tier: string;
+  description: string | null;
+}
+
+interface MediaPartnerProps {
+  sponsors: Sponsor[];
+}
+
+const MediaPartner = ({ sponsors }: MediaPartnerProps) => {
   const { t } = useLanguage();
   
-  const mediaPartners = sponsorData.filter(sponsor => sponsor.tier === "media");
-  
-  if (mediaPartners.length === 0) return null;
+  if (sponsors.length === 0) return null;
   
   return (
     <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
@@ -17,13 +27,13 @@ const MediaPartner = () => {
         <SponsorTierHeader title={t("media_partner")} delay={0.6} />
         
         <div className="max-w-3xl mx-auto">
-          {mediaPartners.map((sponsor) => (
+          {sponsors.map((sponsor) => (
             <SponsorCard
               key={sponsor.id}
               name={sponsor.name}
-              description="Official media partner providing video content and coverage for German Exiles Rugby League events and matches."
-              logoSrc={sponsor.logo}
-              websiteUrl={sponsor.website || undefined}
+              description={sponsor.description || ''}
+              logoSrc={sponsor.logo_url || ''}
+              websiteUrl={sponsor.website_url || undefined}
               delay={0.7}
               isMajorSponsor={true}
               isMediaPartner={true}
