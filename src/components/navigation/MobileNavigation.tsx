@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ExternalLink } from "lucide-react";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useNavigationLinks } from "./NavigationLinks";
+import { getLotteryUrl } from "@/utils/subdomainUtils";
 
 export const MobileNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,9 +42,9 @@ export const MobileNavigation = () => {
               </Link>
             ))}
             
-            {/* Lottery Link - styled distinctively */}
-            <Link
-              to="/lottery"
+            {/* Lottery Link - points to subdomain */}
+            <a
+              href={getLotteryUrl()}
               className={`${
                 location.pathname.startsWith('/lottery')
                   ? "bg-german-gold text-black"
@@ -52,7 +53,7 @@ export const MobileNavigation = () => {
               onClick={() => setIsOpen(false)}
             >
               Lottery
-            </Link>
+            </a>
             
             {/* Club Shop External Link for Mobile */}
             <a 

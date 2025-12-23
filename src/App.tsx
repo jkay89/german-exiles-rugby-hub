@@ -61,13 +61,24 @@ Promise.all([
   seedInitialContent().catch(console.error)
 ]);
 
+// Check if we're on the lottery subdomain
+const isLotterySubdomain = (): boolean => {
+  const hostname = window.location.hostname;
+  return hostname === 'lottery.germanexilesrl.co.uk';
+};
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+    
+    // If on lottery subdomain and at root, redirect to lottery page
+    if (isLotterySubdomain() && pathname === '/') {
+      navigate('/lottery', { replace: true });
+    }
+  }, [pathname, navigate]);
 
   return null;
 }
