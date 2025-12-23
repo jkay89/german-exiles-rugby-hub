@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { getMainSiteUrl } from "@/utils/subdomainUtils";
 
 const LotteryNavigation = () => {
   const { user } = useAuth();
@@ -26,6 +27,12 @@ const LotteryNavigation = () => {
           </Link>
         </Button>
       )}
+      <a 
+        href={getMainSiteUrl()}
+        className="text-gray-400 hover:text-white transition-colors font-medium text-sm"
+      >
+        ← Main Site
+      </a>
     </div>
   );
 };

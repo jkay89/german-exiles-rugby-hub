@@ -10,6 +10,7 @@ import {
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useNavigationLinks } from "./NavigationLinks";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getLotteryUrl } from "@/utils/subdomainUtils";
 
 export const DesktopNavigation = () => {
   const location = useLocation();
@@ -88,9 +89,9 @@ export const DesktopNavigation = () => {
           );
         })}
         
-        {/* Lottery Link - styled distinctively */}
-        <Link
-          to="/lottery"
+        {/* Lottery Link - points to subdomain */}
+        <a
+          href={getLotteryUrl()}
           className={`${
             location.pathname.startsWith('/lottery')
               ? "bg-german-gold text-black"
@@ -98,7 +99,7 @@ export const DesktopNavigation = () => {
           } px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200`}
         >
           Lottery
-        </Link>
+        </a>
         
         {/* Club Shop External Link */}
         <a 
