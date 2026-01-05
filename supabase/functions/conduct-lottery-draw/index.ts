@@ -222,6 +222,16 @@ serve(async (req) => {
       }
     }
 
+    // Fetch the lucky dip winners count from settings
+    const { data: luckyDipCountSetting } = await supabaseClient
+      .from('lottery_settings')
+      .select('setting_value')
+      .eq('setting_key', 'lucky_dip_winners_count')
+      .maybeSingle();
+    
+    const luckyDipWinnersCount = luckyDipCountSetting ? Number(luckyDipCountSetting.setting_value) : 5;
+    console.log(`Lucky dip winners count setting: ${luckyDipWinnersCount}`);
+
     // Find all winners (jackpot and lucky dip)
     const { data: entries, error: entriesError } = await supabaseClient
       .from('lottery_entries')
@@ -244,7 +254,7 @@ serve(async (req) => {
 
     console.log(`Jackpot winners: ${jackpotWinners.length}`);
 
-    // Select 5 random lucky dip winners from all entries (excluding jackpot winners)
+    // Select random lucky dip winners from all entries (excluding jackpot winners)
     const eligibleForLuckyDip = entries?.filter(entry => 
       !jackpotWinners.some(winner => winner.id === entry.id)
     ) || [];
@@ -252,11 +262,11 @@ serve(async (req) => {
     const luckyDipWinners = [];
     const usedUserIds = new Set();
     
-    // Shuffle eligible entries and select up to 5 unique users
+    // Shuffle eligible entries and select up to configured number of unique users
     const shuffled = [...eligibleForLuckyDip].sort(() => 0.5 - Math.random());
     
     for (const entry of shuffled) {
-      if (luckyDipWinners.length >= 5) break;
+      if (luckyDipWinners.length >= luckyDipWinnersCount) break;
       if (!usedUserIds.has(entry.user_id)) {
         luckyDipWinners.push(entry);
         usedUserIds.add(entry.user_id);
