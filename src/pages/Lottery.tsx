@@ -13,29 +13,35 @@ import { DrawTabNavigation } from "@/components/lottery/DrawTabNavigation";
 const Lottery = () => {
   const { user } = useAuth();
   const [currentJackpot, setCurrentJackpot] = useState(1000);
+  const [luckyDipWinnersCount, setLuckyDipWinnersCount] = useState(5);
 
   useEffect(() => {
-    fetchCurrentJackpot();
+    fetchLotterySettings();
   }, []);
 
-  const fetchCurrentJackpot = async () => {
+  const fetchLotterySettings = async () => {
     try {
       const { data, error } = await supabase
         .from('lottery_settings')
-        .select('setting_value')
-        .eq('setting_key', 'current_jackpot')
-        .maybeSingle();
+        .select('setting_key, setting_value')
+        .in('setting_key', ['current_jackpot', 'lucky_dip_winners_count']);
 
       if (error) {
-        console.error('Error fetching current jackpot:', error);
+        console.error('Error fetching lottery settings:', error);
         return;
       }
       
       if (data) {
-        setCurrentJackpot(Number(data.setting_value));
+        data.forEach(setting => {
+          if (setting.setting_key === 'current_jackpot') {
+            setCurrentJackpot(Number(setting.setting_value));
+          } else if (setting.setting_key === 'lucky_dip_winners_count') {
+            setLuckyDipWinnersCount(Number(setting.setting_value));
+          }
+        });
       }
     } catch (error) {
-      console.error('Error fetching current jackpot:', error);
+      console.error('Error fetching lottery settings:', error);
     }
   };
 
@@ -133,7 +139,7 @@ const Lottery = () => {
                 <CardContent>
                   <p className="text-gray-400 text-center">
                     <strong>Jackpot:</strong> Match all 4 numbers<br/>
-                    <strong>Lucky Dip:</strong> 5 winners × £10 each month
+                    <strong>Lucky Dip:</strong> {luckyDipWinnersCount} winner{luckyDipWinnersCount !== 1 ? 's' : ''} × £10 each month
                   </p>
                 </CardContent>
               </Card>
@@ -198,7 +204,7 @@ const Lottery = () => {
                     the Lucky Dip draw. You could win multiple times!
                   </p>
                   <p className="font-semibold text-blue-400">
-                    5 winners each month × £10 each
+                    {luckyDipWinnersCount} winner{luckyDipWinnersCount !== 1 ? 's' : ''} each month × £10 each
                   </p>
                 </CardContent>
               </Card>

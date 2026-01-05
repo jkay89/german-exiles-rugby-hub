@@ -59,6 +59,8 @@ const AdminLottery = () => {
     usage_limit: null as number | null,
     expires_at: ""
   });
+  const [luckyDipWinnersCount, setLuckyDipWinnersCount] = useState(5);
+  const [newLuckyDipWinnersCount, setNewLuckyDipWinnersCount] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated && !adminLoading) {
@@ -71,7 +73,8 @@ const AdminLottery = () => {
       Promise.all([
         fetchDraws(),
         fetchCurrentJackpot(),
-        fetchPromoCodes()
+        fetchPromoCodes(),
+        fetchLuckyDipWinnersCount()
       ]).finally(() => {
         setLoading(false);
       });
@@ -138,6 +141,64 @@ const AdminLottery = () => {
       }
     } catch (error) {
       console.error('Error fetching current jackpot:', error);
+    }
+  };
+
+  const fetchLuckyDipWinnersCount = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'lucky_dip_winners_count')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setLuckyDipWinnersCount(Number(data.setting_value));
+        setNewLuckyDipWinnersCount(data.setting_value);
+      } else {
+        setLuckyDipWinnersCount(5);
+        setNewLuckyDipWinnersCount("5");
+      }
+    } catch (error) {
+      console.error('Error fetching lucky dip winners count:', error);
+    }
+  };
+
+  const updateLuckyDipWinnersCount = async () => {
+    if (!newLuckyDipWinnersCount || Number(newLuckyDipWinnersCount) < 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid number of lucky dip winners",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('lottery_settings')
+        .upsert({
+          setting_key: 'lucky_dip_winners_count',
+          setting_value: newLuckyDipWinnersCount
+        }, {
+          onConflict: 'setting_key'
+        });
+
+      if (error) throw error;
+
+      setLuckyDipWinnersCount(Number(newLuckyDipWinnersCount));
+      toast({
+        title: "Success",
+        description: "Lucky dip winners count updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating lucky dip winners count:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update lucky dip winners count",
+        variant: "destructive",
+      });
     }
   };
 
@@ -460,6 +521,46 @@ const AdminLottery = () => {
                   Update Jackpot
                 </Button>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Lucky Dip Winners Count Management */}
+        <Card className="bg-gray-900 border-gray-800 text-white mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-400" />
+              Lucky Dip Winners Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-gray-400 mb-4">
+                Number of lucky dip winners per draw: <span className="text-2xl font-bold text-blue-400">{luckyDipWinnersCount}</span>
+              </p>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="new-lucky-dip-count">Number of Lucky Dip Winners</Label>
+                  <Input
+                    id="new-lucky-dip-count"
+                    type="number"
+                    min="0"
+                    value={newLuckyDipWinnersCount}
+                    onChange={(e) => setNewLuckyDipWinnersCount(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    placeholder="Enter number of winners"
+                  />
+                </div>
+                <Button 
+                  onClick={updateLuckyDipWinnersCount}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Update Count
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                This controls how many random lucky dip winners are selected each draw. Set to 0 to disable lucky dip.
+              </p>
             </div>
           </CardContent>
         </Card>
