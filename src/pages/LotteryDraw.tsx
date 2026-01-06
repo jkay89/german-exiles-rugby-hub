@@ -24,6 +24,7 @@ const LotteryDraw = () => {
   const [nextDrawDate, setNextDrawDate] = useState<Date | null>(null);
   const [timeUntilDraw, setTimeUntilDraw] = useState<string>("");
   const [currentJackpot, setCurrentJackpot] = useState(50000);
+  const [luckyDipWinnersCount, setLuckyDipWinnersCount] = useState(5);
   const [latestResult, setLatestResult] = useState<DrawResult | null>(null);
   const [isDrawActive, setIsDrawActive] = useState(false);
   const [drawInProgress, setDrawInProgress] = useState(false);
@@ -42,6 +43,7 @@ const LotteryDraw = () => {
     calculateNextDrawDate();
     fetchCurrentJackpot();
     fetchLatestResult();
+    fetchLuckyDipWinnersCount();
   }, []);
 
   useEffect(() => {
@@ -166,6 +168,23 @@ const LotteryDraw = () => {
       }
     } catch (error) {
       console.error('Error fetching current jackpot:', error);
+    }
+  };
+
+  const fetchLuckyDipWinnersCount = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lottery_settings')
+        .select('setting_value')
+        .eq('setting_key', 'lucky_dip_winners_count')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setLuckyDipWinnersCount(Number(data.setting_value));
+      }
+    } catch (error) {
+      console.error('Error fetching lucky dip winners count:', error);
     }
   };
 
@@ -509,7 +528,7 @@ const LotteryDraw = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold mb-2 text-blue-400">Lucky Dip</h3>
-                      <p className="text-2xl font-bold">5 winners × £{latestResult.lucky_dip_amount}</p>
+                      <p className="text-2xl font-bold">{luckyDipWinnersCount} winners × £{latestResult.lucky_dip_amount}</p>
                     </div>
                   </div>
 
