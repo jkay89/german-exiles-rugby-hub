@@ -34,6 +34,7 @@ import {
   deleteContentSection,
   SiteContent
 } from "@/utils/siteContentUtils";
+import { seedLotteryTermsContent } from "@/utils/seedLotteryTerms";
 import { supabase } from "@/integrations/supabase/client";
 
 const AdminSiteEditor = () => {
@@ -64,6 +65,10 @@ const AdminSiteEditor = () => {
   const loadPageContent = async (page: string) => {
     setLoading(true);
     try {
+      // Auto-seed lottery terms content if needed
+      if (page === 'lottery-terms') {
+        await seedLotteryTermsContent();
+      }
       const data = await fetchPageContent(page);
       setContent(data);
       setChanges({});
@@ -299,10 +304,11 @@ const AdminSiteEditor = () => {
                     <TabsTrigger value="committee-members">Committee</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
                   </TabsList>
-                  <TabsList className="grid w-full grid-cols-3">
+                  <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="nrld">NRLD</TabsTrigger>
                     <TabsTrigger value="media">Media</TabsTrigger>
                     <TabsTrigger value="lottery">Lottery</TabsTrigger>
+                    <TabsTrigger value="lottery-terms">Lottery Terms</TabsTrigger>
                   </TabsList>
                 </div>
 
