@@ -200,12 +200,23 @@ serve(async (req) => {
 
     // Update next draw date to end of next month (only for real draws, not test draws)
     if (!isTestDraw) {
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-      const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+      // Calculate next draw date correctly by using the first of the month to avoid date overflow
+      // e.g., Jan 31 + 1 month would incorrectly give Mar 3 due to Feb 31 not existing
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      // Get the last day of next month by getting day 0 of the month after next
+      // This avoids the date overflow issue with setMonth()
+      const nextMonthIndex = currentMonth + 1;
+      const yearForNextMonth = nextMonthIndex > 11 ? currentYear + 1 : currentYear;
+      const adjustedMonthIndex = nextMonthIndex > 11 ? 0 : nextMonthIndex;
+      
+      // Day 0 of month N gives last day of month N-1, so we use month+1 with day 0
+      const lastDayOfNextMonth = new Date(yearForNextMonth, adjustedMonthIndex + 1, 0);
       const nextDrawDate = lastDayOfNextMonth.toISOString().split('T')[0];
 
-      console.log(`Updating next draw date to: ${nextDrawDate}`);
+      console.log(`Current date: ${today.toISOString()}, calculating next draw date as: ${nextDrawDate}`);
       
       const { error: settingsError } = await supabaseClient
         .from('lottery_settings')

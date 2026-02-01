@@ -49,6 +49,7 @@ const AdminLottery = () => {
     lucky_dip_amount: 50
   });
   const [nextDrawDate, setNextDrawDate] = useState("");
+  const [newNextDrawDate, setNewNextDrawDate] = useState("");
   const [currentJackpot, setCurrentJackpot] = useState(1000);
   const [newJackpotAmount, setNewJackpotAmount] = useState("");
   const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -114,15 +115,54 @@ const AdminLottery = () => {
       
       if (dateData) {
         setNextDrawDate(dateData.setting_value);
+        setNewNextDrawDate(dateData.setting_value);
       } else {
         // Fallback to calculating next month if settings not found
         const now = new Date();
         const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
         const formattedDate = lastDayOfNextMonth.toISOString().split('T')[0];
         setNextDrawDate(formattedDate);
+        setNewNextDrawDate(formattedDate);
       }
     } catch (error) {
       console.error('Error fetching next draw date:', error);
+    }
+  };
+
+  const updateNextDrawDate = async () => {
+    if (!newNextDrawDate) {
+      toast({
+        title: "Invalid Date",
+        description: "Please select a valid draw date",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('lottery_settings')
+        .upsert({
+          setting_key: 'next_draw_date',
+          setting_value: newNextDrawDate
+        }, {
+          onConflict: 'setting_key'
+        });
+
+      if (error) throw error;
+
+      setNextDrawDate(newNextDrawDate);
+      toast({
+        title: "Success",
+        description: "Next draw date updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating next draw date:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update next draw date",
+        variant: "destructive",
+      });
     }
   };
 
@@ -565,21 +605,41 @@ const AdminLottery = () => {
           </CardContent>
         </Card>
 
-        {/* Next Draw Info */}
+        {/* Next Draw Date Management */}
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-400" />
-              Next Draw Information
+              Next Draw Date Management
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-gray-400">
-              Next scheduled draw: <span className="text-white">{nextDrawDate ? new Date(nextDrawDate).toLocaleDateString('en-GB') : 'Calculating...'}</span>
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              This is automatically calculated as the last day of next month
-            </p>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-gray-400 mb-4">
+                Current next draw date: <span className="text-2xl font-bold text-blue-400">{nextDrawDate ? new Date(nextDrawDate).toLocaleDateString('en-GB') : 'Not set'}</span>
+              </p>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="new-draw-date">New Next Draw Date</Label>
+                  <Input
+                    id="new-draw-date"
+                    type="date"
+                    value={newNextDrawDate}
+                    onChange={(e) => setNewNextDrawDate(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+                <Button 
+                  onClick={updateNextDrawDate}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Update Date
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                This date will be automatically updated to the end of next month after each draw. You can manually override it here if needed.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
