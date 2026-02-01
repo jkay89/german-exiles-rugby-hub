@@ -22,8 +22,8 @@ export const getLotteryUrl = (path: string = ''): string => {
     return `/lottery${path}`;
   }
   
-  // On production, use the lottery subdomain
-  return `https://${LOTTERY_SUBDOMAIN}${path}`;
+  // On production, link to the lottery page on the main domain
+  return `https://germanexilesrl.co.uk/lottery${path}`;
 };
 
 export const getMainSiteUrl = (path: string = ''): string => {
