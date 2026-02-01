@@ -26,7 +26,8 @@ serve(async (req) => {
 
     console.log(`Processing draw completion for ${drawDate}`);
 
-    // Get all active subscription entries for the completed draw
+    // Get ALL subscription entries for the completed draw (regardless of is_active status)
+    // We validate with Stripe to determine if entries should be renewed
     const { data: subscriptionEntries, error: fetchError } = await supabaseClient
       .from('lottery_entries')
       .select('*')
@@ -39,7 +40,7 @@ serve(async (req) => {
     let validatedEntries = [];
 
     if (subscriptionEntries && subscriptionEntries.length > 0) {
-      console.log(`Found ${subscriptionEntries.length} subscription entries to renew`);
+      console.log(`Found ${subscriptionEntries.length} subscription entries to process`);
 
       // Initialize Stripe
       const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -51,40 +52,50 @@ serve(async (req) => {
       nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
       nextDrawDate.setDate(0); // Last day of next month
 
-      // Validate subscriptions with Stripe and create new entries only for active paid subscriptions
-      
+      // Group entries by subscription ID to avoid duplicate Stripe API calls
+      const entriesBySubscription = new Map<string, typeof subscriptionEntries>();
       for (const entry of subscriptionEntries) {
-        if (!entry.is_active || !entry.stripe_subscription_id) {
-          console.log(`Skipping inactive entry for user ${entry.user_id}`);
-          continue;
-        }
+        if (!entry.stripe_subscription_id) continue;
+        
+        const existing = entriesBySubscription.get(entry.stripe_subscription_id) || [];
+        existing.push(entry);
+        entriesBySubscription.set(entry.stripe_subscription_id, existing);
+      }
 
+      // Validate each subscription with Stripe FIRST, then decide what to do
+      for (const [subscriptionId, entries] of entriesBySubscription) {
         try {
-          // Check subscription status with Stripe
-          const subscription = await stripe.subscriptions.retrieve(entry.stripe_subscription_id);
+          // Check subscription status with Stripe - this is the source of truth
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          console.log(`Stripe subscription ${subscriptionId}: status=${subscription.status}, period_end=${new Date(subscription.current_period_end * 1000).toISOString()}`);
           
-          // Only proceed if subscription is active and current
+          // Only proceed if subscription is active and paid through
           if (subscription.status === 'active' && subscription.current_period_end * 1000 > Date.now()) {
-            validatedEntries.push({
-              user_id: entry.user_id,
-              numbers: entry.numbers,
-              line_number: entry.line_number,
-              is_active: true,
-              stripe_subscription_id: entry.stripe_subscription_id,
-              draw_date: nextDrawDate.toISOString().split('T')[0]
-            });
-            console.log(`Validated active subscription ${entry.stripe_subscription_id} for user ${entry.user_id}`);
+            // Create new entries for next draw for all lines in this subscription
+            for (const entry of entries) {
+              validatedEntries.push({
+                user_id: entry.user_id,
+                numbers: entry.numbers,
+                line_number: entry.line_number,
+                is_active: true,
+                stripe_subscription_id: subscriptionId,
+                draw_date: nextDrawDate.toISOString().split('T')[0]
+              });
+            }
+            console.log(`Validated active subscription ${subscriptionId} for user ${entries[0].user_id}, renewing ${entries.length} line(s)`);
           } else {
-            console.log(`Subscription ${entry.stripe_subscription_id} is ${subscription.status}, not renewing entry`);
+            console.log(`Subscription ${subscriptionId} is ${subscription.status}, not renewing entries`);
             
-            // Deactivate the local lottery entry since subscription is not active
-            await supabaseClient
-              .from('lottery_entries')
-              .update({ is_active: false })
-              .eq('id', entry.id);
+            // Deactivate all local lottery entries since subscription is not active
+            for (const entry of entries) {
+              await supabaseClient
+                .from('lottery_entries')
+                .update({ is_active: false })
+                .eq('id', entry.id);
+            }
           }
         } catch (stripeError) {
-          console.error(`Error validating subscription ${entry.stripe_subscription_id}:`, stripeError);
+          console.error(`Error validating subscription ${subscriptionId}:`, stripeError);
           // If we can't validate with Stripe, don't create new entry to be safe
         }
       }
