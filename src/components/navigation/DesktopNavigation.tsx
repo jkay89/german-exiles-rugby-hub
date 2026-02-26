@@ -101,15 +101,8 @@ export const DesktopNavigation = () => {
           Lottery
         </a>
         
-        {/* Club Shop External Link */}
-        <a 
-          href={CLUB_SHOP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-300 hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-1"
-        >
-          Shop <ExternalLink className="h-3 w-3" />
-        </a>
+
+
         
         <LanguageSwitcher />
       </div>

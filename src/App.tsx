@@ -50,8 +50,13 @@ import CloudinaryMigration from "./pages/admin/CloudinaryMigration";
 import MediaCompression from "./pages/admin/MediaCompression";
 import AdminSiteEditor from "./pages/admin/AdminSiteEditor";
 import { AdminProvider } from "./contexts/AdminContext";
+import { CartProvider } from "./contexts/CartContext";
 import { setupSupabase } from "./lib/supabase-setup";
 import { seedInitialContent } from "./utils/seedInitialContent";
+import Shop from "./pages/Shop";
+import ShopCart from "./pages/ShopCart";
+import ShopSuccess from "./pages/ShopSuccess";
+import AdminShop from "./pages/admin/AdminShop";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +96,7 @@ const App = () => (
       <AdminProvider>
         <LanguageProvider>
           <AuthProvider>
+            <CartProvider>
             <BrowserRouter>
               <ScrollToTop />
               <Navigation />
@@ -136,8 +142,13 @@ const App = () => (
                 <Route path="/admin/site-editor" element={<AdminSiteEditor />} />
                 <Route path="/admin/cloudinary-migration" element={<CloudinaryMigration />} />
                 <Route path="/admin/media-compression" element={<MediaCompression />} />
+                <Route path="/admin/shop" element={<AdminShop />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/shop/cart" element={<ShopCart />} />
+                <Route path="/shop/success" element={<ShopSuccess />} />
               </Routes>
             </BrowserRouter>
+            </CartProvider>
           </AuthProvider>
         </LanguageProvider>
       </AdminProvider>

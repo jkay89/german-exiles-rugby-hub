@@ -14,6 +14,7 @@ export const useNavigationLinks = () => {
     { href: "/documents", label: t("documents") },
     { href: "/nrld", label: t("nrld") },
     { href: "/sponsors", label: t("sponsors") },
+    { href: "/shop", label: "Shop" },
     { href: "/contact", label: t("contact") },
     { href: "/faqs", label: t("faqs") },
   ];

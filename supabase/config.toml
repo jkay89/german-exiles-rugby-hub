@@ -80,3 +80,9 @@ verify_jwt = false
 
 [functions.migrate-to-cloudinary]
 verify_jwt = false
+
+[functions.create-shop-payment]
+verify_jwt = false
+
+[functions.send-order-notification]
+verify_jwt = false
