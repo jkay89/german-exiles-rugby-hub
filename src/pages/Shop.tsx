@@ -115,16 +115,16 @@ const Shop = () => {
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <Navigation />
       <div className="pt-20 pb-10 px-4 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">German Exiles Shop</h1>
+            <h1 className="text-4xl font-bold text-gradient">German Exiles Shop</h1>
             <p className="text-muted-foreground mt-1">Official merchandise and gear</p>
           </div>
-          <Button variant="outline" className="relative" onClick={() => navigate("/shop/cart")}>
+          <Button variant="outline" className="relative border-german-gold/50 hover:border-german-gold" onClick={() => navigate("/shop/cart")}>
             <ShoppingCart className="h-5 w-5 mr-2" /> Cart
             {cartItemCount > 0 && (
               <Badge className="absolute -top-2 -right-2 bg-german-red text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
@@ -142,6 +142,7 @@ const Shop = () => {
               key={cat}
               variant={selectedCategory === cat ? "default" : "outline"}
               size="sm"
+              className={selectedCategory === cat ? "bg-german-red hover:bg-german-red/90" : "border-border"}
               onClick={() => setSelectedCategory(cat)}
             >
               {cat}
@@ -155,8 +156,8 @@ const Shop = () => {
             const stock = getStockStatus(product);
             const maxQty = getMaxQuantity(product);
             return (
-              <Card key={product.id} className="overflow-hidden flex flex-col">
-                <div className="aspect-square bg-gray-100 relative">
+              <Card key={product.id} className="overflow-hidden flex flex-col border-border/50 hover:border-german-gold/30 transition-colors">
+                <div className="aspect-square bg-muted relative">
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
@@ -173,7 +174,7 @@ const Shop = () => {
                   <h3 className="font-semibold text-lg">{product.name}</h3>
                   {product.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{product.description}</p>}
                   <p className="text-xl font-bold mt-2">£{product.price.toFixed(2)}</p>
-                  <p className={`text-sm mt-1 ${stock.inStock ? "text-green-600" : "text-red-500"}`}>{stock.label}</p>
+                  <p className={`text-sm mt-1 ${stock.inStock ? "text-german-gold" : "text-destructive"}`}>{stock.label}</p>
 
                   {stock.inStock && (
                     <div className="mt-auto pt-4 space-y-2">
