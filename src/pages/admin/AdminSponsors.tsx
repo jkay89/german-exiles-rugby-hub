@@ -219,6 +219,8 @@ const AdminSponsors = () => {
                   <option value="platinum">Platinum</option>
                   <option value="gold">Gold</option>
                   <option value="silver">Silver</option>
+                  <option value="bronze">Bronze</option>
+                  <option value="media">Media Partner</option>
                   <option value="affiliate">Affiliate</option>
                 </select>
               </div>

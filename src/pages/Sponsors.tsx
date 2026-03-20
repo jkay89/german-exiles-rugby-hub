@@ -4,6 +4,7 @@ import SponsorHeader from "@/components/sponsors/SponsorHeader";
 import PlatinumSponsors from "@/components/sponsors/PlatinumSponsors";
 import GoldSponsors from "@/components/sponsors/GoldSponsors";
 import SilverSponsors from "@/components/sponsors/SilverSponsors";
+import BronzeSponsors from "@/components/sponsors/BronzeSponsors";
 import MediaPartner from "@/components/sponsors/MediaPartner";
 import AffiliateSponsors from "@/components/sponsors/AffiliateSponsors";
 import BecomeSponsor from "@/components/sponsors/BecomeSponsor";
@@ -66,6 +67,7 @@ const Sponsors = () => {
   const platinumSponsors = sponsors.filter(sponsor => sponsor.tier === "platinum");
   const goldSponsors = sponsors.filter(sponsor => sponsor.tier === "gold");
   const silverSponsors = sponsors.filter(sponsor => sponsor.tier === "silver");
+  const bronzeSponsors = sponsors.filter(sponsor => sponsor.tier === "bronze");
   const mediaPartners = sponsors.filter(sponsor => sponsor.tier === "media");
   const affiliateSponsors = sponsors.filter(sponsor => sponsor.tier === "affiliate");
   
@@ -84,6 +86,7 @@ const Sponsors = () => {
       <PlatinumSponsors sponsors={platinumSponsors} />
       <GoldSponsors sponsors={goldSponsors} />
       <SilverSponsors sponsors={silverSponsors} />
+      <BronzeSponsors sponsors={bronzeSponsors} />
       <MediaPartner sponsors={mediaPartners} />
       <AffiliateSponsors sponsors={affiliateSponsors} />
       <BecomeSponsor />

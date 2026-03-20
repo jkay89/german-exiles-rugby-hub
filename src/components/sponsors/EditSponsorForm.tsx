@@ -100,6 +100,8 @@ const EditSponsorForm = ({
             <option value="platinum">{t("platinum_sponsor")}</option>
             <option value="gold">{t("gold_sponsor")}</option>
             <option value="silver">{t("silver_sponsors")}</option>
+            <option value="bronze">{t("bronze_sponsors")}</option>
+            <option value="media">{t("media_partner")}</option>
             <option value="affiliate">{t("affiliate_sponsors")}</option>
           </select>
         </div>
