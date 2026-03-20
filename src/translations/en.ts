@@ -141,6 +141,7 @@ export default {
   platinum_sponsor: "Platinum Sponsor",
   gold_sponsor: "Gold Sponsor",
   silver_sponsors: "Silver Sponsors",
+  bronze_sponsors: "Bronze Sponsors",
   media_partner: "Media Partner",
   affiliate_sponsors: "Affiliate Sponsors",
   visit_website: "Visit Website",
