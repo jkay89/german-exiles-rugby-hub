@@ -395,6 +395,57 @@ export const AdminUsersTable = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!resetUserId} onOpenChange={(open) => !open && setResetUserId(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Set a new password for <strong>{resetUserEmail}</strong>. Share it via a secure channel — it will not be shown again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="new-password">New password (min 8 chars)</Label>
+              <Input
+                id="new-password"
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                autoComplete="new-password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirm password</Label>
+              <Input
+                id="confirm-password"
+                type="text"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResetUserId(null)}
+              className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={resetting}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              {resetting ? "Saving..." : "Set Password"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
