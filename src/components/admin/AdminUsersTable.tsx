@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, RefreshCw, Mail, Calendar, User, Shield, UserPlus } from "lucide-react";
+import { Trash2, RefreshCw, Mail, Calendar, User, Shield, UserPlus, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AdminUser {
@@ -23,6 +24,11 @@ export const AdminUsersTable = () => {
   const [loading, setLoading] = useState(true);
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [resetUserId, setResetUserId] = useState<string | null>(null);
+  const [resetUserEmail, setResetUserEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
   const { toast } = useToast();
 
   const fetchUsers = async () => {
@@ -139,6 +145,51 @@ export const AdminUsersTable = () => {
         description: "Failed to delete user",
         variant: "destructive",
       });
+    }
+  };
+
+  const openResetDialog = (userId: string, email: string) => {
+    setResetUserId(userId);
+    setResetUserEmail(email);
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetUserId) return;
+    if (newPassword.length < 8) {
+      toast({ title: "Error", description: "Password must be at least 8 characters", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+
+    setResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-user-password', {
+        body: { userId: resetUserId, newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: "Password reset",
+        description: `New password set for ${resetUserEmail}. Share it with them via a secure channel.`,
+      });
+      setResetUserId(null);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset password",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -293,6 +344,16 @@ export const AdminUsersTable = () => {
                       </AlertDialog>
                     )}
 
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openResetDialog(user.id, user.email)}
+                      className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-white"
+                    >
+                      <KeyRound className="h-4 w-4 mr-1" />
+                      Reset Password
+                    </Button>
+
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
@@ -334,6 +395,57 @@ export const AdminUsersTable = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!resetUserId} onOpenChange={(open) => !open && setResetUserId(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Set a new password for <strong>{resetUserEmail}</strong>. Share it via a secure channel — it will not be shown again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="new-password">New password (min 8 chars)</Label>
+              <Input
+                id="new-password"
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                autoComplete="new-password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirm password</Label>
+              <Input
+                id="confirm-password"
+                type="text"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResetUserId(null)}
+              className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={resetting}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              {resetting ? "Saving..." : "Set Password"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
