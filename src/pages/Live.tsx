@@ -21,7 +21,7 @@ const Live = () => {
           <div className="mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground flex items-center gap-3">
               <Radio className="h-9 w-9 text-primary" />
-              Live & Replays
+              ExilesTV
             </h1>
             <p className="text-muted-foreground mt-2">
               Watch German Exiles matches live or catch up on replays
