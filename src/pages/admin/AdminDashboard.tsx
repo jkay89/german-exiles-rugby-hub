@@ -247,6 +247,21 @@ const AdminDashboard = () => {
               </Link>
             </CardContent>
           </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-german-gold" />
+                Live Streams
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Create OBS streams, get RTMP keys and manage broadcasts.</p>
+              <Link to="/admin/live-streams">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Streams</Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">
