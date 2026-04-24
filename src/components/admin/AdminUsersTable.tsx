@@ -24,6 +24,11 @@ export const AdminUsersTable = () => {
   const [loading, setLoading] = useState(true);
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [resetUserId, setResetUserId] = useState<string | null>(null);
+  const [resetUserEmail, setResetUserEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
   const { toast } = useToast();
 
   const fetchUsers = async () => {
