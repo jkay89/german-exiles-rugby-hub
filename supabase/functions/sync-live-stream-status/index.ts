@@ -37,22 +37,33 @@ Deno.serve(async (req) => {
       );
       const liveJson = await liveRes.json();
       const videos = liveJson.result || [];
-      const liveVideo = videos.find((v: any) => v.live_input);
+
+      // The currently-live video has status.state === "live-inprogress"
+      const liveVideo = videos.find(
+        (v: any) => v.status?.state === "live-inprogress",
+      );
+      // A finished recording is readyToStream with positive duration
       const readyVideo = videos.find(
         (v: any) => v.readyToStream && v.duration > 0,
       );
 
-      const isLive = !!liveVideo && liveVideo.status?.state === "live-inprogress";
-      const recordingUrl = readyVideo
-        ? `https://customer-${accountId}.cloudflarestream.com/${readyVideo.uid}/manifest/video.m3u8`
-        : s.recording_url;
+      const isLive = !!liveVideo;
+      // Use the playback URL Cloudflare provides directly (correct customer subdomain + video UID)
+      const livePlaybackUrl = liveVideo?.playback?.hls || null;
+      const recordingUrl = readyVideo?.playback?.hls || s.recording_url;
+
+      const updatePayload: Record<string, unknown> = {
+        is_live: isLive,
+        recording_url: recordingUrl,
+      };
+      // While live, point playback_url at the live video's HLS manifest
+      if (livePlaybackUrl) {
+        updatePayload.playback_url = livePlaybackUrl;
+      }
 
       const { data: updated } = await admin
         .from("live_streams")
-        .update({
-          is_live: isLive,
-          recording_url: recordingUrl,
-        })
+        .update(updatePayload)
         .eq("id", s.id)
         .select()
         .single();
