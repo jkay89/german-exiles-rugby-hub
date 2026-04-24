@@ -155,6 +155,7 @@ export type Database = {
           is_home: boolean
           location: string
           opponent: string
+          stream_id: string | null
           team: string
           time: string
           updated_at: string
@@ -167,6 +168,7 @@ export type Database = {
           is_home?: boolean
           location: string
           opponent: string
+          stream_id?: string | null
           team: string
           time: string
           updated_at?: string
@@ -179,11 +181,76 @@ export type Database = {
           is_home?: boolean
           location?: string
           opponent?: string
+          stream_id?: string | null
           team?: string
           time?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fixtures_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_streams: {
+        Row: {
+          cloudflare_uid: string
+          created_at: string
+          description: string | null
+          fixture_id: string | null
+          id: string
+          is_live: boolean
+          playback_url: string | null
+          recording_url: string | null
+          rtmp_url: string | null
+          scheduled_start: string | null
+          stream_key: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cloudflare_uid: string
+          created_at?: string
+          description?: string | null
+          fixture_id?: string | null
+          id?: string
+          is_live?: boolean
+          playback_url?: string | null
+          recording_url?: string | null
+          rtmp_url?: string | null
+          scheduled_start?: string | null
+          stream_key?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cloudflare_uid?: string
+          created_at?: string
+          description?: string | null
+          fixture_id?: string | null
+          id?: string
+          is_live?: boolean
+          playback_url?: string | null
+          recording_url?: string | null
+          rtmp_url?: string | null
+          scheduled_start?: string | null
+          stream_key?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_streams_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lottery_draws: {
         Row: {
