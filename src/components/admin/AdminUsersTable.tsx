@@ -344,6 +344,16 @@ export const AdminUsersTable = () => {
                       </AlertDialog>
                     )}
 
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openResetDialog(user.id, user.email)}
+                      className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-white"
+                    >
+                      <KeyRound className="h-4 w-4 mr-1" />
+                      Reset Password
+                    </Button>
+
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
