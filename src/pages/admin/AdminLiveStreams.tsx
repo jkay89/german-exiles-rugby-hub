@@ -110,7 +110,7 @@ const AdminLiveStreams = () => {
       body: {
         title,
         description: description || null,
-        scheduled_start: scheduled || null,
+        scheduled_start: scheduled ? new Date(scheduled).toISOString() : null,
         fixture_id: fixtureId || null,
       },
     });
