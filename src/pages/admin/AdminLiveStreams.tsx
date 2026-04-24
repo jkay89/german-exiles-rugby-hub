@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, Copy, RefreshCw, Trash2, Radio } from "lucide-react";
+import { ArrowLeft, Plus, Copy, RefreshCw, Trash2, Radio, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,61 @@ const AdminLiveStreams = () => {
   const [scheduled, setScheduled] = useState("");
   const [fixtureId, setFixtureId] = useState("");
   const [fixtures, setFixtures] = useState<any[]>([]);
+
+  // Edit dialog state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editScheduled, setEditScheduled] = useState("");
+  const [editFixtureId, setEditFixtureId] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const openEdit = (s: any) => {
+    setEditId(s.id);
+    setEditTitle(s.title || "");
+    setEditDescription(s.description || "");
+    // Convert ISO to datetime-local input value (YYYY-MM-DDTHH:mm)
+    setEditScheduled(
+      s.scheduled_start
+        ? new Date(s.scheduled_start).toISOString().slice(0, 16)
+        : "",
+    );
+    setEditFixtureId(s.fixture_id || "");
+    setEditOpen(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editId) return;
+    if (!editTitle.trim()) {
+      toast({ title: "Title required", variant: "destructive" });
+      return;
+    }
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("live_streams")
+      .update({
+        title: editTitle,
+        description: editDescription || null,
+        scheduled_start: editScheduled
+          ? new Date(editScheduled).toISOString()
+          : null,
+        fixture_id: editFixtureId || null,
+      })
+      .eq("id", editId);
+    setSavingEdit(false);
+    if (error) {
+      toast({
+        title: "Failed to update stream",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({ title: "Stream updated" });
+    setEditOpen(false);
+    refetch();
+  };
 
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin");
@@ -167,6 +222,13 @@ const AdminLiveStreams = () => {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => openEdit(s)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => syncStatus(s.id)}
                       >
                         <RefreshCw className="h-4 w-4" />
@@ -272,6 +334,58 @@ const AdminLiveStreams = () => {
             </Button>
             <Button onClick={createStream} disabled={creating}>
               {creating ? "Creating…" : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit live stream</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Title</Label>
+              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Scheduled start (optional)</Label>
+              <Input
+                type="datetime-local"
+                value={editScheduled}
+                onChange={(e) => setEditScheduled(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Link to fixture (optional)</Label>
+              <select
+                className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+                value={editFixtureId}
+                onChange={(e) => setEditFixtureId(e.target.value)}
+              >
+                <option value="">— none —</option>
+                {fixtures.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.team} vs {f.opponent} ({f.date})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit} disabled={savingEdit}>
+              {savingEdit ? "Saving…" : "Save changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
