@@ -9,6 +9,7 @@ export const useNavigationLinks = () => {
     { href: "/", label: t("home") },
     { href: "/about", label: t("about") },
     { href: "/fixtures", label: t("fixtures") },
+    { href: "/live", label: "Live" },
     { href: "/news", label: t("news") },
     { href: "/media", label: t("media") },
     { href: "/documents", label: t("documents") },

@@ -57,6 +57,8 @@ import Shop from "./pages/Shop";
 import ShopCart from "./pages/ShopCart";
 import ShopSuccess from "./pages/ShopSuccess";
 import AdminShop from "./pages/admin/AdminShop";
+import Live from "./pages/Live";
+import AdminLiveStreams from "./pages/admin/AdminLiveStreams";
 
 const queryClient = new QueryClient();
 
@@ -146,6 +148,8 @@ const App = () => (
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop/cart" element={<ShopCart />} />
                 <Route path="/shop/success" element={<ShopSuccess />} />
+                <Route path="/live" element={<Live />} />
+                <Route path="/admin/live-streams" element={<AdminLiveStreams />} />
               </Routes>
             </BrowserRouter>
             </CartProvider>
