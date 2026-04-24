@@ -76,12 +76,39 @@ export const HlsPlayer = ({ src, poster, autoPlay = true, isLive = false }: HlsP
 
   const enterFullscreen = () => {
     const c = containerRef.current;
-    if (!c) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      c.requestFullscreen?.();
+    const v = videoRef.current as any;
+    if (!c || !v) return;
+
+    const doc = document as any;
+    const isFs =
+      doc.fullscreenElement ||
+      doc.webkitFullscreenElement ||
+      doc.webkitCurrentFullScreenElement;
+
+    if (isFs) {
+      (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc);
+      return;
     }
+
+    // iOS Safari: only the <video> element can go fullscreen
+    if (typeof v.webkitEnterFullscreen === "function") {
+      try {
+        v.muted = false;
+        setMuted(false);
+        v.webkitEnterFullscreen();
+        return;
+      } catch {
+        // fall through
+      }
+    }
+
+    // Standard / Android Chrome / desktop
+    const req =
+      c.requestFullscreen ||
+      (c as any).webkitRequestFullscreen ||
+      (v.requestFullscreen as any) ||
+      v.webkitRequestFullscreen;
+    req?.call(c.requestFullscreen ? c : v);
   };
 
   return (
