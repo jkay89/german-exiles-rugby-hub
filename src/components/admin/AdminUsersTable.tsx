@@ -148,6 +148,51 @@ export const AdminUsersTable = () => {
     }
   };
 
+  const openResetDialog = (userId: string, email: string) => {
+    setResetUserId(userId);
+    setResetUserEmail(email);
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetUserId) return;
+    if (newPassword.length < 8) {
+      toast({ title: "Error", description: "Password must be at least 8 characters", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+
+    setResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-user-password', {
+        body: { userId: resetUserId, newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: "Password reset",
+        description: `New password set for ${resetUserEmail}. Share it with them via a secure channel.`,
+      });
+      setResetUserId(null);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset password",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
