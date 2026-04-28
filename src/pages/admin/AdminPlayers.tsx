@@ -17,7 +17,7 @@ import { UploadCloud } from "lucide-react";
 const AdminPlayers = () => {
   const { isAuthenticated } = useAdmin();
   const navigate = useNavigate();
-  const [activeTeam, setActiveTeam] = useState("heritage");
+  const [activeTeam, setActiveTeam] = useState("team");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
