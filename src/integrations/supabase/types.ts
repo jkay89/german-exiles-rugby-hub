@@ -148,12 +148,21 @@ export type Database = {
       }
       fixtures: {
         Row: {
+          ball_sponsor_logo_url: string | null
+          ball_sponsor_name: string | null
+          ball_sponsor_url: string | null
           competition: string
           created_at: string
           date: string
           id: string
           is_home: boolean
           location: string
+          match_sponsor_logo_url: string | null
+          match_sponsor_name: string | null
+          match_sponsor_url: string | null
+          motm_sponsor_logo_url: string | null
+          motm_sponsor_name: string | null
+          motm_sponsor_url: string | null
           opponent: string
           stream_id: string | null
           team: string
@@ -161,12 +170,21 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ball_sponsor_logo_url?: string | null
+          ball_sponsor_name?: string | null
+          ball_sponsor_url?: string | null
           competition: string
           created_at?: string
           date: string
           id?: string
           is_home?: boolean
           location: string
+          match_sponsor_logo_url?: string | null
+          match_sponsor_name?: string | null
+          match_sponsor_url?: string | null
+          motm_sponsor_logo_url?: string | null
+          motm_sponsor_name?: string | null
+          motm_sponsor_url?: string | null
           opponent: string
           stream_id?: string | null
           team: string
@@ -174,12 +192,21 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ball_sponsor_logo_url?: string | null
+          ball_sponsor_name?: string | null
+          ball_sponsor_url?: string | null
           competition?: string
           created_at?: string
           date?: string
           id?: string
           is_home?: boolean
           location?: string
+          match_sponsor_logo_url?: string | null
+          match_sponsor_name?: string | null
+          match_sponsor_url?: string | null
+          motm_sponsor_logo_url?: string | null
+          motm_sponsor_name?: string | null
+          motm_sponsor_url?: string | null
           opponent?: string
           stream_id?: string | null
           team?: string
@@ -931,13 +958,22 @@ export type Database = {
       }
       results: {
         Row: {
+          ball_sponsor_logo_url: string | null
+          ball_sponsor_name: string | null
+          ball_sponsor_url: string | null
           competition: string
           created_at: string
           date: string
           fixture_id: string | null
           id: string
           is_home: boolean
+          match_sponsor_logo_url: string | null
+          match_sponsor_name: string | null
+          match_sponsor_url: string | null
           motm: string | null
+          motm_sponsor_logo_url: string | null
+          motm_sponsor_name: string | null
+          motm_sponsor_url: string | null
           opponent: string
           opponent_score: number
           team: string
@@ -945,13 +981,22 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ball_sponsor_logo_url?: string | null
+          ball_sponsor_name?: string | null
+          ball_sponsor_url?: string | null
           competition: string
           created_at?: string
           date: string
           fixture_id?: string | null
           id?: string
           is_home?: boolean
+          match_sponsor_logo_url?: string | null
+          match_sponsor_name?: string | null
+          match_sponsor_url?: string | null
           motm?: string | null
+          motm_sponsor_logo_url?: string | null
+          motm_sponsor_name?: string | null
+          motm_sponsor_url?: string | null
           opponent: string
           opponent_score: number
           team: string
@@ -959,13 +1004,22 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ball_sponsor_logo_url?: string | null
+          ball_sponsor_name?: string | null
+          ball_sponsor_url?: string | null
           competition?: string
           created_at?: string
           date?: string
           fixture_id?: string | null
           id?: string
           is_home?: boolean
+          match_sponsor_logo_url?: string | null
+          match_sponsor_name?: string | null
+          match_sponsor_url?: string | null
           motm?: string | null
+          motm_sponsor_logo_url?: string | null
+          motm_sponsor_name?: string | null
+          motm_sponsor_url?: string | null
           opponent?: string
           opponent_score?: number
           team?: string
