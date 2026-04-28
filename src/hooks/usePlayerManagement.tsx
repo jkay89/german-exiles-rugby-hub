@@ -72,11 +72,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       }
       
       // Create the player object (keeping old sponsor fields for backward compatibility)
+      // Normalise the virtual "team" group to "heritage" for storage
+      const teamForInsert = activeTeam === "team" ? "heritage" : activeTeam;
       const playerData = {
         name: formData.get('name') as string,
         number: formData.get('number') ? parseInt(formData.get('number') as string) : null,
         position: formData.get('position') as string || null,
-        team: activeTeam,
+        team: teamForInsert,
         heritage: formData.get('heritage') as string || null,
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
