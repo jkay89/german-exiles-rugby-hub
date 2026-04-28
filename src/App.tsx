@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import HeritageTeam from "./pages/HeritageTeam";
 import CommunityTeam from "./pages/CommunityTeam";
+import TheTeam from "./pages/TheTeam";
 import Exiles9s from "./pages/Exiles9s";
 import CoachingTeam from "./pages/CoachingTeam";
 import CommitteeMembers from "./pages/CommitteeMembers";
@@ -105,8 +106,9 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<AboutUs />} />
-                <Route path="/heritage-team" element={<HeritageTeam />} />
-                <Route path="/community-team" element={<CommunityTeam />} />
+                <Route path="/the-team" element={<TheTeam />} />
+                <Route path="/heritage-team" element={<TheTeam />} />
+                <Route path="/community-team" element={<TheTeam />} />
                 <Route path="/exiles-9s" element={<Exiles9s />} />
                 <Route path="/coaching-team" element={<CoachingTeam />} />
                 <Route path="/committee-members" element={<CommitteeMembers />} />
