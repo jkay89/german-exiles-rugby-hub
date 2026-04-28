@@ -1,10 +1,10 @@
 
 import React from "react";
-import { motion } from "framer-motion";
 import { Result } from "@/hooks/useFixtures";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPinIcon, Calendar, Trophy } from "lucide-react";
-import { format, parseISO } from 'date-fns';
+import { format, parseISO } from "date-fns";
+import MatchSponsors from "./MatchSponsors";
 
 interface ResultsGridViewProps {
   results: Result[];
@@ -74,6 +74,28 @@ const ResultsGridView = ({ results }: ResultsGridViewProps) => {
                 </p>
               </div>
             )}
+            <MatchSponsors
+              sponsors={[
+                {
+                  label: "Match Sponsor",
+                  name: result.match_sponsor_name,
+                  logo_url: result.match_sponsor_logo_url,
+                  url: result.match_sponsor_url,
+                },
+                {
+                  label: "MOTM Sponsor",
+                  name: result.motm_sponsor_name,
+                  logo_url: result.motm_sponsor_logo_url,
+                  url: result.motm_sponsor_url,
+                },
+                {
+                  label: "Ball Sponsor",
+                  name: result.ball_sponsor_name,
+                  logo_url: result.ball_sponsor_logo_url,
+                  url: result.ball_sponsor_url,
+                },
+              ]}
+            />
           </CardContent>
         </Card>
       ))}
