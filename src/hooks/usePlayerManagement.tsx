@@ -15,10 +15,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     setLoading(true);
     try {
       console.log(`Loading players for team: ${activeTeam}`);
+      // "team" is a virtual group that combines legacy heritage + community rows
+      const teamFilter = activeTeam === "team" ? ["heritage", "community"] : [activeTeam];
       const { data, error } = await supabase.rest
         .from('players')
         .select('*')
-        .eq('team', activeTeam)
+        .in('team', teamFilter)
         .order('number', { ascending: true })
         .order('name');
         
@@ -70,11 +72,13 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       }
       
       // Create the player object (keeping old sponsor fields for backward compatibility)
+      // Normalise the virtual "team" group to "heritage" for storage
+      const teamForInsert = activeTeam === "team" ? "heritage" : activeTeam;
       const playerData = {
         name: formData.get('name') as string,
         number: formData.get('number') ? parseInt(formData.get('number') as string) : null,
         position: formData.get('position') as string || null,
-        team: activeTeam,
+        team: teamForInsert,
         heritage: formData.get('heritage') as string || null,
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
@@ -194,10 +198,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       }
       
       // Update the player object (keeping old sponsor fields for backward compatibility)
+      const submittedTeam = (formData.get('team') as string) || editingPlayer.team;
       const playerData = {
         name: formData.get('name') as string,
         number: formData.get('number') ? parseInt(formData.get('number') as string) : null,
         position: formData.get('position') as string || null,
+        team: submittedTeam,
         heritage: formData.get('heritage') as string || null,
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
@@ -347,8 +353,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         description: "The heritage team has been updated successfully",
       });
       
-      // Only reload if we're currently viewing the heritage team
-      if (activeTeam === 'heritage') {
+      // Reload if currently viewing The Team (which includes heritage)
+      if (activeTeam === 'team' || activeTeam === 'heritage') {
         loadPlayers();
       }
     } catch (error: any) {

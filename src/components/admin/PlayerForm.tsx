@@ -225,13 +225,18 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
         <div>
           <Label className="text-gray-400">Team</Label>
           {isEditing ? (
-            <Select name="team" required defaultValue={initialValues?.team || ""}>
+            <Select
+              name="team"
+              required
+              defaultValue={
+                initialValues?.team === "exiles9s" ? "exiles9s" : "heritage"
+              }
+            >
               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                 <SelectValue placeholder="Select team" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 text-white">
-                <SelectItem value="heritage">Heritage Team</SelectItem>
-                <SelectItem value="community">Community Team</SelectItem>
+                <SelectItem value="heritage">The Team</SelectItem>
                 <SelectItem value="exiles9s">Exiles 9s</SelectItem>
               </SelectContent>
             </Select>
@@ -239,13 +244,15 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
             <>
               <Input
                 name="team"
-                value={initialValues?.team === 'heritage' ? 'Heritage Team' : 
-                       initialValues?.team === 'community' ? 'Community Team' : 
-                       initialValues?.team === 'exiles9s' ? 'Exiles 9s' : ''}
+                value={initialValues?.team === "exiles9s" ? "Exiles 9s" : "The Team"}
                 readOnly
                 className="bg-gray-800 border-gray-700 text-white cursor-not-allowed"
               />
-              <input type="hidden" name="team" value={initialValues?.team || ""} />
+              <input
+                type="hidden"
+                name="team"
+                value={initialValues?.team === "exiles9s" ? "exiles9s" : "heritage"}
+              />
             </>
           )}
         </div>
