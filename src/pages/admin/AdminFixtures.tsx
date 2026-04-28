@@ -161,6 +161,7 @@ const AdminFixtures = () => {
       location: formData.get("location") as string,
       competition: formData.get("competition") as string,
       is_home: formData.get("isHome") === "home",
+      ...sponsorPayloadFromForm(formData),
     };
     
     try {
@@ -204,6 +205,7 @@ const AdminFixtures = () => {
       location: formData.get("location") as string,
       competition: formData.get("competition") as string,
       is_home: formData.get("isHome") === "home",
+      ...sponsorPayloadFromForm(formData),
     };
     
     try {
@@ -245,7 +247,8 @@ const AdminFixtures = () => {
       opponent_score: parseInt(formData.get("opponentScore") as string),
       competition: formData.get("competition") as string,
       is_home: formData.get("isHome") === "home",
-      motm: formData.get("motm") as string || null,
+      motm: (formData.get("motm") as string) || null,
+      ...sponsorPayloadFromForm(formData),
     };
     
     try {
@@ -287,7 +290,8 @@ const AdminFixtures = () => {
       opponent_score: parseInt(formData.get("opponentScore") as string),
       competition: formData.get("competition") as string,
       is_home: formData.get("isHome") === "home",
-      motm: formData.get("motm") as string || null,
+      motm: (formData.get("motm") as string) || null,
+      ...sponsorPayloadFromForm(formData),
     };
     
     try {
