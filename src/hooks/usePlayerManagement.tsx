@@ -15,10 +15,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
     setLoading(true);
     try {
       console.log(`Loading players for team: ${activeTeam}`);
+      // "team" is a virtual group that combines legacy heritage + community rows
+      const teamFilter = activeTeam === "team" ? ["heritage", "community"] : [activeTeam];
       const { data, error } = await supabase.rest
         .from('players')
         .select('*')
-        .eq('team', activeTeam)
+        .in('team', teamFilter)
         .order('number', { ascending: true })
         .order('name');
         
