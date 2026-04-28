@@ -21,8 +21,7 @@ export const useNavigationLinks = () => {
   ];
 
   const teamLinks = [
-    { href: "/heritage-team", label: t("heritage_team") },
-    { href: "/community-team", label: t("community_team") },
+    { href: "/the-team", label: "The Team" },
     { href: "/exiles-9s", label: "Exiles 9s" },
     { href: "/committee-members", label: t("committee_members") },
     { href: "/coaching-team", label: t("coaching_team") },
