@@ -525,6 +525,34 @@ const AdminFixtures = () => {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  <SponsorFields
+                    prefix="match"
+                    label="Match Sponsor (optional)"
+                    defaults={{
+                      name: editingFixture?.match_sponsor_name,
+                      logo_url: editingFixture?.match_sponsor_logo_url,
+                      url: editingFixture?.match_sponsor_url,
+                    }}
+                  />
+                  <SponsorFields
+                    prefix="motm"
+                    label="Man of the Match Sponsor (optional)"
+                    defaults={{
+                      name: editingFixture?.motm_sponsor_name,
+                      logo_url: editingFixture?.motm_sponsor_logo_url,
+                      url: editingFixture?.motm_sponsor_url,
+                    }}
+                  />
+                  <SponsorFields
+                    prefix="ball"
+                    label="Ball Sponsor (optional)"
+                    defaults={{
+                      name: editingFixture?.ball_sponsor_name,
+                      logo_url: editingFixture?.ball_sponsor_logo_url,
+                      url: editingFixture?.ball_sponsor_url,
+                    }}
+                  />
                 </div>
                 
                 <div className="flex justify-end gap-2">
@@ -731,6 +759,34 @@ const AdminFixtures = () => {
                       defaultValue={editingResult?.motm || ""}
                     />
                   </div>
+
+                  <SponsorFields
+                    prefix="match"
+                    label="Match Sponsor (optional)"
+                    defaults={{
+                      name: editingResult?.match_sponsor_name,
+                      logo_url: editingResult?.match_sponsor_logo_url,
+                      url: editingResult?.match_sponsor_url,
+                    }}
+                  />
+                  <SponsorFields
+                    prefix="motm"
+                    label="Man of the Match Sponsor (optional)"
+                    defaults={{
+                      name: editingResult?.motm_sponsor_name,
+                      logo_url: editingResult?.motm_sponsor_logo_url,
+                      url: editingResult?.motm_sponsor_url,
+                    }}
+                  />
+                  <SponsorFields
+                    prefix="ball"
+                    label="Ball Sponsor (optional)"
+                    defaults={{
+                      name: editingResult?.ball_sponsor_name,
+                      logo_url: editingResult?.ball_sponsor_logo_url,
+                      url: editingResult?.ball_sponsor_url,
+                    }}
+                  />
                 </div>
                 
                 <div className="flex justify-end gap-2">
