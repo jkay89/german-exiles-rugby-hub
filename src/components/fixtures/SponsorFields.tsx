@@ -3,9 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { compressImage } from "@/utils/imageCompression";
+import { uploadToCloudinary } from "@/utils/cloudinaryUtils";
 
 interface SponsorFieldsProps {
   prefix: "match" | "motm" | "ball";
@@ -17,7 +16,7 @@ interface SponsorFieldsProps {
   };
 }
 
-const BUCKET = "match-sponsor-logos";
+const CLOUDINARY_FOLDER = "match-sponsor-logos";
 
 const SponsorFields = ({ prefix, label, defaults }: SponsorFieldsProps) => {
   const { toast } = useToast();
@@ -40,24 +39,8 @@ const SponsorFields = ({ prefix, label, defaults }: SponsorFieldsProps) => {
 
     setUploading(true);
     try {
-      const compressed = await compressImage(file, 2, 1920);
-      const ext = (compressed.name.split(".").pop() || "png").toLowerCase();
-      const path = `${prefix}/${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, compressed, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: compressed.type,
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      setLogoUrl(data.publicUrl);
+      const result = await uploadToCloudinary(file, `${CLOUDINARY_FOLDER}/${prefix}`);
+      setLogoUrl(result.url);
       toast({ title: "Logo uploaded" });
     } catch (err: any) {
       console.error(err);
