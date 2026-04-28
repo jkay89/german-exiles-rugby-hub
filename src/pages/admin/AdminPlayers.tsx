@@ -235,30 +235,17 @@ const AdminPlayers = () => {
               <h2 className="text-xl font-bold text-white mb-4">Manage Existing Players</h2>
               
               <Tabs 
-                defaultValue="heritage" 
+                defaultValue="team" 
                 value={activeTeam}
                 onValueChange={handleTeamChange}
               >
                 <TabsList className="mb-4 bg-gray-800">
-                  <TabsTrigger value="heritage" className="data-[state=active]:bg-german-red">Heritage Team</TabsTrigger>
-                  <TabsTrigger value="community" className="data-[state=active]:bg-german-red">Community Team</TabsTrigger>
+                  <TabsTrigger value="team" className="data-[state=active]:bg-german-red">The Team</TabsTrigger>
                   <TabsTrigger value="exiles9s" className="data-[state=active]:bg-german-red">Exiles 9s</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="heritage">
-                  {activeTeam === 'heritage' && (
-                    <PlayersList 
-                      players={players}
-                      activeTeam={activeTeam}
-                      onEdit={setEditingPlayer}
-                      onPlayersChanged={loadPlayers}
-                      loading={loading}
-                    />
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="community">
-                  {activeTeam === 'community' && (
+                <TabsContent value="team">
+                  {activeTeam === 'team' && (
                     <PlayersList 
                       players={players}
                       activeTeam={activeTeam}

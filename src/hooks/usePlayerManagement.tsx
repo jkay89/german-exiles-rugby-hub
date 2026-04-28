@@ -353,8 +353,8 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
         description: "The heritage team has been updated successfully",
       });
       
-      // Only reload if we're currently viewing the heritage team
-      if (activeTeam === 'heritage') {
+      // Reload if currently viewing The Team (which includes heritage)
+      if (activeTeam === 'team' || activeTeam === 'heritage') {
         loadPlayers();
       }
     } catch (error: any) {
