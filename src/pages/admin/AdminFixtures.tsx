@@ -17,11 +17,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Plus, Edit, Trash2 } from "lucide-react";
 import AddResultForm from "@/components/fixtures/AddResultForm";
+import SponsorFields from "@/components/fixtures/SponsorFields";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format, parseISO } from "date-fns";
 
+interface SponsorFieldsData {
+  match_sponsor_name?: string | null;
+  match_sponsor_logo_url?: string | null;
+  match_sponsor_url?: string | null;
+  motm_sponsor_name?: string | null;
+  motm_sponsor_logo_url?: string | null;
+  motm_sponsor_url?: string | null;
+  ball_sponsor_name?: string | null;
+  ball_sponsor_logo_url?: string | null;
+  ball_sponsor_url?: string | null;
+}
+
 // Fixture type
-interface Fixture {
+interface Fixture extends SponsorFieldsData {
   id: string;
   team: string;
   opponent: string;
@@ -34,7 +47,7 @@ interface Fixture {
 }
 
 // Result type
-interface Result {
+interface Result extends SponsorFieldsData {
   id: string;
   fixture_id?: string;
   team: string;
@@ -47,6 +60,24 @@ interface Result {
   motm?: string;
   created_at?: string;
 }
+
+const sponsorPayloadFromForm = (formData: FormData): SponsorFieldsData => {
+  const get = (k: string) => {
+    const v = (formData.get(k) as string | null)?.trim();
+    return v ? v : null;
+  };
+  return {
+    match_sponsor_name: get("match_sponsor_name"),
+    match_sponsor_logo_url: get("match_sponsor_logo_url"),
+    match_sponsor_url: get("match_sponsor_url"),
+    motm_sponsor_name: get("motm_sponsor_name"),
+    motm_sponsor_logo_url: get("motm_sponsor_logo_url"),
+    motm_sponsor_url: get("motm_sponsor_url"),
+    ball_sponsor_name: get("ball_sponsor_name"),
+    ball_sponsor_logo_url: get("ball_sponsor_logo_url"),
+    ball_sponsor_url: get("ball_sponsor_url"),
+  };
+};
 
 const AdminFixtures = () => {
   const { isAuthenticated } = useAdmin();
