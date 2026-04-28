@@ -198,10 +198,12 @@ export const usePlayerManagement = (activeTeam: string, onSuccess: () => void) =
       }
       
       // Update the player object (keeping old sponsor fields for backward compatibility)
+      const submittedTeam = (formData.get('team') as string) || editingPlayer.team;
       const playerData = {
         name: formData.get('name') as string,
         number: formData.get('number') ? parseInt(formData.get('number') as string) : null,
         position: formData.get('position') as string || null,
+        team: submittedTeam,
         heritage: formData.get('heritage') as string || null,
         club: formData.get('club') as string || null,
         bio: formData.get('bio') as string || null,
