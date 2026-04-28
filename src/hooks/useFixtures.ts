@@ -2,7 +2,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client-extensions";
 
-export interface Fixture {
+export interface MatchSponsorFields {
+  match_sponsor_name?: string | null;
+  match_sponsor_logo_url?: string | null;
+  match_sponsor_url?: string | null;
+  motm_sponsor_name?: string | null;
+  motm_sponsor_logo_url?: string | null;
+  motm_sponsor_url?: string | null;
+  ball_sponsor_name?: string | null;
+  ball_sponsor_logo_url?: string | null;
+  ball_sponsor_url?: string | null;
+}
+
+export interface Fixture extends MatchSponsorFields {
   id: string;
   date: string;
   time: string;
@@ -13,7 +25,7 @@ export interface Fixture {
   team?: string;
 }
 
-export interface Result {
+export interface Result extends MatchSponsorFields {
   id: string;
   team: string;
   opponent: string;
