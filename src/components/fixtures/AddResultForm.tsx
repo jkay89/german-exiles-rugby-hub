@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client-extensions";
 import { useToast } from "@/components/ui/use-toast";
 import { Fixture } from "@/hooks/useFixtures";
 import { Plus } from "lucide-react";
+import SponsorFields from "@/components/fixtures/SponsorFields";
 
 interface AddResultFormProps {
   fixture: Fixture;
@@ -21,9 +22,9 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
   const [motm, setMotm] = useState("");
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (teamScore === "" || opponentScore === "") {
       toast({
         title: "Error",
@@ -34,9 +35,14 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      // Create the result entry
+      const formData = new FormData(e.currentTarget);
+      const get = (k: string) => {
+        const v = (formData.get(k) as string | null)?.trim();
+        return v ? v : null;
+      };
+
       const resultData = {
         fixture_id: fixture.id,
         team: fixture.team || (fixture.is_home ? "German Exiles" : "Germany RL"),
@@ -47,6 +53,15 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
         competition: fixture.competition,
         is_home: fixture.is_home,
         motm: motm.trim() || null,
+        match_sponsor_name: get("match_sponsor_name"),
+        match_sponsor_logo_url: get("match_sponsor_logo_url"),
+        match_sponsor_url: get("match_sponsor_url"),
+        motm_sponsor_name: get("motm_sponsor_name"),
+        motm_sponsor_logo_url: get("motm_sponsor_logo_url"),
+        motm_sponsor_url: get("motm_sponsor_url"),
+        ball_sponsor_name: get("ball_sponsor_name"),
+        ball_sponsor_logo_url: get("ball_sponsor_logo_url"),
+        ball_sponsor_url: get("ball_sponsor_url"),
       };
 
       const { error: resultError } = await supabase.rest
@@ -55,7 +70,6 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
 
       if (resultError) throw resultError;
 
-      // Remove the fixture from upcoming fixtures
       const { error: deleteError } = await supabase.rest
         .from("fixtures")
         .delete()
@@ -68,7 +82,6 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
         description: "The match result has been recorded successfully",
       });
 
-      // Reset form and close dialog
       setTeamScore("");
       setOpponentScore("");
       setMotm("");
@@ -96,14 +109,16 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
           Add Result
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 text-white border-gray-700">
+      <DialogContent className="bg-gray-900 text-white border-gray-700 max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Match Result</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-center py-2">
             <h3 className="text-lg font-semibold">
-              {fixture.is_home ? `${ourTeam} vs ${fixture.opponent}` : `${fixture.opponent} vs ${ourTeam}`}
+              {fixture.is_home
+                ? `${ourTeam} vs ${fixture.opponent}`
+                : `${fixture.opponent} vs ${ourTeam}`}
             </h3>
             <p className="text-gray-400 text-sm">{fixture.competition}</p>
           </div>
@@ -117,7 +132,11 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
                 type="number"
                 min="0"
                 value={fixture.is_home ? teamScore : opponentScore}
-                onChange={(e) => fixture.is_home ? setTeamScore(e.target.value === "" ? "" : Number(e.target.value)) : setOpponentScore(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) =>
+                  fixture.is_home
+                    ? setTeamScore(e.target.value === "" ? "" : Number(e.target.value))
+                    : setOpponentScore(e.target.value === "" ? "" : Number(e.target.value))
+                }
                 className="bg-gray-800 border-gray-700 text-white"
                 required
               />
@@ -130,7 +149,11 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
                 type="number"
                 min="0"
                 value={fixture.is_home ? opponentScore : teamScore}
-                onChange={(e) => fixture.is_home ? setOpponentScore(e.target.value === "" ? "" : Number(e.target.value)) : setTeamScore(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) =>
+                  fixture.is_home
+                    ? setOpponentScore(e.target.value === "" ? "" : Number(e.target.value))
+                    : setTeamScore(e.target.value === "" ? "" : Number(e.target.value))
+                }
                 className="bg-gray-800 border-gray-700 text-white"
                 required
               />
@@ -148,20 +171,41 @@ const AddResultForm = ({ fixture, onResultAdded }: AddResultFormProps) => {
             />
           </div>
 
+          <div className="grid grid-cols-1 gap-4">
+            <SponsorFields
+              prefix="match"
+              label="Match Sponsor (optional)"
+              defaults={{
+                name: fixture.match_sponsor_name,
+                logo_url: fixture.match_sponsor_logo_url,
+                url: fixture.match_sponsor_url,
+              }}
+            />
+            <SponsorFields
+              prefix="motm"
+              label="Man of the Match Sponsor (optional)"
+              defaults={{
+                name: fixture.motm_sponsor_name,
+                logo_url: fixture.motm_sponsor_logo_url,
+                url: fixture.motm_sponsor_url,
+              }}
+            />
+            <SponsorFields
+              prefix="ball"
+              label="Ball Sponsor (optional)"
+              defaults={{
+                name: fixture.ball_sponsor_name,
+                logo_url: fixture.ball_sponsor_logo_url,
+                url: fixture.ball_sponsor_url,
+              }}
+            />
+          </div>
+
           <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="bg-german-red hover:bg-german-gold"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="bg-german-red hover:bg-german-gold" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Result"}
             </Button>
           </div>
