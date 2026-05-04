@@ -61,6 +61,9 @@ const CommitteeMembers = () => {
             <div className="text-white">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...members].sort((a, b) => {
+                  const aZak = a.name?.toLowerCase().includes('zak bredin') ? 0 : 1;
+                  const bZak = b.name?.toLowerCase().includes('zak bredin') ? 0 : 1;
+                  if (aZak !== bZak) return aZak - bZak;
                   const aChair = a.role?.toLowerCase().includes('chairman') ? 0 : 1;
                   const bChair = b.role?.toLowerCase().includes('chairman') ? 0 : 1;
                   return aChair - bChair;
