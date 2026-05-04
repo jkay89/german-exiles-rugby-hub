@@ -6,13 +6,37 @@ import VideoSection from "@/components/home/VideoSection";
 import FeatureGrid from "@/components/home/FeatureGrid";
 import SponsorCarousel from "@/components/home/SponsorCarousel";
 import { PositionedElements } from "@/components/PositionedElements";
-import { sponsorData } from "@/data/sponsorData";
+import { SponsorLogo } from "@/components/home/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [sponsorLogos, setSponsorLogos] = useState<SponsorLogo[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchSponsors = async () => {
+      const { data, error } = await supabase
+        .from('sponsors')
+        .select('id, name, logo_url, website_url, tier');
+      if (error) {
+        console.error('Error fetching sponsors for carousel:', error);
+        return;
+      }
+      const mapped: SponsorLogo[] = (data || [])
+        .filter((s: any) => s.logo_url && ['platinum','gold','silver','affiliate','media'].includes(s.tier))
+        .map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          logo: s.logo_url,
+          website: s.website_url,
+          tier: s.tier,
+        }));
+      setSponsorLogos(mapped);
+    };
+    fetchSponsors();
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -94,7 +118,7 @@ const Index = () => {
       <MissionSection />
       <VideoSection />
       <FeatureGrid />
-      <SponsorCarousel sponsorLogos={sponsorData} />
+      <SponsorCarousel sponsorLogos={sponsorLogos} />
     </div>
   );
 };
