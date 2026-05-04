@@ -59,47 +59,46 @@ const CommitteeMembers = () => {
             </div>
           ) : (
             <div className="text-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...members].sort((a, b) => {
-                  const aZak = a.name?.toLowerCase().includes('zak bredin') ? 0 : 1;
-                  const bZak = b.name?.toLowerCase().includes('zak bredin') ? 0 : 1;
-                  if (aZak !== bZak) return aZak - bZak;
-                  const aChair = a.role?.toLowerCase().includes('chairman') ? 0 : 1;
-                  const bChair = b.role?.toLowerCase().includes('chairman') ? 0 : 1;
-                  return aChair - bChair;
-                }).map((member, index) => (
-                  <div key={member.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-german-gold font-bold truncate">{member.name}</h3>
-                      <p className="text-gray-300 truncate">{member.role}</p>
+                  const priority = (m: CommitteeMember) => {
+                    const name = m.name?.toLowerCase() || '';
+                    if (name.includes('zak bredin')) return 0;
+                    if (m.role?.toLowerCase().includes('chairman')) return 1;
+                    if (name.includes('jay kay')) return 2;
+                    return 3;
+                  };
+                  return priority(a) - priority(b);
+                }).map((member) => (
+                  <div key={member.id} className="bg-gray-800 rounded-lg border border-german-gold overflow-hidden flex flex-col hover:shadow-lg hover:shadow-german-gold/20 transition-shadow">
+                    {member.photo_url ? (
+                      <div className="w-full aspect-square bg-gray-900 overflow-hidden">
+                        <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-square bg-gray-900 flex items-center justify-center text-gray-600 text-6xl font-bold">
+                        {member.name?.charAt(0)}
+                      </div>
+                    )}
+                    <div className="p-4 flex-1 flex flex-col gap-1">
+                      <h3 className="text-german-gold font-bold text-lg">{member.name}</h3>
+                      <p className="text-gray-300 text-sm mb-2">{member.role}</p>
                       {member.contact_email && (
-                        <TooltipProvider delayDuration={200}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <a
-                                href={`mailto:${member.contact_email}`}
-                                className="text-gray-400 hover:text-german-gold flex items-center gap-1.5 min-w-0"
-                              >
-                                <Mail className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">{member.contact_email}</span>
-                              </a>
-                            </TooltipTrigger>
-                            <TooltipContent>{member.contact_email}</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <a
+                          href={`mailto:${member.contact_email}`}
+                          className="text-gray-400 hover:text-german-gold flex items-center gap-2 text-sm break-all"
+                        >
+                          <Mail className="h-4 w-4 flex-shrink-0" />
+                          <span className="break-all">{member.contact_email}</span>
+                        </a>
                       )}
                       {member.contact_number && (
-                        <a href={`tel:${member.contact_number}`} className="text-gray-400 hover:text-german-gold flex items-center gap-1.5 truncate">
+                        <a href={`tel:${member.contact_number}`} className="text-gray-400 hover:text-german-gold flex items-center gap-2 text-sm">
                           <Phone className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">{member.contact_number}</span>
+                          <span>{member.contact_number}</span>
                         </a>
                       )}
                     </div>
-                    {member.photo_url && (
-                      <div className="w-24 h-24 flex-shrink-0">
-                        <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover rounded" />
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
