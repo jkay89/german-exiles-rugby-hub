@@ -25,7 +25,7 @@ const Index = () => {
         return;
       }
       const mapped: SponsorLogo[] = (data || [])
-        .filter((s: any) => s.logo_url && ['platinum','gold','silver','affiliate','media'].includes(s.tier))
+        .filter((s: any) => s.logo_url && ['platinum','gold','silver','bronze','affiliate','media'].includes(s.tier))
         .map((s: any) => ({
           id: s.id,
           name: s.name,
