@@ -118,7 +118,7 @@ const Index = () => {
       <MissionSection />
       <VideoSection />
       <FeatureGrid />
-      <SponsorCarousel sponsorLogos={sponsorData} />
+      <SponsorCarousel sponsorLogos={sponsorLogos} />
     </div>
   );
 };
