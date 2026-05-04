@@ -60,7 +60,11 @@ const CommitteeMembers = () => {
           ) : (
             <div className="text-white">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {members.map((member, index) => (
+                {[...members].sort((a, b) => {
+                  const aChair = a.role?.toLowerCase().includes('chairman') ? 0 : 1;
+                  const bChair = b.role?.toLowerCase().includes('chairman') ? 0 : 1;
+                  return aChair - bChair;
+                }).map((member, index) => (
                   <div key={member.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-german-gold font-bold truncate">{member.name}</h3>
