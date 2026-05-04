@@ -20,10 +20,10 @@ const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Sort sponsors by tier importance (platinum first, then gold, silver, affiliate)
+  // Sort sponsors by tier importance
   const sortedSponsors = [...sponsorLogos].sort((a, b) => {
-    const tierOrder = { platinum: 1, gold: 2, silver: 3, affiliate: 4 };
-    return tierOrder[a.tier] - tierOrder[b.tier];
+    const tierOrder: Record<string, number> = { platinum: 1, gold: 2, silver: 3, bronze: 4, media: 5, affiliate: 6 };
+    return (tierOrder[a.tier] ?? 99) - (tierOrder[b.tier] ?? 99);
   });
 
   useEffect(() => {

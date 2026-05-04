@@ -4,5 +4,5 @@ export interface SponsorLogo {
   name: string;
   logo: string;
   website: string | null;
-  tier: "platinum" | "gold" | "silver" | "affiliate" | "media";
+  tier: "platinum" | "gold" | "silver" | "bronze" | "affiliate" | "media";
 }
