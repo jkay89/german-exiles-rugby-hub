@@ -61,14 +61,16 @@ const CommitteeMembers = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {members.map((member, index) => (
                   <div key={member.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-german-gold font-bold">{member.name}</h3>
-                      <p className="text-gray-300">{member.role}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-german-gold font-bold break-words">{member.name}</h3>
+                      <p className="text-gray-300 break-words">{member.role}</p>
                       {member.contact_email && (
-                        <p className="text-gray-400">{member.contact_email}</p>
+                        <a href={`mailto:${member.contact_email}`} className="text-gray-400 block break-all hover:text-german-gold">
+                          {member.contact_email}
+                        </a>
                       )}
                       {member.contact_number && (
-                        <p className="text-gray-400">{member.contact_number}</p>
+                        <p className="text-gray-400 break-words">{member.contact_number}</p>
                       )}
                     </div>
                     {member.photo_url && (
