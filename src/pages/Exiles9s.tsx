@@ -115,26 +115,30 @@ const Exiles9s = () => {
             </div>
           ) : (
             <div className="text-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {players.map((player, index) => (
-                  <Card key={player.id} className="bg-gray-800 border-german-gold">
-                    <CardContent className="p-6">
-                      <div className="flex gap-4 mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-german-gold font-bold text-lg mb-2">
-                            #{player.number} {player.name}
-                          </h3>
-                          <p className="text-gray-300 mb-1">{player.position}</p>
-                          <p className="text-gray-400 text-sm">{player.club}</p>
-                          <p className="text-gray-400 text-sm">Heritage: {player.heritage}</p>
-                        </div>
-                        {player.photo_url && (
-                          <div className="w-24 h-24 flex-shrink-0">
-                            <img src={player.photo_url} alt={player.name} className="w-full h-full object-cover rounded" />
-                          </div>
-                        )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {players.map((player) => (
+                  <Card key={player.id} className="bg-gray-800 border-german-gold overflow-hidden flex flex-col hover:shadow-lg hover:shadow-german-gold/20 transition-shadow">
+                    {player.photo_url ? (
+                      <div className="w-full aspect-square bg-gray-900 overflow-hidden">
+                        <img
+                          src={player.photo_url}
+                          alt={player.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      
+                    ) : (
+                      <div className="w-full aspect-square bg-gray-900 flex items-center justify-center text-gray-600 text-6xl font-bold">
+                        {player.name?.charAt(0)}
+                      </div>
+                    )}
+                    <CardContent className="p-5 flex-1 flex flex-col">
+                      <h3 className="text-german-gold font-bold text-lg mb-1">
+                        #{player.number} {player.name}
+                      </h3>
+                      <p className="text-gray-300 text-sm">{player.position}</p>
+                      <p className="text-gray-400 text-sm">{player.club}</p>
+                      <p className="text-gray-400 text-sm mb-3">Heritage: {player.heritage}</p>
+
                       {player.bio && (
                         <div className="border-t border-gray-700 pt-3 mb-3">
                           <p className="text-gray-300 text-sm whitespace-pre-line">
@@ -150,7 +154,7 @@ const Exiles9s = () => {
                           )}
                         </div>
                       )}
-                      
+
                       <PlayerSponsorsDisplay playerId={player.id} />
                     </CardContent>
                   </Card>
