@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 import { fetchCommitteeMembers, CommitteeMember } from "@/utils/committeeUtils";
@@ -62,15 +63,29 @@ const CommitteeMembers = () => {
                 {members.map((member, index) => (
                   <div key={member.id} className="bg-gray-800 p-4 rounded border border-german-gold flex gap-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-german-gold font-bold break-words">{member.name}</h3>
-                      <p className="text-gray-300 break-words">{member.role}</p>
+                      <h3 className="text-german-gold font-bold truncate">{member.name}</h3>
+                      <p className="text-gray-300 truncate">{member.role}</p>
                       {member.contact_email && (
-                        <a href={`mailto:${member.contact_email}`} className="text-gray-400 block break-all hover:text-german-gold">
-                          {member.contact_email}
-                        </a>
+                        <TooltipProvider delayDuration={200}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <a
+                                href={`mailto:${member.contact_email}`}
+                                className="text-gray-400 hover:text-german-gold flex items-center gap-1.5 min-w-0"
+                              >
+                                <Mail className="h-4 w-4 flex-shrink-0" />
+                                <span className="truncate">{member.contact_email}</span>
+                              </a>
+                            </TooltipTrigger>
+                            <TooltipContent>{member.contact_email}</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                       {member.contact_number && (
-                        <p className="text-gray-400 break-words">{member.contact_number}</p>
+                        <a href={`tel:${member.contact_number}`} className="text-gray-400 hover:text-german-gold flex items-center gap-1.5 truncate">
+                          <Phone className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">{member.contact_number}</span>
+                        </a>
                       )}
                     </div>
                     {member.photo_url && (
