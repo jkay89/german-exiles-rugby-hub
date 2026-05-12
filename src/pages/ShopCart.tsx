@@ -37,6 +37,7 @@ const ShopCart = () => {
   const [city, setCity] = useState("");
   const [postcode, setPostcode] = useState("");
   const [country, setCountry] = useState("GB");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     fetchShippingRates();
