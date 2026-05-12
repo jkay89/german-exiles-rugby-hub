@@ -100,7 +100,12 @@ const AdminShop = () => {
   };
 
   const fetchOrders = async () => {
-    const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+    // Only show orders with confirmed payment (exclude unfinished/pending checkouts)
+    const { data } = await supabase
+      .from("orders")
+      .select("*")
+      .neq("status", "pending")
+      .order("created_at", { ascending: false });
     if (data) setOrders(data);
   };
 
