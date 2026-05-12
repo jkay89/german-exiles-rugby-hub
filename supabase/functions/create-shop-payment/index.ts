@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { items, customer, shippingType, shippingCost, subtotal, total } = await req.json();
+    const { items, customer, shippingType, shippingCost, subtotal, total, notes } = await req.json();
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
