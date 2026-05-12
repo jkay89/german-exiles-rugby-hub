@@ -419,48 +419,66 @@ const AdminShop = () => {
           {/* ORDERS TAB */}
           <TabsContent value="orders">
             <Card>
-              <CardHeader><CardTitle>Orders</CardTitle></CardHeader>
+              <CardHeader>
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <CardTitle>Orders</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Switch id="show-abandoned" checked={showAbandoned} onCheckedChange={setShowAbandoned} />
+                    <Label htmlFor="show-abandoned" className="text-sm">
+                      Show abandoned checkouts ({orders.filter(o => o.status === "pending").length})
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Pending orders are checkouts that were started but never paid. They are hidden by default.
+                </p>
+              </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map(o => (
-                      <TableRow key={o.id}>
-                        <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell>{o.customer_name}</TableCell>
-                        <TableCell>{o.customer_email}</TableCell>
-                        <TableCell>£{o.total.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Select value={o.status} onValueChange={(v) => handleUpdateOrderStatus(o.id, v)}>
-                            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="paid">Paid</SelectItem>
-                              <SelectItem value="dispatched">Dispatched</SelectItem>
-                              <SelectItem value="delivered">Delivered</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm" onClick={() => navigate(`/admin/shop/order/${o.id}`)}>View</Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {orders.length === 0 && (
-                      <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No orders yet</TableCell></TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                {(() => {
+                  const visibleOrders = showAbandoned ? orders : orders.filter(o => o.status !== "pending");
+                  return (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Customer</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {visibleOrders.map(o => (
+                          <TableRow key={o.id} className={o.status === "pending" ? "opacity-60" : ""}>
+                            <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
+                            <TableCell>{o.customer_name}</TableCell>
+                            <TableCell>{o.customer_email}</TableCell>
+                            <TableCell>£{o.total.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Select value={o.status} onValueChange={(v) => handleUpdateOrderStatus(o.id, v)}>
+                                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="paid">Paid</SelectItem>
+                                  <SelectItem value="dispatched">Dispatched</SelectItem>
+                                  <SelectItem value="delivered">Delivered</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>
+                              <Button variant="outline" size="sm" onClick={() => navigate(`/admin/shop/order/${o.id}`)}>View</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {visibleOrders.length === 0 && (
+                          <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No orders yet</TableCell></TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>
