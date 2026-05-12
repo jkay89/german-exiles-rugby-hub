@@ -58,9 +58,12 @@ const ShopCart = () => {
   };
 
   const getShippingCost = () => {
+    if (shippingType === "collect") return 0;
     const rate = shippingRates.find(r => r.shipping_type === shippingType);
     return rate ? rate.rate : 0;
   };
+
+  const isCollect = shippingType === "collect";
 
   const subtotal = getTotal();
   const shippingCost = getShippingCost();
