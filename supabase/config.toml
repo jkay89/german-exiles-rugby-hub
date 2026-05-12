@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.send-order-notification]
 verify_jwt = false
+
+[functions.verify-shop-payment]
+verify_jwt = false

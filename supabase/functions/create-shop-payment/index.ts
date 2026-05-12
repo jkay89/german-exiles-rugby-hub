@@ -89,7 +89,7 @@ serve(async (req) => {
       customer_email: customer.email,
       line_items: lineItems,
       mode: "payment",
-      success_url: `${origin}/shop/success`,
+      success_url: `${origin}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/shop/cart`,
       metadata: {
         order_id: order.id,
@@ -99,20 +99,8 @@ serve(async (req) => {
     // Update order with stripe session id
     await supabaseAdmin.from("orders").update({ stripe_session_id: session.id }).eq("id", order.id);
 
-    // Send order notification email
-    try {
-      const notifyUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-order-notification`;
-      await fetch(notifyUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
-        },
-        body: JSON.stringify({ orderId: order.id }),
-      });
-    } catch (e) {
-      console.error("Failed to send notification:", e);
-    }
+    // NOTE: Notification emails are now sent by verify-shop-payment AFTER successful payment,
+    // not here, to avoid notifying staff about abandoned carts.
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
