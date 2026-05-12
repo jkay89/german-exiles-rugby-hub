@@ -148,6 +148,7 @@ const App = () => (
                 <Route path="/admin/cloudinary-migration" element={<CloudinaryMigration />} />
                 <Route path="/admin/media-compression" element={<MediaCompression />} />
                 <Route path="/admin/shop" element={<AdminShop />} />
+                <Route path="/admin/shop/order/:id" element={<AdminOrderDetail />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop/cart" element={<ShopCart />} />
                 <Route path="/shop/success" element={<ShopSuccess />} />
