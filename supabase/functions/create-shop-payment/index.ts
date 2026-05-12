@@ -39,6 +39,7 @@ serve(async (req) => {
         shipping_cost: shippingCost,
         subtotal,
         total,
+        notes: notes || null,
         status: "pending",
       })
       .select()
