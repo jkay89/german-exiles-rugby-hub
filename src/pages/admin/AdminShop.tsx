@@ -67,6 +67,7 @@ const AdminShop = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [showAbandoned, setShowAbandoned] = useState(false);
   const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productSizes, setProductSizes] = useState<ProductSize[]>([]);
