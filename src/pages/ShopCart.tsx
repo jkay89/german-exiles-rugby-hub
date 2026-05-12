@@ -70,7 +70,8 @@ const ShopCart = () => {
   const total = subtotal + shippingCost;
 
   const handleCheckout = async () => {
-    if (!name || !email || !addressLine1 || !city || !postcode || !country) {
+    const addressRequired = !isCollect;
+    if (!name || !email || (addressRequired && (!addressLine1 || !city || !postcode || !country))) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -90,11 +91,20 @@ const ShopCart = () => {
             quantity: item.quantity,
             size: item.size,
           })),
-          customer: { name, email, addressLine1, addressLine2, city, postcode, country },
+          customer: {
+            name,
+            email,
+            addressLine1: isCollect ? "Collection in person" : addressLine1,
+            addressLine2,
+            city: isCollect ? "N/A" : city,
+            postcode: isCollect ? "N/A" : postcode,
+            country: isCollect ? "GB" : country,
+          },
           shippingType,
           shippingCost,
           subtotal,
           total,
+          notes,
         },
       });
 
