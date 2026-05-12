@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Trash2, Minus, Plus, ArrowLeft } from "lucide-react";
@@ -36,6 +37,7 @@ const ShopCart = () => {
   const [city, setCity] = useState("");
   const [postcode, setPostcode] = useState("");
   const [country, setCountry] = useState("GB");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     fetchShippingRates();
@@ -56,16 +58,20 @@ const ShopCart = () => {
   };
 
   const getShippingCost = () => {
+    if (shippingType === "collect") return 0;
     const rate = shippingRates.find(r => r.shipping_type === shippingType);
     return rate ? rate.rate : 0;
   };
+
+  const isCollect = shippingType === "collect";
 
   const subtotal = getTotal();
   const shippingCost = getShippingCost();
   const total = subtotal + shippingCost;
 
   const handleCheckout = async () => {
-    if (!name || !email || !addressLine1 || !city || !postcode || !country) {
+    const addressRequired = !isCollect;
+    if (!name || !email || (addressRequired && (!addressLine1 || !city || !postcode || !country))) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -85,11 +91,20 @@ const ShopCart = () => {
             quantity: item.quantity,
             size: item.size,
           })),
-          customer: { name, email, addressLine1, addressLine2, city, postcode, country },
+          customer: {
+            name,
+            email,
+            addressLine1: isCollect ? "Collection in person" : addressLine1,
+            addressLine2,
+            city: isCollect ? "N/A" : city,
+            postcode: isCollect ? "N/A" : postcode,
+            country: isCollect ? "GB" : country,
+          },
           shippingType,
           shippingCost,
           subtotal,
           total,
+          notes,
         },
       });
 
@@ -168,6 +183,29 @@ const ShopCart = () => {
             <Card>
               <CardHeader><CardTitle>Delivery Details</CardTitle></CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <Label>Delivery Method *</Label>
+                  <Select value={shippingType} onValueChange={setShippingType}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="collect">Collect in person - FREE</SelectItem>
+                      {shippingRates
+                        .filter(r => r.shipping_type !== "collect")
+                        .filter(r => country === "GB" ? r.shipping_type !== "international" : r.shipping_type === "international")
+                        .map(r => (
+                          <SelectItem key={r.id} value={r.shipping_type}>
+                            {r.name} - £{r.rate.toFixed(2)}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {isCollect && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      We'll be in touch to arrange a collection time. No delivery address required.
+                    </p>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Full Name *</Label>
@@ -178,58 +216,59 @@ const ShopCart = () => {
                     <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@example.com" />
                   </div>
                 </div>
-                <div>
-                  <Label>Address Line 1 *</Label>
-                  <Input value={addressLine1} onChange={e => setAddressLine1(e.target.value)} placeholder="123 High Street" />
-                </div>
-                <div>
-                  <Label>Address Line 2</Label>
-                  <Input value={addressLine2} onChange={e => setAddressLine2(e.target.value)} placeholder="Flat 2" />
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label>City *</Label>
-                    <Input value={city} onChange={e => setCity(e.target.value)} placeholder="London" />
-                  </div>
-                  <div>
-                    <Label>Postcode *</Label>
-                    <Input value={postcode} onChange={e => setPostcode(e.target.value)} placeholder="SW1A 1AA" />
-                  </div>
-                  <div>
-                    <Label>Country *</Label>
-                    <Select value={country} onValueChange={setCountry}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="GB">United Kingdom</SelectItem>
-                        <SelectItem value="DE">Germany</SelectItem>
-                        <SelectItem value="IE">Ireland</SelectItem>
-                        <SelectItem value="FR">France</SelectItem>
-                        <SelectItem value="NL">Netherlands</SelectItem>
-                        <SelectItem value="BE">Belgium</SelectItem>
-                        <SelectItem value="AT">Austria</SelectItem>
-                        <SelectItem value="CH">Switzerland</SelectItem>
-                        <SelectItem value="US">United States</SelectItem>
-                        <SelectItem value="CA">Canada</SelectItem>
-                        <SelectItem value="AU">Australia</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                {country === "GB" && (
-                  <div>
-                    <Label>Delivery Method</Label>
-                    <Select value={shippingType} onValueChange={setShippingType}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {shippingRates.filter(r => r.shipping_type !== "international").map(r => (
-                          <SelectItem key={r.id} value={r.shipping_type}>
-                            {r.name} - £{r.rate.toFixed(2)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+
+                {!isCollect && (
+                  <>
+                    <div>
+                      <Label>Address Line 1 *</Label>
+                      <Input value={addressLine1} onChange={e => setAddressLine1(e.target.value)} placeholder="123 High Street" />
+                    </div>
+                    <div>
+                      <Label>Address Line 2</Label>
+                      <Input value={addressLine2} onChange={e => setAddressLine2(e.target.value)} placeholder="Flat 2" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label>City *</Label>
+                        <Input value={city} onChange={e => setCity(e.target.value)} placeholder="London" />
+                      </div>
+                      <div>
+                        <Label>Postcode *</Label>
+                        <Input value={postcode} onChange={e => setPostcode(e.target.value)} placeholder="SW1A 1AA" />
+                      </div>
+                      <div>
+                        <Label>Country *</Label>
+                        <Select value={country} onValueChange={setCountry}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="GB">United Kingdom</SelectItem>
+                            <SelectItem value="DE">Germany</SelectItem>
+                            <SelectItem value="IE">Ireland</SelectItem>
+                            <SelectItem value="FR">France</SelectItem>
+                            <SelectItem value="NL">Netherlands</SelectItem>
+                            <SelectItem value="BE">Belgium</SelectItem>
+                            <SelectItem value="AT">Austria</SelectItem>
+                            <SelectItem value="CH">Switzerland</SelectItem>
+                            <SelectItem value="US">United States</SelectItem>
+                            <SelectItem value="CA">Canada</SelectItem>
+                            <SelectItem value="AU">Australia</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </>
                 )}
+
+                <div>
+                  <Label>Additional Information / Comments</Label>
+                  <Textarea
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="Any special requests, sizing notes, collection preferences, etc."
+                    rows={3}
+                    maxLength={1000}
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>
