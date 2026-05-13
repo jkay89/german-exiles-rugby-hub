@@ -60,7 +60,7 @@ interface Order {
 }
 
 const CATEGORIES = ["Jerseys", "Training Wear", "Casual Wear", "Accessories", "Equipment", "Memorabilia"];
-const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL", "7XL"];
 
 const AdminShop = () => {
   const { isAuthenticated } = useAdmin();
