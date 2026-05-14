@@ -34,15 +34,16 @@ const CATEGORY_LABELS: Record<string, string> = {
 const CATEGORY_ORDER = ["main", "ball", "motm", "warm_up_top", "affiliate", "other"];
 
 const GALLERY_IMAGES = [
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765479/media/kglxcs6vv35wylek2kl4.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765482/media/tsychxwuqe1vps5z7wdl.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765486/media/yletkizlrtuzdibinzov.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765492/media/jz5fzb2sjh4rpy75jtzn.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765495/media/sgshyk3oewfyckdjs8pn.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765500/media/angvxi69s7qkrcsrpm4w.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765505/media/qmdwfrwmzodjj7a7x0qj.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765509/media/x3y3nprqdhbao3kxqghs.jpg",
-  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765514/media/h0ltled7gbu7gthx6f4f.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765573/media/b0egj0fru0s99wwbesal.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765576/media/vbvrfnprp7bnduq0aj9q.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765579/media/mqhkt1hsphnnbk5oajlm.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765582/media/qxbcm1rhtzi9isahkcza.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765584/media/n1qzuvjromup6uw8212f.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765587/media/fmt3av8pwvcozibqwqjm.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765592/media/cqodd1lemkt0axtqxmli.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765594/media/okgq2brxse4weigncja3.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765599/media/ngky2ynocrhiajcbynm2.jpg",
+  "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765603/media/iihgvfmo6jbfwoyr7m4l.jpg",
 ];
 
 const HERO_IMAGE = heroImg;
