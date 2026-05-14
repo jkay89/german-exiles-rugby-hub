@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield, CloudUpload, Layout, HelpCircle, ShoppingBag } from "lucide-react";
+import { Folder, Images, Plus, Edit, Calendar, Users, FileText, Ticket, Shield, CloudUpload, Layout, HelpCircle, ShoppingBag, Trophy } from "lucide-react";
 
 const AdminDashboard = () => {
   const { isAuthenticated, currentAdmin, logout } = useAdmin();
@@ -259,6 +259,21 @@ const AdminDashboard = () => {
               <p className="text-gray-400 mb-4">Create OBS streams, get RTMP keys and manage broadcasts.</p>
               <Link to="/admin/live-streams">
                 <Button className="w-full bg-german-red hover:bg-german-gold">Manage Streams</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-german-gold" />
+                Kaiser Cup
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Edit Kaiser Cup details, date/venue, and manage sponsors (main, ball, MOTM, warm-up tops, affiliates).</p>
+              <Link to="/admin/kaiser-cup">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Kaiser Cup</Button>
               </Link>
             </CardContent>
           </Card>
