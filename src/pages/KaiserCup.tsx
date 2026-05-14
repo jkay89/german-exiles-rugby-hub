@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Trophy, Heart, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import stadiumImg from "@/assets/millennium-stadium-featherstone.jpg";
+import heroImg from "@/assets/kaiser-cup-team.jpg";
 
 interface KaiserEvent {
   description: string | null;
@@ -44,7 +45,7 @@ const GALLERY_IMAGES = [
   "https://res.cloudinary.com/dvfs51lfd/image/upload/v1762765514/media/h0ltled7gbu7gthx6f4f.jpg",
 ];
 
-const HERO_IMAGE = GALLERY_IMAGES[0];
+const HERO_IMAGE = heroImg;
 
 const KaiserCup = () => {
   const [event, setEvent] = useState<KaiserEvent | null>(null);
