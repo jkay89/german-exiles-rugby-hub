@@ -11,6 +11,7 @@ import {
   CarouselApi
 } from "@/components/ui/carousel";
 import { SponsorLogo } from "./types";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SponsorCarouselProps {
   sponsorLogos: SponsorLogo[];
@@ -19,12 +20,36 @@ interface SponsorCarouselProps {
 const SponsorCarousel = ({ sponsorLogos }: SponsorCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const [kaiserSponsors, setKaiserSponsors] = useState<SponsorLogo[]>([]);
 
-  // Sort sponsors by tier importance
-  const sortedSponsors = [...sponsorLogos].sort((a, b) => {
-    const tierOrder: Record<string, number> = { platinum: 1, gold: 2, silver: 3, bronze: 4, media: 5, affiliate: 6 };
-    return (tierOrder[a.tier] ?? 99) - (tierOrder[b.tier] ?? 99);
-  });
+  useEffect(() => {
+    supabase
+      .from("kaiser_cup_sponsors" as any)
+      .select("id, name, logo_url, website_url")
+      .eq("is_active", true)
+      .not("logo_url", "is", null)
+      .then(({ data }) => {
+        if (!data) return;
+        setKaiserSponsors(
+          (data as any[]).map((s) => ({
+            id: `kaiser-${s.id}`,
+            name: s.name,
+            logo: s.logo_url,
+            website: s.website_url,
+            tier: "affiliate" as const,
+          }))
+        );
+      });
+  }, []);
+
+  // Sort main sponsors by tier importance, then append Kaiser Cup sponsors at the end
+  const sortedSponsors = [
+    ...[...sponsorLogos].sort((a, b) => {
+      const tierOrder: Record<string, number> = { platinum: 1, gold: 2, silver: 3, bronze: 4, media: 5, affiliate: 6 };
+      return (tierOrder[a.tier] ?? 99) - (tierOrder[b.tier] ?? 99);
+    }),
+    ...kaiserSponsors,
+  ];
 
   useEffect(() => {
     if (!api) return;

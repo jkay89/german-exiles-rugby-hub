@@ -61,6 +61,8 @@ import AdminShop from "./pages/admin/AdminShop";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import Live from "./pages/Live";
 import AdminLiveStreams from "./pages/admin/AdminLiveStreams";
+import KaiserCup from "./pages/KaiserCup";
+import AdminKaiserCup from "./pages/admin/AdminKaiserCup";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +156,8 @@ const App = () => (
                 <Route path="/shop/success" element={<ShopSuccess />} />
                 <Route path="/live" element={<Live />} />
                 <Route path="/admin/live-streams" element={<AdminLiveStreams />} />
+                <Route path="/kaiser-cup" element={<KaiserCup />} />
+                <Route path="/admin/kaiser-cup" element={<AdminKaiserCup />} />
               </Routes>
             </BrowserRouter>
             </CartProvider>
