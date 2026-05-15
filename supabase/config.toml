@@ -89,3 +89,12 @@ verify_jwt = false
 
 [functions.verify-shop-payment]
 verify_jwt = false
+
+[functions.create-ticket-payment]
+verify_jwt = false
+
+[functions.verify-ticket-payment]
+verify_jwt = false
+
+[functions.send-ticket-confirmation]
+verify_jwt = false
