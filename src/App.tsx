@@ -63,6 +63,10 @@ import Live from "./pages/Live";
 import AdminLiveStreams from "./pages/admin/AdminLiveStreams";
 import KaiserCup from "./pages/KaiserCup";
 import AdminKaiserCup from "./pages/admin/AdminKaiserCup";
+import Tickets from "./pages/Tickets";
+import TicketPurchase from "./pages/TicketPurchase";
+import TicketSuccess from "./pages/TicketSuccess";
+import AdminTickets from "./pages/admin/AdminTickets";
 
 const queryClient = new QueryClient();
 
@@ -158,6 +162,10 @@ const App = () => (
                 <Route path="/admin/live-streams" element={<AdminLiveStreams />} />
                 <Route path="/kaiser-cup" element={<KaiserCup />} />
                 <Route path="/admin/kaiser-cup" element={<AdminKaiserCup />} />
+                <Route path="/tickets" element={<Tickets />} />
+                <Route path="/tickets/success" element={<TicketSuccess />} />
+                <Route path="/tickets/:fixtureId" element={<TicketPurchase />} />
+                <Route path="/admin/tickets" element={<AdminTickets />} />
               </Routes>
             </BrowserRouter>
             </CartProvider>

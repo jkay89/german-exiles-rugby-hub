@@ -277,6 +277,20 @@ const AdminDashboard = () => {
               </Link>
             </CardContent>
           </Card>
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="h-5 w-5 text-german-gold" />
+                Ticket Sales
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Enable ticket sales per fixture, set prices, and view ticket orders.</p>
+              <Link to="/admin/tickets">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Manage Tickets</Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">

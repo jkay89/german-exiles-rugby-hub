@@ -146,6 +146,47 @@ export type Database = {
         }
         Relationships: []
       }
+      fixture_tickets: {
+        Row: {
+          created_at: string
+          display_order: number
+          fixture_id: string
+          id: string
+          is_active: boolean
+          price: number
+          ticket_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          fixture_id: string
+          id?: string
+          is_active?: boolean
+          price?: number
+          ticket_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          fixture_id?: string
+          id?: string
+          is_active?: boolean
+          price?: number
+          ticket_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fixture_tickets_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fixtures: {
         Row: {
           ball_sponsor_logo_url: string | null
@@ -166,6 +207,7 @@ export type Database = {
           opponent: string
           stream_id: string | null
           team: string
+          tickets_on_sale: boolean
           time: string
           updated_at: string
         }
@@ -188,6 +230,7 @@ export type Database = {
           opponent: string
           stream_id?: string | null
           team: string
+          tickets_on_sale?: boolean
           time: string
           updated_at?: string
         }
@@ -210,6 +253,7 @@ export type Database = {
           opponent?: string
           stream_id?: string | null
           team?: string
+          tickets_on_sale?: boolean
           time?: string
           updated_at?: string
         }
@@ -1299,6 +1343,94 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ticket_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          quantity: number
+          ticket_type: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          quantity?: number
+          ticket_type: string
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          quantity?: number
+          ticket_type?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_orders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          fixture_id: string
+          id: string
+          notes: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          fixture_id: string
+          id?: string
+          notes?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          fixture_id?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_orders_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
