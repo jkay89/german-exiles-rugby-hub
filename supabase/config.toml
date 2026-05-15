@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.send-ticket-confirmation]
 verify_jwt = false
+
+[functions.stripe-ticket-webhook]
+verify_jwt = false
