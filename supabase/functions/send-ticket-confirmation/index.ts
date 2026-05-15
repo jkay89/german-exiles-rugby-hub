@@ -47,6 +47,20 @@ async function buildTicketsPdf(opts: {
   const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const helvBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+  // Embed brand logo (best-effort; ticket still renders if fetch fails)
+  let logoImg: any = null;
+  try {
+    const logoRes = await fetch(
+      "https://german-exiles-rugby-hub.lovable.app/lovable-uploads/d5497b13-60f3-4490-9abb-bc42b3027140.png"
+    );
+    if (logoRes.ok) {
+      const logoBytes = new Uint8Array(await logoRes.arrayBuffer());
+      logoImg = await pdfDoc.embedPng(logoBytes);
+    }
+  } catch (e) {
+    console.warn("Logo fetch failed", e);
+  }
+
   let pageNum = 0;
   for (const ticket of opts.tickets) {
     pageNum++;
@@ -55,11 +69,19 @@ async function buildTicketsPdf(opts: {
 
     // Top brand band
     page.drawRectangle({ x: 0, y: height - 70, width, height: 70, color: RED });
+
+    let textX = 30;
+    if (logoImg) {
+      const logoH = 50;
+      const logoW = (logoImg.width / logoImg.height) * logoH;
+      page.drawImage(logoImg, { x: 20, y: height - 60, width: logoW, height: logoH });
+      textX = 20 + logoW + 14;
+    }
     page.drawText("GERMAN EXILES RUGBY LEAGUE", {
-      x: 30, y: height - 42, size: 18, font: helvBold, color: rgb(1, 1, 1),
+      x: textX, y: height - 42, size: 18, font: helvBold, color: rgb(1, 1, 1),
     });
     page.drawText("MATCH TICKET", {
-      x: 30, y: height - 60, size: 11, font: helv, color: GOLD,
+      x: textX, y: height - 60, size: 11, font: helv, color: GOLD,
     });
 
     // Ticket type badge (top right)
