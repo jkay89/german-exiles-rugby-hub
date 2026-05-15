@@ -291,6 +291,20 @@ const AdminDashboard = () => {
               </Link>
             </CardContent>
           </Card>
+          <Card className="bg-gray-900 border-gray-800 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="h-5 w-5 text-german-gold" />
+                Gate Scanner
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-4">Scan ticket QR codes at the gate using your device camera.</p>
+              <Link to="/admin/scan">
+                <Button className="w-full bg-german-red hover:bg-german-gold">Open Scanner</Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="bg-gray-900 border-gray-800 text-white mb-8">
