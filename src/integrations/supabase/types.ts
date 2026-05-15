@@ -1432,6 +1432,42 @@ export type Database = {
           },
         ]
       }
+      tickets: {
+        Row: {
+          created_at: string
+          fixture_id: string
+          holder_name: string | null
+          id: string
+          is_used: boolean
+          order_id: string
+          scanned_by: string | null
+          ticket_type: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          fixture_id: string
+          holder_name?: string | null
+          id?: string
+          is_used?: boolean
+          order_id: string
+          scanned_by?: string | null
+          ticket_type: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          fixture_id?: string
+          holder_name?: string | null
+          id?: string
+          is_used?: boolean
+          order_id?: string
+          scanned_by?: string | null
+          ticket_type?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
