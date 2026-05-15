@@ -41,14 +41,17 @@ serve(async (req) => {
 
     const { data: existing } = await supabaseAdmin
       .from("ticket_orders").select("status").eq("id", orderId).single();
-    const alreadyConfirmed = existing && existing.status !== "pending";
 
-    if (!alreadyConfirmed) {
+    // Mark as paid if still pending
+    if (existing?.status === "pending") {
       await supabaseAdmin.from("ticket_orders").update({
         status: "paid",
         stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : null,
       }).eq("id", orderId);
+    }
 
+    // Trigger fulfilment (PDF + email) unless already fulfilled. Send fn is idempotent.
+    if (existing?.status !== "fulfilled") {
       try {
         const notifyUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-ticket-confirmation`;
         await fetch(notifyUrl, {
