@@ -67,6 +67,7 @@ import Tickets from "./pages/Tickets";
 import TicketPurchase from "./pages/TicketPurchase";
 import TicketSuccess from "./pages/TicketSuccess";
 import AdminTickets from "./pages/admin/AdminTickets";
+import AdminScan from "./pages/admin/AdminScan";
 
 const queryClient = new QueryClient();
 
@@ -166,6 +167,7 @@ const App = () => (
                 <Route path="/tickets/success" element={<TicketSuccess />} />
                 <Route path="/tickets/:fixtureId" element={<TicketPurchase />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
+                <Route path="/admin/scan" element={<AdminScan />} />
               </Routes>
             </BrowserRouter>
             </CartProvider>
