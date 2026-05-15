@@ -67,6 +67,7 @@ import Tickets from "./pages/Tickets";
 import TicketPurchase from "./pages/TicketPurchase";
 import TicketSuccess from "./pages/TicketSuccess";
 import AdminTickets from "./pages/admin/AdminTickets";
+import AdminScan from "./pages/admin/AdminScan";
 
 const queryClient = new QueryClient();
 
