@@ -10,6 +10,7 @@ export const useNavigationLinks = () => {
     { href: "/about", label: t("about") },
     { href: "/fixtures", label: t("fixtures") },
     { href: "/kaiser-cup", label: "Kaiser Cup" },
+    { href: "/tickets", label: "Tickets" },
     { href: "/live", label: "ExilesTV" },
     { href: "/news", label: t("news") },
     { href: "/media", label: t("media") },
