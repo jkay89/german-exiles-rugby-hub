@@ -13,6 +13,7 @@ const TICKET_LABELS: Record<string, string> = {
   concession: "Concession",
   child: "Child",
   family: "Family (2 adults + 2 children)",
+  hospitality: "Hospitality",
 };
 
 serve(async (req) => {

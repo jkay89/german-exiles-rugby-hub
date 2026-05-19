@@ -17,8 +17,9 @@ const TICKET_LABELS: Record<string, string> = {
   concession: "Concession",
   child: "Child",
   family: "Family (2 adults + 2 children)",
+  hospitality: "Hospitality",
 };
-const TYPE_ORDER = ["adult", "concession", "child", "family"];
+const TYPE_ORDER = ["adult", "concession", "child", "family", "hospitality"];
 
 const customerSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),

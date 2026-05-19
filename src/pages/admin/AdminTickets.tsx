@@ -16,6 +16,7 @@ const TICKET_TYPES = [
   { key: "concession", label: "Concession" },
   { key: "child", label: "Child" },
   { key: "family", label: "Family (2 adults + 2 children)" },
+  { key: "hospitality", label: "Hospitality" },
 ];
 
 interface Fixture {
