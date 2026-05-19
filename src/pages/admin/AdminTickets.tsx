@@ -45,6 +45,7 @@ interface OrderRow {
   status: string;
   created_at: string;
   fixture_id: string;
+  stripe_session_id: string | null;
 }
 
 const AdminTickets = () => {
