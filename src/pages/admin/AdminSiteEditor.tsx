@@ -184,16 +184,17 @@ const AdminSiteEditor = () => {
     <div className="min-h-screen bg-background p-6 pt-24">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-4 min-w-0">
             <Button
               variant="ghost"
               size="icon"
+              className="shrink-0"
               onClick={() => navigate("/admin")}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-3xl font-bold">Site Editor</h1>
               <p className="text-muted-foreground">
                 Manage website content with live preview
@@ -201,7 +202,7 @@ const AdminSiteEditor = () => {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:flex lg:shrink-0">
             <Button
               variant="outline"
               onClick={() => loadPageContent(activeTab)}
@@ -221,9 +222,10 @@ const AdminSiteEditor = () => {
             <Button
               onClick={handlePublish}
               disabled={publishing || loading}
+              className="bg-german-red hover:bg-german-gold text-white"
             >
               <Eye className="h-4 w-4 mr-2" />
-              Publish Changes
+              {publishing ? "Publishing…" : "Publish Changes"}
             </Button>
           </div>
         </div>
@@ -313,7 +315,15 @@ const AdminSiteEditor = () => {
                 </div>
 
                 <TabsContent value={activeTab} className="space-y-4 mt-4">
-                  <div className="flex justify-end">
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+                    <Button
+                      onClick={handlePublish}
+                      disabled={publishing || loading}
+                      className="bg-german-red hover:bg-german-gold text-white"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      {publishing ? "Publishing…" : "Publish Changes"}
+                    </Button>
                     <AddSectionDialog
                       page={activeTab}
                       onSectionAdded={() => loadPageContent(activeTab)}
