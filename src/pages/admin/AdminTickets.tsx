@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Calendar } from "lucide-react";
+import { ArrowLeft, Save, Calendar, CheckCircle, Loader2 } from "lucide-react";
 
 const TICKET_TYPES = [
   { key: "adult", label: "Adult" },
@@ -56,6 +56,7 @@ const AdminTickets = () => {
   const [ticketsByFixture, setTicketsByFixture] = useState<Record<string, FixtureTicket[]>>({});
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin");
@@ -115,12 +116,13 @@ const AdminTickets = () => {
 
   const savePrices = async (fixtureId: string) => {
     const rows = ticketsByFixture[fixtureId] || [];
-    for (const row of rows) {
+    for (const [index, row] of rows.entries()) {
       const payload = {
         fixture_id: fixtureId,
         ticket_type: row.ticket_type,
         price: Number(row.price) || 0,
         is_active: row.is_active,
+        display_order: index,
       };
       if (row.id) {
         await supabase.from("fixture_tickets").update(payload).eq("id", row.id);
@@ -130,6 +132,28 @@ const AdminTickets = () => {
     }
     toast({ title: "Prices saved" });
     load();
+  };
+
+  const manuallyConfirmOrder = async (orderId: string) => {
+    setConfirmingOrderId(orderId);
+    try {
+      const { data, error } = await supabase.functions.invoke("manual-confirm-ticket-order", {
+        body: { orderId },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Manual confirmation failed");
+
+      toast({
+        title: data.alreadyFulfilled ? "Already fulfilled" : "Order confirmed",
+        description: data.alreadyFulfilled ? "Tickets had already been sent." : "Tickets have been generated and emailed.",
+      });
+      load();
+    } catch (error: any) {
+      toast({ title: "Confirmation failed", description: error.message, variant: "destructive" });
+    } finally {
+      setConfirmingOrderId(null);
+    }
   };
 
   if (!isAuthenticated) return null;
@@ -225,6 +249,21 @@ const AdminTickets = () => {
                               <p className="text-xs text-muted-foreground">
                                 {new Date(o.created_at).toLocaleString("en-GB")}
                               </p>
+                              {(o.status === "pending" || o.status === "paid") && (
+                                <Button
+                                  size="sm"
+                                  className="bg-german-red hover:bg-german-gold text-white"
+                                  disabled={confirmingOrderId === o.id}
+                                  onClick={() => manuallyConfirmOrder(o.id)}
+                                >
+                                  {confirmingOrderId === o.id ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                  )}
+                                  Confirm &amp; email
+                                </Button>
+                              )}
                               {o.status === "pending" && o.stripe_session_id && (
                                 <Button
                                   size="sm"
