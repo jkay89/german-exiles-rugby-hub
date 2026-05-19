@@ -76,16 +76,25 @@ const AdminTickets = () => {
       const { data: tix } = await supabase
         .from("fixture_tickets").select("*").in("fixture_id", ids);
       const grouped: Record<string, FixtureTicket[]> = {};
+      const missingRows: Array<{ fixture_id: string; ticket_type: string; price: number; is_active: boolean; display_order: number }> = [];
       ids.forEach((id) => {
         const existing = (tix || []).filter((t: any) => t.fixture_id === id);
-        grouped[id] = TICKET_TYPES.map((tt) => {
+        grouped[id] = TICKET_TYPES.map((tt, index) => {
           const found = existing.find((e: any) => e.ticket_type === tt.key);
-          return found
-            ? { ...found, price: Number(found.price) }
-            : { fixture_id: id, ticket_type: tt.key, price: 0, is_active: true };
+          if (found) return { ...found, price: Number(found.price) };
+
+          missingRows.push({ fixture_id: id, ticket_type: tt.key, price: 0, is_active: true, display_order: index });
+          return { fixture_id: id, ticket_type: tt.key, price: 0, is_active: true };
         });
       });
       setTicketsByFixture(grouped);
+
+      if (missingRows.length > 0) {
+        const { error } = await supabase.from("fixture_tickets").insert(missingRows);
+        if (error) {
+          toast({ title: "Some ticket rows could not be restored", description: error.message, variant: "destructive" });
+        }
+      }
     }
 
     const { data: ordersData } = await supabase
