@@ -218,12 +218,34 @@ const AdminTickets = () => {
                               <p className="text-sm text-muted-foreground">{o.customer_email}</p>
                               {fx && <p className="text-xs text-muted-foreground">{fx.team} vs {fx.opponent}</p>}
                             </div>
-                            <div className="text-right">
+                            <div className="text-right flex flex-col items-end gap-1">
                               <p className="text-german-gold font-bold">£{Number(o.total).toFixed(2)}</p>
-                              <Badge variant={o.status === "paid" ? "default" : "secondary"}>{o.status}</Badge>
-                              <p className="text-xs text-muted-foreground mt-1">
+                              <Badge variant={o.status === "paid" || o.status === "fulfilled" ? "default" : "secondary"}>{o.status}</Badge>
+                              <p className="text-xs text-muted-foreground">
                                 {new Date(o.created_at).toLocaleString("en-GB")}
                               </p>
+                              {o.status === "pending" && o.stripe_session_id && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={async () => {
+                                    toast({ title: "Verifying with Stripe…" });
+                                    const { data, error } = await supabase.functions.invoke("verify-ticket-payment", {
+                                      body: { sessionId: o.stripe_session_id },
+                                    });
+                                    if (error) {
+                                      toast({ title: "Verify failed", description: error.message, variant: "destructive" });
+                                    } else if (data?.paid) {
+                                      toast({ title: "Order marked paid", description: "Tickets emailed to customer." });
+                                      load();
+                                    } else {
+                                      toast({ title: "Not paid", description: `Stripe status: ${data?.status || "unknown"}`, variant: "destructive" });
+                                    }
+                                  }}
+                                >
+                                  Verify &amp; fulfil
+                                </Button>
+                              )}
                             </div>
                           </div>
                         );
