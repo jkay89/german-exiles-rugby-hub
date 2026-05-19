@@ -90,7 +90,10 @@ const AdminTickets = () => {
       setTicketsByFixture(grouped);
 
       if (missingRows.length > 0) {
-        const { error } = await supabase.from("fixture_tickets").insert(missingRows);
+        const { error } = await supabase.from("fixture_tickets").upsert(missingRows, {
+          onConflict: "fixture_id,ticket_type",
+          ignoreDuplicates: true,
+        });
         if (error) {
           toast({ title: "Some ticket rows could not be restored", description: error.message, variant: "destructive" });
         }
@@ -136,7 +139,7 @@ const AdminTickets = () => {
       if (row.id) {
         await supabase.from("fixture_tickets").update(payload).eq("id", row.id);
       } else {
-        await supabase.from("fixture_tickets").insert(payload);
+        await supabase.from("fixture_tickets").upsert(payload, { onConflict: "fixture_id,ticket_type" });
       }
     }
     toast({ title: "Prices saved" });
