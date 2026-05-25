@@ -31,6 +31,10 @@ import LotteryDraw from "./pages/LotteryDraw";
 import TestDraw from "./pages/TestDraw";
 import LotteryTerms from "./pages/LotteryTerms";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ClubPrivacyPolicy from "./pages/ClubPrivacyPolicy";
+import CookiesPolicy from "./pages/CookiesPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Footer from "./components/Footer";
 import LotterySuccess from "./pages/LotterySuccess";
 import LotteryDashboard from "./pages/LotteryDashboard";
 import AuthPage from "./pages/auth/AuthPage";
@@ -168,7 +172,11 @@ const App = () => (
                 <Route path="/tickets/:fixtureId" element={<TicketPurchase />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/scan" element={<AdminScan />} />
+                <Route path="/privacy-policy" element={<ClubPrivacyPolicy />} />
+                <Route path="/cookies" element={<CookiesPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
               </Routes>
+              <Footer />
             </BrowserRouter>
             </CartProvider>
           </AuthProvider>
