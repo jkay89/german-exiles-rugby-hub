@@ -136,7 +136,7 @@ const TermsOfService = () => {
             </CardContent>
           </Card>
 
-          <Call className="hidden" />
+          
 
           <Card className="bg-muted border-gray-800">
             <CardHeader>
@@ -184,8 +184,5 @@ const TermsOfService = () => {
     </div>
   );
 };
-
-// Prevent accidental component; safe no-op
-const Call = (_: { className?: string }) => null;
 
 export default TermsOfService;
